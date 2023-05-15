@@ -351,7 +351,7 @@
 				<div class="board-btns display-flex flex-grow-1" style="margin: 5px 0px;">
 					<div class="btns-right" style="display: flex; justify-content: flex-end; flex-grow: 1;">
 						<span>
-							<c:if test="${category % 100 != 0 && memberInfo != null}">
+							<c:if test="${memberInfo != null}">
 								<button class="btn-write adv-hover" onclick="location.href='${pageContext.request.contextPath}/board/share/write?category=${category}';">글쓰기</button>
 							</c:if>
 						</span>
@@ -410,7 +410,9 @@
 									</div>
 								</div>
 								<div class="view-middle display-flex justify-content-space-between align-items-center padding-5px padding-hor-0">
-									<span class="font-weight-bolder">${article.member.mem_nickname}</span>
+									<span class="font-weight-bolder">${article.member.mem_nickname}
+										<span id="member_username" style="color: rgba(var(--theme-font-rgb), 0.5);">${article.member.mem_username}</span>
+									</span>
 									<div class="display-flex justify-content-flex-end align-items-center">
 									
  										<%-- <c:if test="${fn:contains(article.status_name, '모집')}"><button>${article.status_name}</button></c:if>

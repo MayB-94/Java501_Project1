@@ -306,6 +306,7 @@ textarea.rep-content {
 .modal-checkbox{
     display: flex;
 	align-items: center;
+	padding: 10px;
 }
 
 .myCheckbox {

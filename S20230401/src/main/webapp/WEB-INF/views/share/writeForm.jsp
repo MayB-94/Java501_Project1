@@ -146,13 +146,7 @@
 		};
 		editor.getModule('toolbar').addHandler('image', () => selectLocalImage());
 	});
-	// contextPath 할당
-	const contextPath = window.location.pathname.split('/')[0];
-	function userMessage(){
-    let url = `${contextPath}/message`
-    let name = "message-popup";
-    let option = "width=800, height=600, top=200, left=400, location=no";
-    window.open(url, name, option);
+
 </script>
 <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/share/writeForm.css">
@@ -443,9 +437,9 @@
 		
 							<div class="form-age display-flex justify-content-flex-end align-items-center">
 								<label for="age-limit" class="margin-right-5px">나이</label> 
-								<input type="number" class="width-50px" name="trade.trd_minage" min="1" max="100" value="10">
+								<input type="number" class="width-50px" name="trade.trd_minage" min="1" max="100">
 								<span class="margin-hor-5px font-weight-bolder">~</span>
-								<input type="number" class="width-50px" name="trade.trd_maxage" min="1" max="100" value="30">
+								<input type="number" class="width-50px" name="trade.trd_maxage" min="1" max="100">
 							</div>
 						</div>
 					</div>

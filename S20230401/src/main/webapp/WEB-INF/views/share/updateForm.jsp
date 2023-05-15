@@ -181,13 +181,6 @@
 		};
 		editor.getModule('toolbar').addHandler('image', () => selectLocalImage());
 	});
-	// contextPath 할당
-	const contextPath = window.location.pathname.split('/')[0];
-	function userMessage(){
-    let url = `${contextPath}/message`
-    let name = "message-popup";
-    let option = "width=800, height=600, top=200, left=400, location=no";
-    window.open(url, name, option);
 </script>
 <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/share/updateForm.css">
@@ -359,6 +352,7 @@
 				<form action="${pageContext.request.contextPath}/board/share/updateArticleForm" method="post" onsubmit="return updateAction();">
 					<input type="hidden" 	name="category" 		value="${category}">
 					<input type="hidden" 	name="art_id" 			value="${article.art_id}">
+					<input type="hidden" 	name="brd_id" 			value="${article.brd_id}">
 				<!-- 임시 기본값 저장 -->
 					<input type="hidden" 	name="trade.trd_id" value="${article.trade.trd_id }">
 					<input type="hidden" 	name="trade.trd_status" value="401">
