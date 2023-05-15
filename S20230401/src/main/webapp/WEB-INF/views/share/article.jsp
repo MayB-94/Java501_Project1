@@ -11,16 +11,24 @@
 <script type="text/javascript" src="${pageContext.request.contextPath }/js/layout.js"></script>
 <script type="text/javascript">
    
-   // 그 전 페이지의 정보 삭제
-   sessionStorage.clear();
-   // 세션 스토리지에 pageContext 저장 URL용
-   sessionStorage.setItem('contextPath', '${pageContext.request.contextPath}');
-   sessionStorage.setItem('artId', '${article.art_id}');
-   sessionStorage.setItem('brdId', '${article.brd_id}');
-   sessionStorage.setItem('memId', '${article.mem_id}');
-   sessionStorage.setItem('category', '${category}');
-   sessionStorage.setItem('loginUser', '${memberInfo.mem_id}')
+	// 그 전 페이지의 정보 삭제
+	sessionStorage.clear();
+	// 세션 스토리지에 pageContext 저장 URL용
+	sessionStorage.setItem('contextPath', '${pageContext.request.contextPath}');
+	sessionStorage.setItem('artId', '${article.art_id}');
+	sessionStorage.setItem('brdId', '${article.brd_id}');
+	sessionStorage.setItem('memId', '${article.mem_id}');
+	sessionStorage.setItem('category', '${category}');
+	sessionStorage.setItem('loginUser', '${memberInfo.mem_id}')
 
+	// contextPath 할당
+	const contextPath = window.location.pathname.split('/')[0];
+	function userMessage(){
+    let url = `${contextPath}/message`
+    let name = "message-popup";
+    let option = "width=800, height=600, top=200, left=400, location=no";
+    window.open(url, name, option);
+}
 </script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/share/article.js"></script>
 <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
@@ -116,6 +124,10 @@
 				</div>
 			</div>
 			<div id="top-right">
+				<!-- 메세지 추가 -->
+				<div class="userMessage" onclick="userMessage()">
+					<svg class="userMessage-popup" viewBox="0 0 512 512" style="width: 30; height: 30;"><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg>
+				</div>
 				<!-- <button id="viewMode">
 					<div id="viewModeButton"></div>
 				</button> -->
