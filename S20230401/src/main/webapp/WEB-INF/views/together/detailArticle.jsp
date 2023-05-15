@@ -253,6 +253,18 @@
 			});
 		});
 		
+		$(() => {
+			$('.btns-cancel').click(e => {								// 수정버튼을 누른다	
+				
+				if ($(e.target).closest('.reply-detail').find('.rep-content').not(':disabled')) { // 댓글 rep-content가 disabled이면?
+					$(e.target).closest('.reply-detail').find('.rep-content').prop('disabled', true);		// textbox disabled는 false로
+					$(e.target).closest('.reply-detail').find('.btns-repUpdate').toggle();					// 수정은 none으로
+					$(e.target).closest('.reply-detail').find('.btns-delete').toggle();						// 삭제는 none으로
+					$(e.target).closest('.reply-detail').find('.btns-repComplete').toggle();				// 완료는 block으로
+					$(e.target).closest('.reply-detail').find('.btns-cancel').toggle();						// 취소는 block으로
+				}
+			});
+		});
 		
 		// 댓글 기능 - 댓글 수정 (Update)	
 		$(() => {
