@@ -22,21 +22,68 @@
         box-sizing: border-box;
       }
 </style>
-<script type="text/javascript">
-/* 	if(document.getElementsByName("agree").checked!=true){
-		alert("해당 내용에 동의하셔야 신청 및 참여가능합니다.");
-		f.agree.focus();
-		return false;
-	} */
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.0.min.js"></script>
+<script defer type="text/javascript">
+
+	/* function goApplyInsert(p_brd_id, p_art_id, p_mem_id) {
+		console.log(p_brd_id);
+		console.log(p_art_id);
+		console.log(p_mem_id);
+		
+		if ($("input:checkbox[id='agree']").is(":checked")){
+			if (confirm("신청을 하시겠습니까?")){    
+				console.log("1"+p_brd_id);
+				console.log("1"+p_art_id);
+				console.log("1"+p_mem_id);
+				alert("신청이 완료되었습니다. 작성자의 신청수락을 기다려주세요."); 
+				location.href="/dutchpay/ApplyInsert?brd_id="+p_brd_id+"&art_id="+p_art_id+"&mem_id="+p_mem_id;
+				window.close();
+		 		return true;
+		    } 
+			  else {
+		      return false;
+		    }
+		  } 
+		else {
+		    alert("약관내용 동의가 필요합니다.");
+		    return false;
+		  }
+		} */
+		
+		function goApplyInsert(p_brd_id, p_art_id, p_mem_id) {
+			console.log(p_brd_id);
+			console.log(p_art_id);
+			console.log(p_mem_id);
+			
+			 if ($("input:checkbox[id='agree']").is(":checked")){
+				if (confirm("신청을 하시겠습니까?")){    
+					var data = {
+							brd_id: p_brd_id,
+							art_id: p_art_id,
+							mem_id: p_mem_id
+					};
+					$.ajax({
+						type: "POST",
+						url: "/board/dutchpay/ApplyInsert",
+						contentType: "application/json; charset=utf-8",
+						data: JSON.stringify(data),
+						dataType: "text",
+						async: false,
+						success: function(data){
+							alert("신청이 완료되었습니다. 작성자의 신청수락을 기다려주세요."); 
+							window.close();
+						},
+						 error:function(request,status,error){
+						        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+					      }
+					});
+				}
+		   } else {
+				    alert("약관내용 동의가 필요합니다.");
+				    return false;
+		   }
+		}
 	
-	/* if(!$('input[name="agree"]').attr('checked')){
-		alert("해당 내용에 동의하셔야 신청 및 참여가능합니다.");
-		$('input[name="agree"]').focus();
-		return false;
-	} */	
-
-
-
 </script>    
 </head>
 <body>
@@ -67,14 +114,14 @@
 	<div>
 <form name="agreeForm" id="applyForm" method="post">
 		<span>위 내용에 모두 동의하십니까?</span>
-		<input type="checkbox" id="agree" name="agree" required="required">
+		<input type="checkbox" id="agree" >
 		
  	<input type="hidden" name="trd_id" value="${article.trd_id }">
 	<input type="hidden" name="brd_id" value="${article.brd_id }">
 	<input type="hidden" name="art_id" value="${article.art_id }">
 	
 	<input type="submit" value="취소" 	onclick="javascript:self.close();">
- 	<input type="submit" value="신청하기" formaction="${pageContext.request.contextPath }/dutchpay/ApplyInsert"> 
+ 	<input type="submit" value="신청하기" onclick="goApplyInsert(${article.brd_id},${article.art_id},${memberInfo.mem_id})"> 
 </form>
 	</div>
 </body>

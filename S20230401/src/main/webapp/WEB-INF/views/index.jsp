@@ -89,11 +89,15 @@
 				</div>
 			</div>
 			<div id="top-right">
+				<!-- 메세지 추가 -->
+				<div class="userMessage" onclick="userMessage()">
+					<svg class="userMessage-popup" viewBox="0 0 512 512" style="width: 30; height: 30;"><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg>
+				</div>
 				<!-- <button id="viewMode">
 					<div id="viewModeButton"></div>
 				</button> -->
 				<div></div>
-				<div class="popup-group">
+				<div class="popup-group" style="display: flex; align-items: center;">
 					<c:choose>
 						<c:when test="${memberInfo == null }">
 							<button id="login" class="togglePopup init-button">
@@ -109,6 +113,8 @@
 							</div>
 						</c:when>
 						<c:otherwise>
+						
+							
 							<button id="userInfo" class="togglePopup adv-hover">
 								<div id="user-profile">
 									<img src="${pageContext.request.contextPath }/uploads/profile/${memberInfo.mem_image }" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';">

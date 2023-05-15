@@ -1,27 +1,176 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ include file="../preset.jsp" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ include file="/WEB-INF/views/preset.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>메인 페이지 ▒ ShareGo</title>
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.0.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath }/js/initializer.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath }/js/layout.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath }/js/index.js"></script>
+
+
 <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/preference.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/presets.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/layout.css">
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/index.css">
-<style>
-	td {
-        text-align: center;
-      }
-</style>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/share/article.css">
 
+
+<script type="text/javascript">
+	$(() => {
+		$('.board-toggle').click(e => {
+			let parent = $(e.target).closest('.board-summary');
+			let children = parent.find('.board-summary-part');
+			children.toggle();
+		});
+	});
+	$(document).ready(()=>{
+	    $('#btns-show, #btns-hide').click(e=>{
+	        $(e.target).closest('.reply-list')
+	        .find('#btns-show').toggle().end()
+	        .find('#btns-hide').toggle().end()
+	        .find('.reply-detail').toggle().end();
+	    });
+	});
+</script>
+
+<script type="text/javascript">
+	function goCustomerGood(p_brd_id, p_art_id) {
+	 	  
+	 	  $.ajax({
+	 				url:"/board/customer/shcustomLike",
+	 				data: {brd_id : p_brd_id,
+	 					   art_id : p_art_id},
+	 				type:'POST',
+	 				dataType:'text',
+	 				success:function(data){
+	 						alert('추천되었습니다.');
+	 				}
+	 	  		});
+	 		  } 
+	
+	function goCustomerBad(p_brd_id, p_art_id) {
+	 	  
+	 	  $.ajax({
+	 				url:"/board/customer/shcustomDislike",
+	 				data: {brd_id : p_brd_id,
+	 					   art_id : p_art_id},
+	 				type:'POST',
+	 				dataType:'text',
+	 				success:function(data){
+	 						alert('비추천되었습니다.');
+	 				}
+	 	  		});
+	 		  } 
+</script>
+
+
+<!-- <script type="text/javascript">
+    $(function() {
+        // 추천 버튼 클릭 시
+        $("#shLike").click(function(event)) {
+        	event.preventDefault();
+        	// 글 정보
+            var brd_id = ${article.brd_id};
+            var art_id = ${article.art_id};
+            
+            var isshCustomLike = true;
+			
+            // ajax 아작스
+            $.ajax({
+                type: "POST",
+                url: "${pageContext.request.contextPath}/board/customer/customLike",
+                data: {
+                    art_id: art_id,
+                    brd_id: brd_Id,
+                    isshCustomLike: isshCustomLike
+                },
+                success: function(response) {
+                    // 추천 성공 시 버튼 상태 변경
+                    $("#shLike").prop("disabled", true);
+                    $("#shDislike").prop("disabled", true);
+                    $("#shcancelLike").prop("disabled", false);
+                }
+            });
+        });
+
+        // 비추천 버튼 클릭 시
+        $("#shDislike").click(function(event)) {
+        	event.preventDefault();
+        	var brd_id = ${article.brd_id};
+            var art_id = ${article.art_id};
+            
+            var isshCustomDislike = true;
+
+            $.ajax({
+                type: "POST",
+                url: "${pageContext.request.contextPath}/board/customer/customDislike",
+                data: {
+                	art_id: art_id,
+                    brd_id: brd_Id,
+                    isshCustomDislike: isshCustomDislike
+                },
+                success: function(response) {
+                    // 비추천 성공 시 버튼 상태 변경
+                    $("#shLike").prop("disabled", true);
+                    $("#shDislike").prop("disabled", true);
+                    $("#shcancelDislike").prop("disabled", false);
+                }
+            });
+        });
+ 
+    
+	    // 추천 취소 버튼 클릭 시
+	    $("#shcancelLike").click(function(event)) {
+        	event.preventDefault();
+	    	var brd_id = ${article.brd_id};
+            var art_id = ${article.art_id};
+	        var isshCustomLike = false;
+	
+	        $.ajax({
+	            type: "POST",
+	            url: "cancelRecommendation",
+	            data: {
+	            	art_id: art_id,
+                    brd_id: brd_Id,
+	                isshCustomLike: isshCustomLike
+	            },
+	            success: function(response) {
+	                // 추천 취소 성공 시 버튼 상태 변경
+	                $("#shLike").prop("disabled", false);
+	                $("#shDislike").prop("disabled", false);
+	                $("#shcancelLike").prop("disabled", true);
+	            }
+	        });
+	    });
+	
+	    // 비추천 취소 버튼 클릭 시
+	    $("#shcancelDislike").click(function(event)) {
+        	event.preventDefault();
+	    	var brd_id = ${article.brd_id};
+            var art_id = ${article.art_id};
+	        var isshCustomDislike = false;
+	
+	        $.ajax({
+	            type: "POST",
+	            url: "cancelRecommendation",
+	            data: {
+	            	art_id: art_id,
+                    brd_id: brd_Id,
+	                isshCustomDislike: isshCustomDislike
+	            },
+	            success: function(response) {
+	                // 비추천 취소 성공 시 버튼 상태 변경
+	                $("#shLike").prop("disabled", false);
+	                $("#shDislike").prop("disabled", false);
+	                $("#shcancelDislike").prop("disabled", true);
+	            }
+	        });
+	    });
+	});
+	</script> -->
 </head>
 <body>
 	<header>
@@ -47,7 +196,7 @@
 				<div class="menu-separator"></div>
 				<a class="adv-hover menuitem" href="${pageContext.request.contextPath}/board/community?category=1300">커뮤니티</a>
 				<div class="menu-separator"></div>
-				<a class="adv-hover menuitem" href="${pageContext.request.contextPath}/board/information?category=1400">정보공유</a>
+				<a class="adv-hover menuitem" href="${pageContext.request.contextPath }/board/information?category=1400">정보공유</a>
 				<div class="menu-separator"></div>
 				<a class="adv-hover menuitem" href="${pageContext.request.contextPath}/board/customer?category=1500">고객센터</a>
 				<div id="dropdown">
@@ -81,10 +230,10 @@
 							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/community?category=1340">질문 / 요청</a>
 						</div>
 						<div class="submenu">
-							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/information?category=1410">동네정보</a>
-							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/information?category=1420">구매정보</a>
-							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/information?category=1430">신규점포</a>
-							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/information?category=1440">지역활동</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1410">동네정보</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1420">구매정보</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1430">신규점포</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1440">지역활동</a>
 						</div>
 						<div class="submenu">
 							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/customer?category=1510">공지</a>
@@ -154,7 +303,7 @@
 											</div>
 										</div>
 									</div>
-									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/';">
+									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/user/mypage';">
 										마이 페이지
 									</button>
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px; margin-bottom: 10px;" class="subtheme-button" onclick="location.href = '${pageContext.request.contextPath }/logout';">
@@ -172,116 +321,296 @@
 		
 	</aside>
 	<main>
-		<!-- detailCustomer코드 -->
-		<div align="center">
-		<h2>작성글</h2>
-		<table border="1" style="width:500px; table-layout:fixed; word-break:break-all;">
-		<tbody>
-			<tr>
-				<th>작성자</th>
-				<td colspan="3"><img src="${pageContext.request.contextPath}/uploads/profile/${article.mem_image }" alt="예시" style="max-height: 30px; max-width: 30px;">${article.mem_nickname}</td>
-			</tr>
-			<tr>
-				<th>작성일</th>
-				<td colspan="3"><fmt:formatDate value="${article.art_regdate }" pattern="yy-MM-dd HH:mm:ss"/></td>
-			</tr>
-			<tr>
-				<th>조회수</th>
-				<td colspan="3">${article.art_read}</td>
-			</tr>
-			<tr>
-				<th>제목</th>
-				<td colspan="3">${article.art_title }</td>
-			</tr>
-			<tr>
-				<th height="300">내용</th>
-				<td colspan="3" valign="top">${article.art_content }</td>
-			</tr>
-			<tr>
-				<th>태그</th>
-				<td colspan="3">
-				${article.art_tag1 != '' ? article.art_tag1 : ''}
-	  			${article.art_tag2 != '' ? article.art_tag2 : ''}
-	  			${article.art_tag3 != '' ? article.art_tag3 : ''}
-	  			${article.art_tag4 != '' ? article.art_tag4 : ''}
-	  			${article.art_tag5 != '' ? article.art_tag5 : ''}
-  				</td>
-  			</tr>
- 			<tr>
-	 			<td colspan="2">${article.art_good }<br><button>추천</button></td>
-				<td colspan="2">${article.art_bad }<br><button>비추천</button></td>
-  			</tr>
-			</tbody>
-			</table>
-  			
-<%-- 			<tr><th>추천</th><td>${article.art_good}</td></tr>
-			<tr><th>비추천수</th><td>${article.art_bad}</td></tr> --%>
-		<p align= "right">  			
-  		<c:choose>
-			<c:when test="${memberInfo.mem_id != null && memberInfo.mem_id == article.mem_id }">
-				<input type="button" value="글 수정" onclick="location.href='${pageContext.request.contextPath}/board/customer/updateFormC?art_id=${article.art_id}&brd_id=${article.brd_id}&category=${category}'">
-				<input type="button" value="글 삭제" onclick="location.href='${pageContext.request.contextPath}/board/customer/deleteCustomer?art_id=${article.art_id }&brd_id=${article.brd_id }&category=${category}'">
-			</c:when>
-		</c:choose>
-  				<input type="button" value="목록" onclick="location.href='${pageContext.request.contextPath}/board/customer?category=${category}'">
-		</p>
-		<br>
-		<!-- 댓글 -->
-		<div>
-		${replyCount}개의 댓글
-		<br>
-		<c:choose>
-			<c:when test="${memberInfo.mem_id != null}">
-				<form action="shcustomerWriteReply" method="post" name="reply">
-		<div>
-					<table border="1" style="width:500px; table-layout:fixed; word-break:break-all;">
-					<tr>
-						<td width="70px">
-							<img src="${pageContext.request.contextPath}/uploads/profile/${memberInfo.mem_image}" alt="예시" style="max-height: 30px; max-width: 30px;">${memberInfo.mem_nickname}
-						</td>
-						<td width="300px">
-							<textarea name="rep_content" placeholder="내용을 입력해 주세요" required="required" style="width:100%; border: 0; resize: none;"></textarea>
-						</td>
-						<td>
-							<p align="right"><input type="submit" value="댓글작성"></p>
-						</td>
-					</tr>
-					</table>
-						<input type="hidden" name="mem_id" value="${memberInfo.mem_id}">								
-						<input type="hidden" name="rep_id" value="${reply.rep_id}">					
-						<input type="hidden" name="art_id" value="${article.art_id}">									
-						<input type="hidden" name="brd_id" value="${article.brd_id}">
-		</div>									
-				</form>
-			</c:when>
-		</c:choose>
+		<div class="view-content">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+			<!-- 바꿔 -->
 
-		<!-- 댓글목록 -->
-		<div>
-			<c:forEach var="reply" items="${replyList }">
-				<table border="1" style="width:500px; table-layout:fixed; word-break:break-all;">
-					<tr><td width="70px"><img src="${pageContext.request.contextPath}/uploads/profile/${reply.mem_image}" alt="예시" style="max-height: 30px; max-width: 30px;">${reply.mem_nickname}</td>
-					<td width="300px">${reply.rep_content }</td>
-					<td width="25px">${reply.rep_good }</td>
-					<td width="25px">${reply.rep_bad }</td>
-					<td width="70px"><fmt:formatDate value="${reply.rep_regdate }" pattern="yy-MM-dd HH:mm:ss"/>
-				</table>
 
-			<c:choose>
-				<c:when test="${memberInfo.mem_id == reply.mem_id }">
-				<p align="right">
-				<input type="button" value="댓글수정" onclick="location.href='${pageContext.request.contextPath}/board/customer/customerUpdateReply?art_id=${article.art_id }&rep_id=${reply.rep_id }&brd_id=${article.brd_id }&category=${category}'">
-				<input type="button" value="댓글삭제" onclick="location.href='${pageContext.request.contextPath}/board/customer/customerDeleteReply?art_id=${article.art_id }&rep_id=${reply.rep_id }&brd_id=${article.brd_id }&category=${category}'">
-				</p>
-				</c:when>
-			</c:choose>
-			</c:forEach>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			<!-- 게시글 -->
+			<div class="view-article">
+				<!-- 게시글의 정보 -->
+				<div class="article-header" class="padding-0">
+					<!-- 카테고리 표시 -->
+					<div class="article-category display-flex justify-content-space-between align-items-center">
+						<span class="category-name">
+							<a href="${pageContext.request.contextPath}/board/customer?category=${article.brd_id - (article.brd_id % 100) }"><span style="color: rgba(var(--theme-font-rgb), 0.5);">고객센터</span></a>
+							<span class="margin-hor-2_5px" style="color: rgba(var(--theme-font-rgb), 0.5);">&gt;</span>
+							<a class="font-weight-bolder" style="color: var(--subtheme)" href="${pageContext.request.contextPath}/board/customer?category=${article.brd_id}">${article.brd_name}</a>
+						</span>
+						<span class="only-for-member display-flex justify-content-flex-end align-items-center">
+							<!-- 글 수정 삭제 -->
+							<c:if test="${memberInfo.mem_id != null && memberInfo.mem_id == article.mem_id}">
+								<button id="btns-artUpdate" class="adv-hover" type="button" onclick="location.href='${pageContext.request.contextPath}/board/customer/updateFormC?art_id=${article.art_id}&brd_id=${article.brd_id}&category=${category}'">글수정</button>
+								<button id="btns-artDelete" class="adv-hover" type="button" onclick="location.href='${pageContext.request.contextPath}/board/customer/deleteCustomer?art_id=${article.art_id }&brd_id=${article.brd_id }&category=${category}'">글삭제</button>
+							</c:if>
+							
+							
+							
+							
+							<!-- category가 brd_id값이 넘어옴 -->
+							
+							<button class="adv-hover" onclick="location.href='${pageContext.request.contextPath}/board/customer?category=${category}';">목록</button>
+						</span>
+					</div>
+				</div>
+	         
+				<!-- 글 제목 및 상태 -->
+				<div class="article-title" style="border: 2px solid rgba(128, 128, 128, 0.5); border-width: 2px 0;">
+<%-- 					<div class="title-status">
+						<c:if test="${article.status_name != null}"><button class="btn font-weight-bold">${article.status_name}</button></c:if>
+					</div> --%>
+					<div class="title-subject">
+						<span class="font-size-20px font-weight-bold">${article.art_title}</span>
+					</div>
+					<!-- 게시글 신고 -->
+					
+					
+					
+					
+					
+					<!-- 신고 아직 기능구현 안됨 -->
+					
+					<div class="modal-report">
+						<c:if test="${not empty memberInfo}">
+							<svg id="article-report" viewBox="0 0 512 512" width="30" height="30" style="fill: none; stroke: var(--warning); stroke-width: 32px; stroke-linecap: round; stroke-linejoin: round; cursor: pointer;"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"/><path d="M250.26 166.05L256 288l5.73-121.95a5.74 5.74 0 00-5.79-6h0a5.74 5.74 0 00-5.68 6z"/><path d="M256 367.91a20 20 0 1120-20 20 20 0 01-20 20z" style="stroke: none; fill: var(--warning);"/></svg>
+						</c:if>
+					</div>
+					
+					<!-- 신고 아직 기능구현 안됨 -->
+					
+					
+					
+					
+				</div>
+				
+				<!-- 작성자 -->
+				<div class="article-memberRow display-flex align-items-center" style="border-bottom: 1px solid rgba(128, 128, 128, 0.5);">
+					<div class="user-profile-image-in-list">
+						<img src="${pageContext.request.contextPath}/uploads/profile/${article.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';"></span>
+					</div>
+					<div class="article-member" style="display: flex; align-items: center;">
+						<div class="modal-report display-flex justify-content-flex-start align-items-center padding-0">
+						<span id="member_nickname" class="font-weight-bolder margin-right-10px">${article.mem_nickname}</span>
+						<c:if test="${not empty memberInfo}">
+							<svg id="member-report" viewBox="0 0 512 512" width="24" height="24" style="fill: none; stroke: var(--warning); stroke-width: 32px; stroke-linecap: round; stroke-linejoin: round; cursor: pointer;"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"/><path d="M250.26 166.05L256 288l5.73-121.95a5.74 5.74 0 00-5.79-6h0a5.74 5.74 0 00-5.68 6z"/><path d="M256 367.91a20 20 0 1120-20 20 20 0 01-20 20z" style="stroke: none; fill: var(--warning);"/></svg>
+							<input type="hidden" id="member_id" value="${article.mem_id}">
+							<!-- 리포트관련 -->
+							<input type="hidden" id="memReport_id" value="${article.report_id}">
+						</c:if>
+					   </div>
+					</div>
+					<div class="article-memberInfo" style="font-size: 14px; flex-grow: 1; text-align: right;">
+						<span>추천 ${article.art_good}</span>
+						<span>비추천 ${article.art_bad}</span>
+						<span>댓글 ${article.rep_cnt == null ? 0:article.rep_cnt}</span>
+						<span>조회수 ${article.art_read}</span>
+						<span>작성일 <fmt:formatDate value="${article.art_regdate}" pattern="yy.MM.dd HH:mm:ss"/></span>
+					</div>
+				</div>
+				
+				<!-- 태그 출력 및 검색 -->
+				<div class="article-info">
+					<div class="view-tag padding-0">
+						<form action="${pageContext.request.contextPath}/board/customer/shSearch">
+							<input type="hidden" name="category" value="${category}">
+							<input type="hidden" name="brd_id" value="${brd_id}">
+							<input type="hidden" name="search" value="articleTag">
+							<c:forEach begin="1" end="5" varStatus="status">
+								<c:set var="art_tag" value="art_tag${status.index}"/>
+									<c:if test="${article[art_tag] != null}">
+										<button class="btns-tag" name="search_keyWord" value="${article[art_tag]}">${article[art_tag]}</button>
+									</c:if>
+							</c:forEach>
+						</form>
+					</div>
+					
+					<!-- 본문 내용 -->
+					<div class="article_content" style="padding: 20px 10px;">
+						${article.art_content }
+					</div>
+					
+				<div class="article-body" style="border-bottom: 1px solid rgba(128, 128, 128, 0.5);">
+					<!-- 추천 비추천 -->
+					<div class="share-btns" id="btns-vote">
+						<button class="btns-good" id="shLike" onclick="goCustomerGood(${article.brd_id},${article.art_id})">추천 <span>${article.art_good}</span></button>
+						<button class="btns-good" id="btns-good" style="display: none; background-color: #0193F8;">추천 <span>${article.art_good}</span></button>
+						<button class="btns-bad" id="shDislike" onclick="goCustomerBad(${article.brd_id},${article.art_id})">비추천 <span>${article.art_bad}</span></button>
+						<button class="btns-bad" id="btns-bad" style="display: none; background-color: red;">비추천 <span>${article.art_bad}</span></button>
+					</div>
+				</div>
+				
+				<!-- 댓글 부분 -->      
+				<div class="reply-list padding-hor-0">
+					<div class="list-toggle display-flex justify-content-flex-start align-items-center padding-hor-0" style="padding-bottom: 10px; border-bottom: 1px solid rgba(128, 128, 128, 0.5);">
+						<c:choose>
+							<c:when test="${not empty replyList}">
+								<span class="font-size-24px font-weight-bolder color-subtheme">댓글</span>
+								<span class="font-size-14px font-weight-bold color-theme-font margin-left-10px" style="color: rgba(var(--theme-font-rgb), 0.5);">(${replyCount})</span>
+								<button id="btns-show" style="display: none;">▶ 펼치기</button>
+								<button id="btns-hide">▼ 접기</button>
+							</c:when>
+							<c:otherwise>
+								<p style="text-align: center; flex-grow: 1;">이 글은 아직 댓글이 없어요<br> 첫 댓글을 남겨주세요</p>
+							</c:otherwise>
+						</c:choose>
+					</div>
+					
+					<!-- 댓글 리스트 -->
+					<c:forEach var="reply" items="${replyList}" varStatus="status">
+						<div class="reply-detail display-flex flex-direction-column justify-content-flex-start align-items-stretch">
+							<input type="hidden" id="reply_id" name="rep_id" value="${reply.rep_id}">
+							<input type="hidden" id="reply_nickname" value="${reply.mem_nickname}">
+							<input type="hidden" id="repReport_id"    value="${reply.report_id}">
+							<div class="reply-view display-flex flex-direction-column justify-content-flex-start align-items-stretch" style="${(reply.rep_id != reply.rep_parent) ? 'margin-left: 32px; background-color: rgba(var(--subtheme-rgb), 0.125);' : ''}">
+								<div class="reply-header display-flex justify-content-flex-start align-items-center">
+								<div class="user-profile-image-in-list">
+									<img src="${pageContext.request.contextPath}/uploads/profile/${reply.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg'; $(this).removeAttr('onerror');">
+								</div>
+								<div class="reply-header-info modal-report display-flex justify-content-flex-start align-items-center">
+									<span id="member_nickname" class="font-weight-bolder">${reply.mem_nickname}</span>
+									<c:if test="${not empty memberInfo}">
+										<svg id="member-report" class="margin-hor-5px" viewBox="0 0 512 512" width="24" height="24" style="fill: none; stroke: var(--warning); stroke-width: 32px; stroke-linecap: round; stroke-linejoin: round; cursor: pointer;"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"/><path d="M250.26 166.05L256 288l5.73-121.95a5.74 5.74 0 00-5.79-6h0a5.74 5.74 0 00-5.68 6z"/><path d="M256 367.91a20 20 0 1120-20 20 20 0 01-20 20z" style="stroke: none; fill: var(--warning);"/></svg>
+										<input type="hidden" id="member_id" value="${reply.mem_id}">
+										<input type="hidden" id="memReport_id" value="${reply.report_id}">
+									</c:if>
+									<span class="color-theme-font font-size-14px" style="color: rgba(var(--theme-font-rgb), 0.5);">(<fmt:formatDate value="${reply.rep_regdate}" pattern="yy-MM-dd :HH:mm:ss"/>)</span>
+								</div>
+								
+								<!-- 대댓글달기 입력버튼 -->
+								<div class="flex-grow-1 display-flex justify-content-flex-end align-items-center">
+									<c:if test="${memberInfo != null }">
+										<button class="btns-repWrite font-weight-bolder">댓글 달기</button>
+									</c:if>
+									<c:if test="${reply.mem_id == memberInfo.mem_id || memberInfo.mem_authority > 108}">
+										<button class="btns-repUpdate font-weight-bolder" onclick="location.href='${pageContext.request.contextPath}/board/customer/customerUpdateReply?art_id=${article.art_id }&rep_id=${reply.rep_id }&brd_id=${article.brd_id }&category=${category}'">수정</button>
+										<button class="btns-repComplete font-weight-bolder" style="display: none;" onclick="rep_Update(${status.index})">완료</button>
+										<button class="btns-delete font-weight-bolder" onclick="location.href='${pageContext.request.contextPath}/board/customer/customerDeleteReply?art_id=${article.art_id }&rep_id=${reply.rep_id }&brd_id=${article.brd_id }&category=${category}'")">삭제</button>
+										<button class="btns-cancel font-weight-bolder" style="display: none;">취소</button>
+									</c:if>
+									<div class="modal-report padding-0" style="width: 24px; height: 24px;">
+										<c:if test="${not empty memberInfo}">
+											<svg id="reply-report" viewBox="0 0 512 512" width="24" height="24" style="fill: none; stroke: var(--warning); stroke-width: 32px; stroke-linecap: round; stroke-linejoin: round; cursor: pointer;"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"/><path d="M250.26 166.05L256 288l5.73-121.95a5.74 5.74 0 00-5.79-6h0a5.74 5.74 0 00-5.68 6z"/><path d="M256 367.91a20 20 0 1120-20 20 20 0 01-20 20z" style="stroke: none; fill: var(--warning);"/></svg>
+										</c:if>
+									</div>
+								</div>
+							   </div>
+							   <!-- 댓글 본문 -->
+							   <div class="reply-inner padding-0" style="flex-grow: 1">
+									<!-- 댓글 수정 -->
+									<div class="reply-content padding-0">
+										<textarea class="rep-content full-width full-height" id="rep-content${status.index}" disabled="disabled" autofocus="autofocus">${reply.rep_content}</textarea>
+									</div>
+							   </div>
+							</div>
+							
+							<!-- 댓글의 댓글 작성 -->
+							<div class="reply-replyWrite" style="display: none; margin-left: 10%">
+								<form action="${pageContext.request.contextPath}/board/customer/댓글의댓글" method="post">
+									<div class="form-box display-flex flex-direction-column justify-content-flex-start align-items-stretch" style="border: 2px solid var(--subtheme); border-radius: 5px;">
+										<input type="hidden" id="brd_id${status.index}" name="brd_id"    value="${article.brd_id}">
+										<input type="hidden" id="art_id${status.index}" name="art_id"    value="${article.art_id}">
+										<input type="hidden" id="rep_id${status.index}" name="rep_id"    value="${reply.rep_id}">
+										<input type="hidden" name="category"    value="${category}">
+										<input type="hidden" name="rep_parent"value="${reply.rep_parent}">
+										<input type="hidden" name="rep_step"   value="${reply.rep_step}">
+										<div class="display-flex flex-direction-column justify-content-flex-start align-items-stretch">
+										<div class="display-flex justify-content-space-between align-items-center" style="border-bottom: 1px solid rgba(var(--subtheme-rgb), 0.5);">
+											<span class="font-size-18px font-weight-bolder">${memberInfo.mem_nickname }</span>
+											<input class="reply-primitive-submit" type="submit" value="등록">
+										</div>
+										<textarea class="reply-primitive-write" style="margin-top: 10px;" placeholder="댓글을 입력하세요" name="rep_content"></textarea>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</c:forEach>
+					
+					<!-- 새로운 댓글 작성 -->
+					<div class="reply-write">
+						<c:choose>
+							<c:when test="${memberInfo != null}">
+								<form action="${pageContext.request.contextPath}/board/customer/replyForm" method="post" name="reply">
+									<div class="form-box display-flex flex-direction-column justify-content-flex-start align-items-stretch" style="border: 2px solid var(--subtheme); border-radius: 5px;">
+										<span><input type="hidden" name="brd_id"    value="${article.brd_id}"></span>
+										<span><input type="hidden" name="art_id"    value="${article.art_id}"></span>
+										<span><input type="hidden" name="category"    value="${category}"></span>
+										<span><input type="hidden" name="mem_id" value="${memberInfo.mem_id}"></span>							
+										<span><input type="hidden" name="rep_id" value="${reply.rep_id}"></span>
+										<span><input type="hidden" name="rep_parent"value="${reply.rep_parent}"></span>
+										<span><input type="hidden" name="rep_step"   value="${reply.rep_step}"></span>
+										<div class="display-flex flex-direction-column justify-content-flex-start align-items-stretch">
+											<div class="display-flex justify-content-space-between align-items-center" style="border-bottom: 1px solid rgba(var(--subtheme-rgb), 0.5);">
+												<span class="font-size-18px font-weight-bolder">${memberInfo.mem_nickname }</span>
+												<input class="reply-primitive-submit" type="submit" value="등록">
+											</div>
+											<textarea class="reply-primitive-write" style="margin-top: 10px;" placeholder="댓글을 입력하세요" name="rep_content"></textarea>
+										</div>
+									</div>
+								</form>
+							</c:when>
+							<c:otherwise>
+								<div class="reply-login padding-10px display-flex flex-direction-column justify-content-center align-items-center" style="border-radius: 5px; background-color: rgba(var(--subtheme-rgb), 0.25);">
+									<span>본 게시물에 댓글을 작성하실 권한이 없습니다. 로그인 하신 후 댓글을 다실 수 있습니다.</span>
+									<span>ShareGo <a href="${pageContext.request.contextPath }/login"><span class="color-subtheme font-weight-bolder">로그인</span></a></span>
+								</div>
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</div>
+			</div>
 		</div>
-		</div>
-		</div>
-
-		<!-- 여기까지 -->
-
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<!-- 바꿔 -->
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		<button id="scrollToTop" class="adv-hover">
 			<svg style="fill: var(--subtheme); stroke: var(--subtheme); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" width="20" height="10" viewBox="0 0 32 16">
 				<path d="M 15 1 L 1 15 31 15 Z"/>

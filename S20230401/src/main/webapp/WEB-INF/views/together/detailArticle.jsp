@@ -789,8 +789,8 @@
 				<!-- 작성자 -->
 				<div class="article-memberRow display-flex align-items-center" style="border-bottom: 1px solid rgba(128, 128, 128, 0.5);">
 					<div class="user-profile-image-in-list">
-						<!-- 아마 사진 경로는 다른듯???... 그래서 안나온느듯??? 일단 원래 경로 <img src="${pageContext.request.contextPath}/uploads/profile/${detailArticle.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';"></span> -->
-						<img src="${pageContext.request.contextPath}/image/picture/${detailArticle.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';"></span>
+						<img src="${pageContext.request.contextPath}/uploads/profile/${detailArticle.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';"></span>
+						<%-- <img src="${pageContext.request.contextPath}/image/picture/${detailArticle.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';"></span> --%>
 					</div>
 					<div class="article-member" style="display: flex; align-items: center;">
 						<div class="modal-report display-flex justify-content-flex-start align-items-center padding-0">
@@ -872,8 +872,8 @@
 							<input type="hidden" id="member_id" name="mem_id" value="${join.mem_id}">
 								<div class="userList-memberInfo">
 									<div class="user-profile-image-in-list">
-										<%-- 원래경로 <img src="${pageContext.request.contextPath}/uploads/profile/${join.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';"> --%>
-										<img src="${pageContext.request.contextPath}/image/picture/${join.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';">
+										<img src="${pageContext.request.contextPath}/uploads/profile/${join.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';">
+										<%-- <img src="${pageContext.request.contextPath}/image/picture/${join.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';"> --%>
 									</div>
 									<div class="userList-details">
 										<div class="display-flex justify-content-flex-start align-items-center padding-0">
@@ -918,8 +918,8 @@
 							<input type="hidden" id="member_id" name="mem_id" value="${waiting.mem_id}">
 								<div class="userList-memberInfo">
 									<div class="user-profile-image-in-list">
-										<%-- 원래경로 <img src="${pageContext.request.contextPath}/uploads/profile/${join.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';"> --%>
-										<img src="${pageContext.request.contextPath}/image/picture/${waiting.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';">
+										<img src="${pageContext.request.contextPath}/uploads/profile/${waiting.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';">
+										<%-- <img src="${pageContext.request.contextPath}/image/picture/${waiting.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';"> --%>
 									</div>
 									<div class="userList-details">
 										<div class="display-flex justify-content-flex-start align-items-center padding-0">
@@ -1046,8 +1046,8 @@
 							<div class="reply-view display-flex flex-direction-column justify-content-flex-start align-items-stretch" style="${(reply.rep_id != reply.rep_parent) ? 'margin-left: 32px; background-color: rgba(var(--subtheme-rgb), 0.125);' : ''}">
 								<div class="reply-header display-flex justify-content-flex-start align-items-center">
 								<div class="user-profile-image-in-list">
-									<!-- 원래 이미지 경로!!  <img alt="profile" src="${pageContext.request.contextPath}/uploads/profile/${reply.mem_image}"> -->
-									<img alt="profile" src="${pageContext.request.contextPath}/image/picture/${reply.mem_image}">
+									<img src="${pageContext.request.contextPath}/uploads/profile/${reply.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg'; $(this).removeAttr('onerror');">
+									<%-- <img alt="profile" src="${pageContext.request.contextPath}/image/picture/${reply.mem_image}"> --%>
 								</div>
 								<div class="reply-header-info modal-report display-flex justify-content-flex-start align-items-center">
 									<span id="member_nickname" class="font-weight-bolder">${reply.mem_nickname}</span>
@@ -1059,8 +1059,10 @@
 									<span class="color-theme-font font-size-14px" style="color: rgba(var(--theme-font-rgb), 0.5);">(<fmt:formatDate value="${reply.rep_regdate}" pattern="yy-MM-dd :HH:mm:ss"/>)</span>
 								</div>
 								<div class="flex-grow-1 display-flex justify-content-flex-end align-items-center">
-									<c:if test="${reply.mem_id == memberInfo.mem_id || memberInfo.mem_authority > 108}">
+									<c:if test="${memberInfo != null }">
 										<button class="btns-repWrite font-weight-bolder">댓글 달기</button>
+									</c:if>
+									<c:if test="${reply.mem_id == memberInfo.mem_id || memberInfo.mem_authority > 108}">
 										<button class="btns-repUpdate font-weight-bolder">수정</button>
 										<button class="btns-repComplete font-weight-bolder" style="display: none;">완료</button>
 										<button class="btns-delete font-weight-bolder" onclick="deleteReply(${reply.brd_id}, ${reply.art_id}, ${reply.rep_id}, ${reply.mem_id});">삭제</button>

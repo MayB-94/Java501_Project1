@@ -74,7 +74,6 @@ public class ReplyDaoImpl implements ReplyDao {
 	}
 	
 	
-
 	
 	
 	// 백준
@@ -146,17 +145,17 @@ public class ReplyDaoImpl implements ReplyDao {
 		return countReply;
 	}
 	@Override
-	public List<Reply> replyList(Reply reply) {
+	public List<Reply> replyList(Article article) {
 		System.out.println("댓글 다오 시작");
 		
 		List<Reply> listReply = null;
 		
 		try {
-			listReply = session.selectList("shlistReply",reply);
+			listReply = session.selectList("shlistReply", article);
 		} catch (Exception e) {
 			System.out.println("댓글에러"+e.getMessage());
 		}
-		System.out.println("댓글다오임플 리플값"+ reply);
+		System.out.println("댓글다오임플 리플값"+ article);
 		return listReply;
 	}
 	
@@ -207,10 +206,29 @@ public class ReplyDaoImpl implements ReplyDao {
 	public int hgInsertReply(Reply reply) {
 		return session.insert("hgInsertReply", reply);
 	}
-	
 	@Override
 	public List<ReplyMember> hgGetRepliesOfMember(int mem_id) {
 		return session.selectList("hgGetRepliesOfMember", mem_id);
+	}
+	
+	@Override
+	public List<Reply> hgGetRepliesOfArticle(Article searcher) {
+		return session.selectList("hgGetRepliesOfArticle", searcher);
+	}
+	
+	@Override
+	public int hgDeleteReply(Reply reply) {
+		return session.update("hgDeleteReply", reply);
+	}
+	
+	@Override
+	public Reply hgGetReplyById(Reply reply) {
+		return session.selectOne("hgGetReplyById", reply);
+	}
+	
+	@Override
+	public int hgRealDeleteReply(Reply reply) {
+		return session.delete("hgRealDeleteReply", reply);
 	}
 	
 	
@@ -324,11 +342,15 @@ public class ReplyDaoImpl implements ReplyDao {
 	
 	// 김진현
 	@Override
-	public int replyInsert2(Article article) {
+	public int JHreplyInsert2(Article article) {
 		return session.insert("JHReplyInsert", article);
 	}
 	@Override
-	public int replyDelete2(Article article) {
-		return session.update("JHReplyUpdate", article);		
+	public int JHreplyDelete2(Article article) {
+		return session.update("JHReplyDelete", article);		
 	}
+	@Override
+	public void JHreplyUpdate2(Article article) {
+		session.update("JHReplyUpdate",article);
+	}	
 }

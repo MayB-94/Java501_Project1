@@ -105,36 +105,55 @@
 	</select>
 	
 	<select id="bjreplyMain" parameterType="Reply" resultType="Reply">
-		SELECT reply.*, member.*
-		FROM reply
-		INNER JOIN member ON reply.mem_id = member.mem_id
-		WHERE reply.art_id = #{art_id} AND reply.brd_id = #{brd_id} AND reply.isdelete = 0
-		ORDER BY reply.rep_regdate DESC
+		SELECT  *
+		FROM   (SELECT  ROWNUM RN, J.*
+		        FROM   (SELECT  R.*, M.MEM_USERNAME, M.MEM_NICKNAME, M.MEM_EMAIL, M.MEM_AUTHORITY, M.MEM_IMAGE, M.MEM_LATEST, M.REPORT_ID AS memReport_id
+		                FROM    REPLY R, MEMBER M
+		                WHERE   R.MEM_ID = M.MEM_ID(+))J
+				WHERE 	ART_ID = #{art_id}
+				AND 	BRD_ID = #{brd_id}
+		        ORDER BY J.REP_PARENT ASC, REP_STEP ASC
+		        )
+		WHERE 	ISDELETE = 0
 	</select>
 
 	<insert id="bjReplyWrite" parameterType="Reply">
-	INSERT INTO REPLY (
-						art_id,
-						brd_id,
-						rep_id,
-						mem_id,
-						rep_content,
-						rep_regdate,
-						rep_good,
-						rep_bad,
-						rep_parent,
-						rep_step,
-						isdelete,
-						report_id 
-						)
-				VALUES(
-						#{art_id},
-						#{brd_id},
-						(SELECT NVL(MAX(rep_id), 0) + 1 FROM REPLY WHERE art_id=#{art_id} AND brd_id=#{brd_id}),
-						#{mem_id},
-						#{rep_content},
-						SYSDATE,
-						0, 0, 1, 1, 0, null )
+	INSERT 
+		INTO    REPLY(ART_ID, BRD_ID, REP_ID, MEM_ID, REP_CONTENT, REP_REGDATE, REP_GOOD, REP_BAD, REP_PARENT, REP_STEP, ISDELETE)
+		VALUES (#{art_id},
+		        #{brd_id},
+		       (SELECT  NVL(MAX(REP_ID),0)+1
+		        FROM    REPLY
+		        WHERE   ART_ID = #{art_id}
+		        AND     BRD_ID = #{brd_id}),
+		        #{mem_id},
+		        #{rep_content},
+		        SYSDATE,
+		        0,
+		        0,
+		        <choose>
+		        	<when test="rep_parent != null">
+		        		#{rep_parent}, 
+		        	</when>
+		        	<otherwise>
+		        		(SELECT  NVL(MAX(REP_ID),0)+1
+				         FROM    REPLY
+				         WHERE   ART_ID = #{art_id}
+				         AND     BRD_ID = #{brd_id}),
+		        	</otherwise>
+		        </choose>
+		        <choose>
+		        	<when test="rep_step != null">
+		        		(SELECT  NVL(MAX(REP_STEP),0)+1
+		        		 FROM    REPLY
+		        		 WHERE   ART_ID = #{art_id}
+		        		 AND     BRD_ID = #{brd_id}),
+		        	</when>
+		        	<otherwise>
+		        		0,
+		        	</otherwise>
+		        </choose>
+		        0)
 	</insert>
 	
 	<insert id="bjReplyDelete" parameterType="Reply">
@@ -190,7 +209,7 @@
 	<!-- 김찬영  -->
 	<!-- 댓글조회 -->
 	<select id="cyReply" parameterType="Reply" resultType="Reply">
-	select r.rep_id, m.mem_nickname, r.rep_content, r.rep_regdate, r.rep_parent, r.rep_step, m.mem_image, r.rep_good, r.rep_bad
+	select r.rep_id, m.mem_nickname, r.rep_content, r.rep_regdate, r.rep_parent, r.rep_step, m.mem_image, r.rep_good, r.rep_bad, r.mem_id, m.mem_id
 	from reply r
 	left join member m 
 	on r.mem_id = m.mem_id
@@ -200,10 +219,48 @@
 			
 	<!-- 댓글작성 -->
 	<insert id="cywriteReply" parameterType="Reply">
-	insert into reply(rep_id, art_id, brd_id, mem_id, rep_content, rep_regdate, rep_good, rep_bad, rep_parent, rep_step, isdelete)
-	values(#{art_id},#{brd_id},(Select NVL(max(rep_id),0) + 1 
-	from reply
-	where art_id = #{art_id} and brd_id=#{brd_id}), #{mem_id}, #{rep_content}, SYSDATE, #{rep_good}, #{rep_bad}, #{rep_parent}, #{rep_step},0)
+     INSERT 
+      INTO REPLY (  ART_ID
+               , BRD_ID
+               , REP_ID
+               , MEM_ID
+               , REP_CONTENT
+               , REP_REGDATE
+               , REP_GOOD
+               , REP_BAD
+               , REP_PARENT
+               , REP_STEP
+               , ISDELETE)
+      VALUES       (  #{art_id}
+               , #{brd_id}
+               , (SELECT NVL(MAX(REP_ID), 0) + 1 FROM REPLY
+                  WHERE ART_ID = #{art_id} AND BRD_ID = #{brd_id})
+               , #{mem_id}
+               , #{rep_content, jdbcType=VARCHAR}
+               , SYSDATE
+               , 0
+               , 0
+               , <choose>
+                  <when test="rep_parent == null">
+                     (SELECT NVL(MAX(REP_ID), 0) + 1 FROM REPLY
+                      WHERE ART_ID = #{art_id} AND BRD_ID = #{brd_id}),
+                  </when>
+                  <otherwise>
+                     #{rep_parent},
+                  </otherwise>
+                 </choose>
+                    
+                 <choose>
+                  <when test="rep_parent == null">
+                     1,
+                  </when>
+                  <otherwise>
+                  (SELECT NVL(MAX(REP_STEP), 0) + 1 FROM REPLY
+                   WHERE ART_ID = #{art_id} AND BRD_ID = #{brd_id}
+                         AND REP_PARENT = #{rep_parent}),
+                  </otherwise>
+                 </choose>
+                 0)
 	</insert>
 	
 	<!-- 댓글 삭제 -->
@@ -246,7 +303,7 @@
 
 
 
-	<!-- 최승환 -->
+	<!-- 최승환  -->
 	<select id="shcountReply" parameterType="Reply" resultType="int">
 		SELECT COUNT(*) as rep_cnt
 		FROM reply
@@ -263,10 +320,33 @@
 	<insert id="shWriteReply" parameterType="Reply">
 		INSERT INTO reply (art_id, brd_id, rep_id, mem_id, rep_content, rep_regdate, rep_good, rep_bad, rep_parent, rep_step, isdelete, report_id) 
     	VALUES (#{art_id}, #{brd_id},
-			    	(SELECT NVL(max(rep_id), 0)+ 1
+			    	(SELECT NVL(MAX(rep_id), 0)+ 1
 				    FROM reply
 				    WHERE art_id = #{art_id} AND brd_id = #{brd_id}),  
-				    #{mem_id}, #{rep_content}, SYSDATE, 0, 0, 1, 1, 0, NULL)
+				    #{mem_id}, #{rep_content}, SYSDATE, 0, 0, 
+				    <choose>
+		        	<when test="rep_parent != null">
+		        		#{rep_parent}, 
+		        	</when>
+		        	<otherwise>
+		        		(SELECT  NVL(MAX(rep_id),0)+1
+				         FROM    reply
+				         WHERE   art_id = #{art_id}
+				         AND     brd_id = #{brd_id}),
+		        	</otherwise>
+		        </choose>
+		        <choose>
+		        	<when test="rep_step != null">
+		        		(SELECT  NVL(MAX(rep_Step),0)+1
+		        		 FROM    REPLY
+		        		 WHERE   art_id = #{art_id}
+		        		 AND     brd_id = #{brd_id}),
+		        	</when>
+		        	<otherwise>
+		        		0,
+		        	</otherwise>
+		        </choose>
+				0, null)
 	</insert>
 	
 	<insert id="shDeleteReply" parameterType="Reply">
@@ -276,9 +356,9 @@
 	</insert>
 	
 	<update id="shUpdateReply" parameterType="Reply">
-		UPDATE reply
-		SET	rep_content = #{rep_content}
-		WHERE art_id = #{art_id} AND brd_id = #{brd_id} AND rep_id = #{rep_id}
+		update reply 
+		set rep_content = #{rep_content, jdbcType=CLOB}
+		where art_id = #{art_id} and brd_id = #{brd_id} and rep_id = #{rep_id}
 	</update>
 	
 	
@@ -343,6 +423,22 @@
 			WHERE ROWNUM <= 10
 		]]>
 	</select>
+	<select id="hgGetRepliesOfArticle" parameterType="Article" resultType="Reply">
+		SELECT R.*, M.MEM_NICKNAME, M.MEM_USERNAME, M.MEM_IMAGE
+		FROM REPLY R LEFT OUTER JOIN MEMBER M ON (R.MEM_ID = M.MEM_ID)
+		WHERE R.ART_ID = #{art_id} AND R.BRD_ID = #{brd_id}
+		ORDER BY R.REP_PARENT, R.REP_STEP
+	</select>
+	<update id="hgDeleteReply" parameterType="Reply">
+		UPDATE REPLY SET ISDELETE = #{isdelete} WHERE ART_ID = #{art_id} AND BRD_ID = #{brd_id} AND REP_ID = #{rep_id}
+	</update>
+	<select id="hgGetReplyById" parameterType="Reply" resultType="Reply">
+		SELECT * FROM REPLY
+		WHERE ART_ID = #{art_id} AND BRD_ID = #{brd_id} AND REP_ID = #{rep_id}
+	</select>
+	<delete id="hgRealDeleteReply" parameterType="Reply">
+		DELETE FROM REPLY WHERE ART_ID = #{art_id} AND BRD_ID = #{brd_id} AND REP_ID = #{rep_id}
+	</delete>
 	
 	
 	<!-- 임동빈 -->

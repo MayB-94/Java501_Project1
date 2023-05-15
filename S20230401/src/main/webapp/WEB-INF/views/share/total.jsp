@@ -12,6 +12,25 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/preference.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/presets.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/layout.css">
+
+<script type="text/javascript">
+	$(window).scroll(() => {
+		let scrollTop = $(window).scrollTop();
+		let header = $('header');
+		if (header != null) {
+			if (scrollTop > 21 && !header.hasClass('fix-header')) {
+				header.addClass('fix-header');
+			}
+			else if (scrollTop <= 21 && header.hasClass('fix-header')) {
+				header.removeClass('fix-header');
+			}
+		}
+	});
+	$(() => {
+		$('#scrollToTop').click(e => $(window).scrollTop(0));
+		$('#scrollToBottom').click(e => $(window).scrollTop($(document).height() - 1120));
+	});
+</script>
 <style type="text/css">
 	button{
 		width: auto;
@@ -24,11 +43,16 @@
 		border: none;
 		border-radius: 14px;
 	}
-	.btn-write {
-		background-color: var(--subtheme);
-		color: var(--subtheme-font);
-		font-weight: bolder;
-		cursor: pointer;
+	.btn-cost{
+		width: auto;
+		height: 25px;
+		font-size:15px;
+		font-family: 'Nanum Gothic';
+		color: white;
+		text-align: center;
+		background: red;
+		border: none;
+		border-radius: 8px;
 	}
 	.btns-tag{
 		padding: 0px 2px;
@@ -376,11 +400,19 @@
 								<div class="view-middle display-flex justify-content-space-between align-items-center padding-5px padding-hor-0">
 									<span class="font-weight-bolder">${article.member.mem_nickname}</span>
 									<div class="display-flex justify-content-flex-end align-items-center">
+									
+ 										<%-- <c:if test="${fn:contains(article.status_name, '모집')}"><button>${article.status_name}</button></c:if>
+										<c:if test="${fn:contains(article.status_name, '진행')}"><button>${article.status_name}</button></c:if>
+										<c:if test="${fn:contains(article.status_name, '완료')}"><button>${article.status_name}</button></c:if>
+										<c:if test="${fn:contains(article.status_name, '취소')}"><button>${article.status_name}</button></c:if> --%>
+										
 										<c:if test="${article.status_name != null}">
-											<button class="btn margin-right-5px font-weight-bolder" ${article.trade.trd_status == 401 ? 'style="background-color: var(--subtheme);"' : '' }>${article.status_name}</button>
+											<button class="btn margin-right-5px font-weight-bolder" ${article.trade.trd_status == 401 || article.trade.trd_status == 402 ? 'style="background-color: var(--subtheme);"' : '' }>${article.status_name}</button>
 										</c:if>
+										
+										
 										<c:choose>
-											<c:when test="${article.trade.trd_cost == null || article.trade.trd_cost == 0}">
+											<c:when test="${article.trade.trd_cost == 0}">
 												<span class="font-size-20px font-weight-bolder color-subtheme">무료</span>
 											</c:when>
 											<c:when test="${article.trade.trd_cost != null && article.trade.trd_cost != 0}">

@@ -19,6 +19,11 @@
 	<select id="hgGetCategoryListBySuper" parameterType="int" resultType="Comm">
 		SELECT * FROM COMM WHERE TRUNC(COMM_ID / 100) * 100 = #{superId} AND COMM_ID != #{superId}
 	</select>
+	<select id="hgGetCategoryNames" resultType="Comm">
+		<![CDATA[
+			SELECT * FROM COMM WHERE COMM_ID >= 1000
+		]]>
+	</select>
 	
 	
 	
@@ -33,7 +38,7 @@
 		FROM    COMM
 		WHERE   COMM_ID = #{comm_id}
 	</select>
-	<!-- 공통테이블 저장 / 권한-100 / 성별-200 / 쪽지상태-300 / 거래상태-400 / 카테고리-1000~ -->
+	
 	<select id="dgCommList" parameterType="int" resultType="Comm">
 		SELECT  *
 		FROM    COMM
@@ -68,8 +73,30 @@
 	<select id="JHPayStatus" resultType="Comm">
 		SELECT * FROM comm WHERE comm_id IN (401, 404)
 	</select>
+
+	<select id="JHBoardName" parameterType="int" resultType="java.lang.String">
+		SELECT comm_value
+		FROM comm
+		WHERE comm_id = #{comm_id}
+	</select>
+	
+	<select id="JHcommList" resultType="Comm">
+		SELECT * FROM comm WHERE comm_id BETWEEN 1100 and 1160
+	</select>
 	
 	
+	<!-- 최승환 -->
+<!-- 	<select id="shCategoryName" parameterType="int" resultType="java.lang.String">
+		SELECT  comm_value
+		FROM    comm
+		WHERE   comm_id = #{comm_id}
+	</select>
+	
+	<select id="shCommList" parameterType="int" resultType="Comm">
+		SELECT  *
+		FROM    comm
+		WHERE   comm_id BETWEEN #{comm_id} AND #{comm_id}+99
+	</select> -->
 	
 	
 	

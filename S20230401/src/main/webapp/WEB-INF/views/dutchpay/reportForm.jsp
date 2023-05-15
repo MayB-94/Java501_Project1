@@ -32,7 +32,7 @@
 		
 	<input type="hidden" name="brd_id" value="${reportForm.brd_id }">${reportForm.brd_id }
 	<input type="hidden" name="art_id" value="${reportForm.art_id }">${reportForm.art_id }
- 	<input type="hidden" name="art_id" value="${reportForm.report_id }">${reportForm.report_id }
+ 	<input type="hidden" name="report_id" value="${reportForm.report_id }">${reportForm.report_id }
 	
 	<input type="submit" value="취소" 	onclick="javascript:self.close();">
  	<input type="submit" value="신고하기" formaction="${pageContext.request.contextPath }/dutchpay/reportInsert"> 

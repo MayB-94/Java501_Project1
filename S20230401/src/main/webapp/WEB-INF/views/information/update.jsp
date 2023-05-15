@@ -1,66 +1,198 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ include file="../preset.jsp" %>
+<%@ include file="/WEB-INF/views/preset.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>게시물 수정 ▒ ShareGo</title>
+<title>[페이지 이름] ▒ ShareGo</title>
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath }/js/initializer.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath }/js/layout.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath }/js/index.js"></script>
-<link href="https://unpkg.com/sanitize.css" rel="stylesheet">
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/preference.css">
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/presets.css">
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/layout.css">
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/index.css">
-
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/initializer.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/layout.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/js/quill/quill.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/js/quill/image-resize.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/js/quill/image-drop.min.js"></script>
 <script type="text/javascript">
-	$(window).scroll(() => {
-		let scrollTop = $(window).scrollTop();
-		let header = $('header');
-		if (header != null) {
-			if (scrollTop > 21 && !header.hasClass('fix-header')) {
-				header.addClass('fix-header');
-			}
-			else if (scrollTop <= 21 && header.hasClass('fix-header')) {
-				header.removeClass('fix-header');
-			}
+	function updateAction () {
+		if ($('#article-title').val() == '' || $('#article-title').val() == null) {
+			return false;
 		}
-	});
+		if ($('#art_content').val() == '' || $('#art_content').val() == null) {
+			return false;
+		}
+		for (let i = 1; i <= 5; i++) $('#art_tag' + i).removeAttr('value');
+		let tagIndex = 1;
+		$('.tag-box-tag').each((index, value) => {
+			let tag = $(value).find('.tag-box-tag-value').html();
+			$('#art_tag' + tagIndex++).val(tag);
+		});
+		return true;
+	}
+	const quillInit = (id) => {
+		let fontArray = [];
+		for (let i = 8; i <= 30; i++) fontArray[fontArray.length] = i + 'px';
+		var Size = Quill.import('attributors/style/size');
+		Size.whitelist = fontArray;
+		Quill.register(Size, true);
+		var option = {
+			modules: {
+				toolbar: [
+						[{size: fontArray}],
+						[{'color': [
+							'#FFFFFF', '#FF0000', '#FFFF00', '#00FF00', '#00FFFF', '#0000FF', '#FF00FF',
+							'#E0E0E0', '#E00000', '#E0E000', '#00E000', '#00E0E0', '#0000E0', '#E000E0',
+							'#C0C0C0', '#C00000', '#C0C000', '#00C000', '#00C0C0', '#0000C0', '#C000C0',
+							'#A0A0A0', '#A00000', '#A0A000', '#00A000', '#00A0A0', '#0000A0', '#A000A0',
+							'#808080', '#800000', '#808000', '#008000', '#008080', '#000080', '#800080',
+							'#606060', '#600000', '#606000', '#006000', '#006060', '#000060', '#600060',
+							'#404040', '#400000', '#404000', '#004000', '#004040', '#000040', '#400040',
+							'#202020', '#200000', '#202000', '#002000', '#002020', '#000020', '#200020',
+							'#000000', '#000000', '#000000', '#000000', '#000000', '#000000', '#000000'
+						]}],
+						['bold', 'italic', 'underline', 'strike'],
+						['image', 'video', 'link'],
+						[{list: 'ordered'}, {list: 'bullet'}]
+				],
+				imageResize: {
+					displaySize: true
+				},
+				imageDrop: true
+			},
+			placeholder: '내용을 입력해주세요',
+			theme: 'snow'
+		};
+		editor = new Quill('#' + id, option);
+	};
+	var editor;
+	var observers = [];
+	const setObserver = (target, index) => {
+		const config = { attributes: true, childList: false, characterData: false };
+		const tradeFix = (mutationList, observer) => {
+			mutationList.forEach(mutation => {
+				let tagType = $(mutation.target)[0].tagName.toUpperCase();
+				let targetAttr = tagType == 'BUTTON' ? 'disabled' : 'readonly';
+				if (mutation.attributeName == targetAttr && $(mutation.target).attr(targetAttr) == false) {
+					$(mutation.target).attr(targetAttr, true);
+				}
+			});
+		};
+		const observer = new MutationObserver(tradeFix);
+		observer.observe(target, config);
+		observers.push({[index]: observer});
+	};
 	$(() => {
-		$('#scrollToTop').click(e => $(window).scrollTop(0));
-		$('#scrollToBottom').click(e => $(window).scrollTop($(document).height() - 1120));
+		// disable fix용 코드
+		$('.trade-info-box').find('button, input, select').each((index, item) => {
+			setObserver(item, index);
+		});
+		// tag loading 코드
+		for (let i = 1; i <= 5; i++) {
+			let tag_value = $('#art_tag' + i).val();
+			if (!tag_value) continue;
+			let elem = '<div class="tag-box-tag"><span class="tag-box-tag-value">' + tag_value + '</span><button class="tag-box-tag-remove adv-hover" type="button"><svg class="tag-box-tag-remove-svg" width="10" height="10" viewBox="0 0 12 12" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M 2 2 L 10 10 M 10 2 L 2 10"/></svg></button></div>';
+			$('#tag-box').append(elem);
+			$('#tag-box').find('div.tag-box-tag:last-child > button.tag-box-tag-remove').click(e => {
+				$(e.target).parent().remove();
+			});
+		}
+		// checkbox 이벤트
+		$('#btns-checkbox').change(()=>{
+			if($('#btns-checkbox').is(':checked')){
+				$('#art_isnotice').val('1');
+			}else{
+				$('#art_isnotice').val('0');
+			}
+			console.info($('#art_isnotice').val());
+		});
+		// Load Editor
+		quillInit('articleEditor');
+		
+		// 게시글 컨텐츠 로드
+		let delta = editor.clipboard.convert($('#art_content').val());
+		editor.setContents(delta, 'silent');
+		
+		// input keydown event
+		$('form input').keydown(e => {
+			if (e.keyCode == 13) e.preventDefault();
+		});
+		
+		// Tag input Effects
+		$('#tag-input').keydown(e => {
+			if ($('#tag-box').find('.tag-box-tag').length >= 5 && e.keyCode != 8) {
+				e.preventDefault();
+				e.target.value = null;
+				return;
+			}
+			if (e.keyCode == 32) {
+				e.preventDefault();
+				if (e.target.value == '' || !e.target.value || e.target.value == null) return;
+				$(e.target).blur();
+				e.target.value = null;
+				$(e.target).focus();
+			} else if (e.keyCode == 13) e.preventDefault();
+			else if (e.keyCode == 8) {
+				if (e.target.selectionStart == 0 && e.target.selectionEnd == 0) {
+					$('#tag-box').find('div.tag-box-tag:last-child').remove();
+					e.preventDefault();
+				}
+			}
+		});
+		$('#tag-input').blur(e => {
+			if ($('#tag-box').find('.tag-box-tag').length >= 5) {
+				e.target.value = null;
+				return;
+			}
+			if (e.target.value == '' || !e.target.value || e.target.value == null) return;
+			let elem = '<div class="tag-box-tag"><span class="tag-box-tag-value">' + e.target.value + '</span><button class="tag-box-tag-remove adv-hover" type="button"><svg class="tag-box-tag-remove-svg" width="10" height="10" viewBox="0 0 12 12" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M 2 2 L 10 10 M 10 2 L 2 10"/></svg></button></div>';
+			$('#tag-box').append(elem);
+			$('#tag-box').find('div.tag-box-tag:last-child > button.tag-box-tag-remove').click(e => {
+				$(e.target).parent().remove();
+			});
+			e.target.value = null;
+		});
+		editor.on('text-change', () => {
+			$('#art_content').val(editor.root.innerHTML);
+		});
+		const selectLocalImage = () => {
+			const fileInput = document.createElement('input');
+			fileInput.setAttribute('type', 'file');
+			fileInput.click();
+			fileInput.addEventListener('change', e => {
+				const formData = new FormData();
+				const file = fileInput.files[0];
+				formData.append('uploadFile', file);
+				
+				$.ajax({
+					type: 'post',
+					enctype: 'multipart/form-data',
+					url: '/board/share/imageUpload',
+					data: formData,
+					//data: fileInput.value,
+					processData: false,
+					contentType: false,
+					dataType: 'json',
+					success: function(data) {
+						const range = editor.getSelection();
+						//data.uploadPath = data.uploadPath.replace(/\\/g, '/');
+						data.url = data.url.toString().replace(/\\/g, '/');
+						editor.insertEmbed(range.index, 'image', data.url);
+					}
+				});
+			});
+		};
+		editor.getModule('toolbar').addHandler('image', () => selectLocalImage());
 	});
 </script>
-<style type="text/css">
-	.btn-tag{
-		width: auto;
-		height: 25px;
-		font-size:12px;
-		font-family: 'Nanum Gothic';
-		color: white;
-		text-align: center;
-		background: gray;
-		border: none;
-		border-radius: 14px;
-	}
-	.btn-cost{
-		width: auto;
-		height: 25px;
-		font-size:15px;
-		font-family: 'Nanum Gothic';
-		color: white;
-		text-align: center;
-		background: red;
-		border: none;
-		border-radius: 8px;
-	}
-</style>
+<link href="https://unpkg.com/sanitize.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/share/updateForm.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/preference.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/presets.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/layout.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/js/quill/quill.core.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/js/quill/quill.snow.css">
 </head>
 <body>
 	<header>
-<div id="usernav">
+		<div id="usernav">
 			<a href="">이용 약관</a>
 			<a href="">개인정보 취급 방침</a>
 		</div>
@@ -82,7 +214,7 @@
 				<div class="menu-separator"></div>
 				<a class="adv-hover menuitem" href="${pageContext.request.contextPath}/board/community?category=1300">커뮤니티</a>
 				<div class="menu-separator"></div>
-				<a class="adv-hover menuitem" href="${pageContext.request.contextPath}/board/information?category=1400">정보공유</a>
+				<a class="adv-hover menuitem" href="${pageContext.request.contextPath }/board/information?category=1400">정보공유</a>
 				<div class="menu-separator"></div>
 				<a class="adv-hover menuitem" href="${pageContext.request.contextPath}/board/customer?category=1500">고객센터</a>
 				<div id="dropdown">
@@ -116,10 +248,10 @@
 							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/community?category=1340">질문 / 요청</a>
 						</div>
 						<div class="submenu">
-							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/information?category=1410">동네정보</a>
-							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/information?category=1420">구매정보</a>
-							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/information?category=1430">신규점포</a>
-							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/information?category=1440">지역활동</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1410">동네정보</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1420">구매정보</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1430">신규점포</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1440">지역활동</a>
 						</div>
 						<div class="submenu">
 							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/customer?category=1510">공지</a>
@@ -189,7 +321,7 @@
 											</div>
 										</div>
 									</div>
-									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/';">
+									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/user/mypage';">
 										마이 페이지
 									</button>
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px; margin-bottom: 10px;" class="subtheme-button" onclick="location.href = '${pageContext.request.contextPath }/logout';">
@@ -207,60 +339,92 @@
 		
 	</aside>
 	<main>
-<form action="${pageContext.request.contextPath }/board/information/modify" method = "post" id = "modify">
-	<input type="hidden" name="art_id" value="${article.art_id }">
-	<input type="hidden" name="brd_id" value="${article.brd_id }">
-	<input type="hidden" name="category" value="${category}">
-      <div id="wrap" >
-        <h1>게시글 수정</h1>
-            <table>
-                <tr>
-                    <th>제목</th>
-                    <td><input type="text" name="art_title" value="${article.art_title}"></td>
-                </tr>
-                <tr>
-                    <th>태그1</th>
-                    <td><input type="text" name="art_tag1" value="${article.art_tag1}"></td>
-                </tr>
-                <tr>
-                    <th>태그2</th>
-                    <td><input type="text" name="art_tag2" value="${article.art_tag2}"></td>
-                </tr>
-                <tr>
-                    <th>태그3</th>
-                    <td><input type="text" name="art_tag3" value="${article.art_tag3}"></td>
-                </tr>
-                <tr>
-                    <th>태그4</th>
-                    <td><input type="text" name="art_tag4" value="${article.art_tag4}"></td>
-                </tr>
-                <tr>
-                    <th>태그5</th>
-                    <td><input type="text" name="art_tag5" value="${article.art_tag5}"></td>
-                </tr>
-                <tr>
-                    <th>내용</th>
-                    <td><textarea rows="15" cols="70" name="art_content">${article.art_content}</textarea></td>
-                </tr>
-            </table>
-    	<button type="submit">수정하기</button>
-    	<button onclick="window.history.back()">뒤로가기</button>
-</div>
-</form>
-	<button id="scrollToTop" class="adv-hover">
+		<!-- 각자 페이지 들어갈 공간 시작 -->
+		<div class="container">
+	
+			<h1 class="color-subtheme text-align-center">게시글 수정</h1>
+	
+			<div>
+				<form action="${pageContext.request.contextPath}/board/information/modify" method="post" id="modify" onsubmit="return updateAction();">
+					<input type="hidden" 	name="category" 		value="${category}">
+					<input type="hidden" 	name="art_id" 			value="${article.art_id}">
+				<!-- 임시 기본값 저장 -->
+					<input type="hidden" 	name="art_good" 		value="0">
+					<input type="hidden" 	name="art_bad" 			value="0">
+					<input type="hidden" 	name="art_read" 		value="0">
+					<input type="hidden" 	name="isdelete" 		value="0">
+					
+					
+					<div class="display-flex justify-content-space-between align-items-center">
+						<div class="form-group display-flex justify-content-flex-start align-items-center">
+							<label for="category" class="margin-right-5px">카테고리</label>
+							<select name="brd_id" id="brd_id">
+								<option value="1410" ${article.brd_id == 1410? 'selected':''}>동네정보</option>
+								<option value="1420" ${article.brd_id == 1420? 'selected':''}>구매정보</option>
+								<option value="1430" ${article.brd_id == 1430? 'selected':''}>신규점포</option>
+								<option value="1440" ${article.brd_id == 1440? 'selected':''}>지역활동</option>
+							</select>
+						</div>
+						
+						<!-- 매니저 이상의 권한만 공지 설정 가능 -->
+						<c:if test="${memberInfo.mem_authority >= 108}">
+							<div class="form-group checkbox-group display-flex justify-content-flex-end align-items-center">
+								<label for="btns-checkbox" class="margin-right-5px">공지 여부</label>
+								<input type="hidden" id="art_isnotice" name="art_isnotice" value="0">
+								<input type="checkbox" id="btns-checkbox" name="btns-checkbox">
+							</div>
+						</c:if>
+					</div>
+	
+					<div class="form-group display-flex justify-content-flex-start align-items-center">
+						<label for="article-title" class="margin-right-5px width-50px">제목</label>
+						<input type="text" class="flex-grow-1" id="article-title" name="art_title" placeholder="제목" value="${article.art_title }" required="required">
+					</div>
+					
+					<div class="form-group flex-grow-1 display-flex justify-content-flex-end align-items-center">
+						<input type="hidden" id="art_tag1" name="art_tag1" value="${article.art_tag1 }">
+						<input type="hidden" id="art_tag2" name="art_tag2" value="${article.art_tag2 }">
+						<input type="hidden" id="art_tag3" name="art_tag3" value="${article.art_tag3 }">
+						<input type="hidden" id="art_tag4" name="art_tag4" value="${article.art_tag4 }">
+						<input type="hidden" id="art_tag5" name="art_tag5" value="${article.art_tag5 }">
+						<label class="margin-right-5px width-50px">태그</label>
+						<div class="input-box display-flex justify-content-flex-start align-items-center" style="border-bottom: 2.5px solid rgba(128, 128, 128, 0.5); margin: 0; flex-grow: 1;" onclick="$('#tag-input').focus();">
+							<div id="tag-box">
+								<!-- 태그들 들어갈 자리 -->
+							</div>
+							<input class="art_tag flex-grow-1" style="border-bottom: 0;" type="text" id="tag-input" name="tag-input" maxlength="10" placeholder="태그를 입력한 후 스페이스바를 눌러 추가하세요">
+						</div>
+					</div>
+					
+					<!-- 글 내용 -->
+					<input type="hidden" id="art_content" name="art_content" value="<c:out value="${article.art_content }" escapeXml="true"/>" required>
+					<div id="articleEditor"></div>
+					
+					<!-- 참가자 있을 시 수정 불가 안내 메시지 -->
+					<c:if test="${isAnyoneJoined }">
+						<p class="color-warning font-size-18px font-weight-bolder text-align-center">참가자가 있어 거래정보를 수정할 수 없습니다</p>
+					</c:if>
+					
+	
+					<div class="button-group">
+						<button type="submit" class="btns-submit">작성</button>
+						<button type="button" class="btns-cancel" onclick="location.href='${pageContext.request.contextPath}/board/information?category='+${category};">취소</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<!-- 각자 페이지 들어갈 공간 끝 -->
+		<button id="scrollToTop" class="adv-hover">
 			<svg style="fill: var(--subtheme); stroke: var(--subtheme); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" width="20" height="10" viewBox="0 0 32 16">
 				<path d="M 15 1 L 1 15 31 15 Z"/>
 			</svg>
 		</button>
 		<button id="scrollToBottom" class="adv-hover">
 			<svg style="fill: var(--subtheme); stroke: var(--subtheme); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" width="20" height="10" viewBox="0 0 32 16">
-				<path d="M 15 15 L 1 1 31 1 Z"/>
+				<path d="M 15 15 L 1 1 31 1 Z"/>'
 			</svg>
 		</button>
 	</main>
-	
-	
-	
 	<aside id="rightside">
 		
 	</aside>

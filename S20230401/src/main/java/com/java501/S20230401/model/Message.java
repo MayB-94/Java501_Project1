@@ -15,4 +15,7 @@ public class Message {
 	private Integer mes_isread;
 	private Integer mes_status;
 	private Integer isdelete;
+	
+	// 참조
+	private Member member;
 }

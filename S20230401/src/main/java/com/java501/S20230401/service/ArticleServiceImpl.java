@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.java501.S20230401.dao.ArticleDao;
 import com.java501.S20230401.dao.CommDao;
+import com.java501.S20230401.dao.FavoriteDao;
 import com.java501.S20230401.dao.JoinDao;
 import com.java501.S20230401.dao.RegionDao;
 import com.java501.S20230401.dao.ReplyDao;
@@ -35,6 +36,9 @@ public class ArticleServiceImpl implements ArticleService {
 	private final ReplyDao 		rpd;
 	private final JoinDao       jd;
 	private final WaitingDao    wd;
+	private final FavoriteDao   fd;
+	
+
 
 
 	// 유현규 로그인 기능 추가
@@ -92,6 +96,14 @@ public class ArticleServiceImpl implements ArticleService {
 	public List<Article> hgAdminArticleList(Article searcher) {
 		return ad.hgAdminArticleList(searcher);
 	}
+	@Override
+	public int hgGetCountAllArticle() {
+		return ad.hgGetCountAllArticle();
+	}
+	@Override
+	public List<Article> hgGetArticles(Article searcher) {
+		return ad.hgGetArticles(searcher);
+	}
 	
 	
 	// 양동균
@@ -122,8 +134,8 @@ public class ArticleServiceImpl implements ArticleService {
 	
 	// 백준
 	@Override
-	public Integer totalArticle(int brd_id) {
-		Integer totalArticleCnt = ad.totalArticle(brd_id);
+	public Integer bjTotalArticle(Article article) {
+		Integer totalArticleCnt = ad.bjTotalArticle(article);
 		return totalArticleCnt;
 	}
 	@Override
@@ -205,9 +217,15 @@ public class ArticleServiceImpl implements ArticleService {
 		return ad.bjBad(article);
 	}
 	
+	@Override
+	public List<Comm> bjcommList(int comm_id) {
+		return ad.bjcommList(comm_id);
+	}
 	
-	
-	
+	@Override
+	public String bjCategoryName(int comm_id) {
+		return ad.bjCategoryName(comm_id);
+	}
 	
 	
 	// 임동빈
@@ -444,15 +462,15 @@ public class ArticleServiceImpl implements ArticleService {
 	// 김찬영
 	// 총리스트 	
 	@Override
-	public int totalArticle() {
+	public int cytotalArticle() {
 		System.out.println("ArticleServiceImpl Start total...");
-		int totArticleCnt = ad.totalArticle();
-		System.out.println("ArticleServiceImpl totalArticle totArticleCnt->" + totArticleCnt);
-		return totArticleCnt;
+		int cytotalArticle = ad.cytotalArticle();
+		System.out.println("ArticleServiceImpl totalArticle totArticleCnt->" + cytotalArticle);
+		return cytotalArticle;
 	}
-	//댓글
+	//검색
 //	@Override
-//	public int totalArticleSearch(Article article) {
+//	public int cytotalArticleSearch(Article article) {
 //		System.out.println("아티클 서비스임플 댓글 스타트");
 //		int totalArticleSearch = ad.totalArticle();
 //		System.out.println("ArticleServiceImpl totlaArticleSearch totalArticleSearch->" + totalArticleSearch);
@@ -460,12 +478,12 @@ public class ArticleServiceImpl implements ArticleService {
 //	}
 	//리스트 조회
 	@Override
-	public List<Article> listArticle(Article article) {
-		List<Article> articleList = null;
+	public List<Article> cylistArticle(Article article) {
+		List<Article> cylistArticle = null;
 		System.out.println("ArticleServiceImpl listManager Start..");
-		articleList = ad.listArticle(article);
-		System.out.println("ArticleServiceImpl listArticle articleList.size()->" +articleList.size());
-		return articleList;
+		cylistArticle = ad.cylistArticle(article);
+		System.out.println("ArticleServiceImpl listArticle articleList.size()->" +cylistArticle.size());
+		return cylistArticle;
 	}
 
 	// 상세페이지 조회
@@ -476,14 +494,14 @@ public class ArticleServiceImpl implements ArticleService {
 		System.out.println("ArticleServiceImpl cyArticlereadDetail article->" +article);
 		return result;
 	}
-	// 상세페이지?
-	@Override
-	public Article detailArticle(int art_title) {
-		System.out.println("ArticleServiceImpl detail...");
-		Article article = null;
-		article = ad.detatilArticle(art_title);
-		return article;
-	}
+//	// 상세페이지?
+//	@Override
+//	public Article cydetailArticle(int art_title) {
+//		System.out.println("ArticleServiceImpl detail...");
+//		Article article = null;
+//		article = ad.cydetailArticle(art_title);
+//		return article;
+//	}
 	// 수정페이지 상세페이지
 	@Override
 	public Article cyArticlereadupdate(Article article) {
@@ -516,23 +534,23 @@ public class ArticleServiceImpl implements ArticleService {
 	}
 	//조회수 증가
 	@Override
-	public int updateView(Article article) {
+	public int cyupdateView(Article article) {
 		System.out.println("ArticleServiceImpl updateView");
-		int result = ad.updateView(article);
+		int result = ad.cyupdateView(article);
 		return result;
 	}
 	// 게시물 좋아요
 	@Override
-	public int updateGood(Article article) {
+	public int cyupdateGood(Article article) {
 		System.out.println("ArticleServiceImpl updateView");
-		int result = ad.updateGood(article);
+		int result = ad.cyupdateGood(article);
 		return result;
 	}
 	// 게시물 싫어요
 	@Override
-	public int updateBad(Article article) {
+	public int cyupdateBad(Article article) {
 		System.out.println("ArticleServiceImpl updateView");
-		int result = ad.updateBad(article);
+		int result = ad.cyupdateBad(article);
 		return result;
 	}
 
@@ -541,6 +559,15 @@ public class ArticleServiceImpl implements ArticleService {
 	
 	
 	// 최승환
+	@Override
+	public int totalCustomer(Article article) {
+		System.out.println("ArticleServiceImpl Start int total...");
+		int totalCustomer = ad.totalCustomer(article);
+		System.out.println("ArticleServiceImpl totalCustomer totCustomerCnt-> " + totalCustomer);
+		
+		return totalCustomer;
+	}
+	
 	@Override
 	public List<Article> listCustomer(Article article) {
 		List<Article> customerList = null;
@@ -556,12 +583,12 @@ public class ArticleServiceImpl implements ArticleService {
 		customerDetail = ad.detailCustomer(article);
 		return customerDetail;
 	}
-	@Override
-	public List<Article> listCustomerMenu(Article article) {
-		List<Article> listMenu = null;
-		listMenu = ad.listCustomerMenu(article);
-		return listMenu;
-	}
+	// 넌 뭐냐
+	/*
+	 * @Override public List<Article> listCustomerMenu(Article article) {
+	 * List<Article> listMenu = null; listMenu = ad.listCustomerMenu(article);
+	 * return listMenu; }
+	 */
 	@Override
 	public int insertCustomer(Article article) {
 		int result = 0;
@@ -588,14 +615,6 @@ public class ArticleServiceImpl implements ArticleService {
 		return ad.customerViewCount(article);
 	}
 	@Override
-	public int totalCustomer(Article article) {
-		System.out.println("ArticleServiceImpl Start int total...");
-		int totCustomerCnt = ad.totalCustomer(article);
-		System.out.println("ArticleServiceImpl totalCustomer totCustomerCnt-> " + totCustomerCnt);
-
-		return totCustomerCnt;
-	}
-	@Override
 	public List<Article> shSearchCustomer(Article article) {
 		List<Article> shCustomerSearch = null;
 		System.out.println("ArticleServiceImpl shSearchCustomer Start..." );
@@ -604,169 +623,225 @@ public class ArticleServiceImpl implements ArticleService {
 		return shCustomerSearch;
 	}
 	
+	@Override
+	public int customLike(Article article) {
+		int result = ad.customLike(article);
+		return result;
+	}
 	
+	@Override
+	public int customDislike(Article article) {
+		int result = ad.customDislike(article);
+		return result;
+	}
 	
 	
 	
 	@Override//김진현
-	public List<Article> getDutchpayList(String boardName) {
-		List<Article> article = ad.getDutchpayList(boardName);
-		return article;
+	public List<Article> JHgetDutchpayList(Article article) {
+		List<Article> List = ad.JHgetDutchpayList(article);
+		return List;
 	}
 
 	@Override
-	public Article detail1(Article article) {
+	public Article JHdetail1(Article article) {
 		Article article1 = null;
-		article1 = ad.detail2(article);
+		article1 = ad.JHdetail2(article);
 		return article1;
 	}
 	
 	@Override
-	public List<Article> repList1(Article article) {
-		List<Article> repList = ad.repList2(article);
+	public List<Article> JHrepList1(Article article) {
+		List<Article> repList = ad.JHrepList2(article);
 		return repList;
 	}
 
 	@Override
-	public List<Comm> payStatus1() {
+	public List<Comm> JHpayStatus1() {
 		List<Comm> payStatus = null;
-		payStatus = ad.payStatus2();
+		payStatus = ad.JHpayStatus2();
 		return payStatus;
 	}
 	
 
-	public Article payStatusPro1(Article article) {
+	public Article JHpayStatusPro1(Article article) {
 		Article payStatusPro = null;
-		payStatusPro = ad.payStatusPro2(article);
+		payStatusPro = ad.JHpayStatusPro2(article);
 		return payStatusPro;
 	}
 	
 	@Override
-	public void replyInsert1(Article article) {
-		 rpd.replyInsert2(article);
+	public void JHreplyInsert1(Article article) {
+		 rpd.JHreplyInsert2(article);
 	}
 	
 	@Override
-	public void replyDelete1(Article article) {
-		rpd.replyDelete2(article);
+	public void JHreplyDelete1(Article article) {
+		rpd.JHreplyDelete2(article);
 	}
 
 	@Override
-	public List<Comm> category1() {
+	public List<Comm> JHcategory1() {
 		List<Comm> cm = null;
-		cm = ad.category2();
+		cm = ad.JHcategory2();
 		return cm;
 	}
 
 	@Override
-	public List<Region> loc1() {
+	public List<Region> JHloc1() {
 		List<Region> re = null;
-		re = ad.loc2();
+		re = ad.JHloc2();
 		return re;
 	}
 
 	@Override
-	public void dutchpayInsert1(Article article) {
-		ad.dutchpayInsert2(article);
+	public void JHdutchpayInsert1(Article article) {
+		ad.JHdutchpayInsert2(article);
 	}
 	
 	@Override
-	public Article updateForm1(Article article) {
+	public Article JHupdateForm1(Article article) {
 		Article updateForm = null;
-		updateForm = ad.updateForm2(article);
+		updateForm = ad.JHupdateForm2(article);
 		return updateForm;
 	}
 
 	@Override
-	public List<Region> loc_ud1() {
+	public List<Region> JHloc_ud1() {
 		List<Region> re = null;
-		re = ad.loc_ud2();
+		re = ad.JHloc_ud2();
 		return re;
 	}
 
 	@Override
-	public void dutchpayUpdate1(Article article) {
-		ad.dutchpayUpdate2(article);
+	public void JHdutchpayUpdate1(Article article) {
+		ad.JHdutchpayUpdate2(article);
 		
 	}
 
 	@Override
-	public void dutchpayDelete1(Article article) {
-		ad.dutchpayDelete2(article);
+	public void JHdutchpayDelete1(Article article) {
+		ad.JHdutchpayDelete2(article);
 		
 	}
 
 	@Override
-	public int DeatilRead1(Article article) {
+	public int JHDeatilRead1(Article article) {
 		int read = 0;
-		read = ad.DeatilRead2(article);
+		read = ad.JHDeatilRead2(article);
 		return read;
 	}
 	
 	@Override
-	public int totalArticle1() {
+	public int JHtotalArticle1(Article article) {
 		int page = 0;
-		page = ad.totalArticle2();
+		page = ad.JHtotalArticle2(article);
 		return page;
 	}
 	
 	@Override
-	public void applyInsert1(Article article) {
-		ad.applyInsert2(article);
+	public void JHapplyInsert1(Article article) {
+		ad.JHapplyInsert2(article);
 	}
 
 	@Override
-	public Article applyCancel1(Article article) {
+	public Article JHapplyCancel1(Article article) {
 		Article cancel = null;
-		cancel = ad.applyCancel2(article);
+		cancel = ad.JHapplyCancel2(article);
 		return cancel;
 	}
 	
 	@Override
-	public Article joinCancel1(Article article) {
+	public Article JHjoinCancel1(Article article) {
 		Article joinCancel = null;
-		joinCancel = ad.joinCancel2(article);
+		joinCancel = ad.JHjoinCancel2(article);
 		return joinCancel;
 	}
 
 	@Override
-	public List<Article> joinList1(Article article) {
+	public List<Article> JHjoinList1(Article article) {
 		List<Article> joinList = null;
-		joinList = ad.joinList2(article);
+		joinList = ad.JHjoinList2(article);
 		return joinList;
 	}
 	@Override
-	public List<Article> waitList1(Article article) {
+	public List<Article> JHwaitList1(Article article) {
 		List<Article> waitList = null;
-		waitList = ad.waitList2(article);
+		waitList = ad.JHwaitList2(article);
 		return waitList;
 	}
 	@Override
-	public Article joinDeny1(Article article) {
+	public Article JHjoinDeny1(Article article) {
 		Article joinDeny1 = null;
-		joinDeny1 = ad.joinDeny2(article);
+		joinDeny1 = ad.JHjoinDeny2(article);
 		return joinDeny1;
 	}
 	@Override
-	public Article joinAccept1(Article article) {
+	public Article JHjoinAccept1(Article article) {
 		Article joinAccept1 = null;
-		joinAccept1 = ad.joinAccept2(article);
+		joinAccept1 = ad.JHjoinAccept2(article);
 		return joinAccept1;
 	}
 	@Override
-	public int payCompleted1(int trd_id) {
+	public int JHpayCompleted1(int trd_id) {
 		int payCompleted = 0;
-		payCompleted = ad.payCompleted2(trd_id);
+		System.out.println("service impl trd_id -> "+trd_id);
+
+		payCompleted = ad.JHpayCompleted2(trd_id);
 		return payCompleted;
 	}
 	@Override
-	public int jhJoinListYN(Article article) {
-		return jd.jhJoinListYN(article);
+	public int JHJoinListYN(Article article) {
+		return jd.JHJoinListYN(article);
 	}
 	
 	@Override
-	public int jhWaitListYN(Article article) {
-		return wd.jhWaitListYN(article);
+	public int JHWaitListYN(Article article) {
+		return wd.JHWaitListYN(article);
 	}
+	
+	@Override
+	public void JHfavoriteInsert1(Article article) {
+		fd.JHfavoriteInsert2(article);
+	}
+	@Override
+	public int JHfavoriteInsertYN1(Article article) {
+		return fd.JHfavoriteInsertYN2(article);
+	}
+	@Override
+	public void JHreplyUpdate1(Article article) {
+		rpd.JHreplyUpdate2(article);
+	}
+	@Override
+	public List<Article> JHarticleSearch1(Article article) {
+		List<Article> articleSearch = null;
+		articleSearch = ad.JHarticleSearch2(article);
+		return articleSearch;
+	}
+	@Override
+	public void JHartGood1(Article article) {
+		ad.JHartGood2(article);
+	}
+	@Override
+	public void JHartBad1(Article article) {
+		ad.JHartBad2(article);
+	}
+	@Override
+	public void JHrepGood1(Article article) {
+		ad.JHrepGood2(article);
+	}
+	@Override
+	public void JHrepBad1(Article article) {
+		ad.JHrepBad2(article);
+	}
+	@Override
+	public String JHboardName1(int comm_id) {
+		return cd.JHboardName2(comm_id);
+	}
+	@Override
+	public List<Comm> JHcommList1() {
+		return cd.JHcommList2();
+	}
+
 	
 }

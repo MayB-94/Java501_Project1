@@ -185,6 +185,7 @@ public class ShareController {
 		return "share/article";
 	}
 	
+
 	
 	
 	// 게시글 작성 페이지 이동
@@ -239,7 +240,7 @@ public class ShareController {
 		model.addAttribute("superRegions", superRegions);
 		model.addAttribute("regions", regionHierachy);
 		model.addAttribute("category", category);
-		model.addAttribute("isAnyoneJoined", joinList == null || joinList.size() > 0);
+		model.addAttribute("isAnyoneJoined", (joinList.size() > 0)); // 수정
 		
 		return "share/updateForm";
 	}
@@ -558,7 +559,7 @@ public class ShareController {
 	// ***************
 	// 신고 Map으로 가져오기 (@RequestParam(required = false) 필요함)
 	@PostMapping(value = "board/share/reportForm")
-	public String shareReport(@AuthenticationPrincipal MemberDetails memberDetails, @RequestParam(required = false) Map<String, Object> data, Integer category){
+	public String shareReport(@AuthenticationPrincipal MemberDetails memberDetails, @RequestParam(required = false) Map<String, Object> data,Integer reportMem_id ,Integer category){
 		
 		Article article = null;
 		Reply reply = null;
@@ -571,44 +572,51 @@ public class ShareController {
 		// 필드가 있는데 값이 없거나, 필드가 없는데 값이 있거나 (에러 발생시 무시)
 		objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		article = objectMapper.convertValue(data, Article.class); // redirect
 		
-		article = objectMapper.convertValue(data, Article.class);
 		
 		// 로그인이 되어 있을 경우에만 신고 실행
 		if(memberDetails != null) {
 			shareUser = memberDetails.getMemberInfo();
-			report = objectMapper.convertValue(data, Report.class);
-			report.setMem_id(shareUser.getMem_id());
-			report.setReport_id(article.getReport_id());
-			
-			result = reportService.shareReport(report);
+			report = objectMapper.convertValue(data, Report.class); // report 객체 저장
+			report.setMem_id(shareUser.getMem_id()); // 신고자 id 저장 ( 접속 유저 )
+			result = reportService.shareReport(report); // report_id값 리턴
+
+			System.out.println("report 번호 : "+result);
 			if(result > 0) {
-				switch (report.getType()) {
+				switch (report.getType()) { // 신고 타입에 따라 실행
 				case "article":
-					System.out.println(" 게시글 신고  게시글 신고  게시글 신고  게시글 신고  게시글 신고  게시글 신고  게시글 신고 ");
 					article.setReport_id(result);
 					result = articleService.dgReportArticle(article);
 					break;
 				case "reply":
-					System.out.println(" 댓글 신고  댓글 신고  댓글 신고  댓글 신고  댓글 신고  댓글 신고  댓글 신고  댓글 신고  ");
 					reply = objectMapper.convertValue(data, Reply.class);
 					reply.setReport_id(result);
 					result = replyService.dgReportReply(reply);
 					break;
 				case "member":
-					System.out.println(" 유저 신고  유저 신고  유저 신고  유저 신고  유저 신고  유저 신고  유저 신고  유저 신고 ");
 					member = objectMapper.convertValue(data, Member.class);
+					member.setMem_id(reportMem_id); 
 					member.setReport_id(result);
 					result = memberService.dgReportMember(member);
 					break;
 				}
 			}
-			if(result > 0) System.out.println("성공 개꿀딱지");
 		}
 		return getRedirectArticle(article, category);
 	}
 
-	
+	// 신고 체크
+	@RequestMapping(value = "board/share/isReport")
+	@ResponseBody
+	public boolean isReport(@AuthenticationPrincipal MemberDetails memberDetails, Report report) {
+		boolean isReport = false;
+		if(memberDetails != null) {
+			report.setMem_id(memberDetails.getMemberInfo().getMem_id());
+			isReport = reportService.shareIsReport(report);
+		}
+		return isReport;
+	}
 	
 
 
@@ -619,6 +627,7 @@ public class ShareController {
 	public String indexPage() {
 		return "redirect:/board/share?category=999";
 	}
+*/
 	// Share외의 다른 카테고리 연결
 	@RequestMapping(value = "board/{categoryConnect}")
 	public String togetherPage(	@PathVariable("categoryConnect")
@@ -633,7 +642,7 @@ public class ShareController {
 		redirectAttributes.addFlashAttribute("currentPage", currentPage);
 		return "redirect:/board/share?category="+category;
 	}
-*/
+
 	// 쿠키용 체크
 	public boolean dgCheck(	HttpServletRequest request,
 							HttpServletResponse response,
