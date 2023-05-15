@@ -1,5 +1,6 @@
 package com.java501.S20230401.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
@@ -7,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -268,7 +270,9 @@ public class DutchpayController {
 	
 
 	@RequestMapping(value = "/board/dutchpay/dutchpayUpdateForm") //업데이트(수정) 폼 + 드롭다운 
-	public String dutchpayUpdateForm(Article article, Model model, @AuthenticationPrincipal MemberDetails memberDetails) {
+	public String dutchpayUpdateForm(Article article, Model model, 
+									
+									@AuthenticationPrincipal MemberDetails memberDetails) {
 		
 		if (memberDetails != null)
 			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
@@ -276,6 +280,8 @@ public class DutchpayController {
 		System.out.println("dutchpay/dutchpayUpdateForm start..");
 		System.out.println("controller updateForm brd_id  -> "+article.getBrd_id());
 		System.out.println("controller updateForm art_id  -> "+article.getArt_id());
+
+
 		Article updateForm = as.JHupdateForm1(article);
 		model.addAttribute("updateForm", updateForm);
 		
@@ -291,9 +297,9 @@ public class DutchpayController {
 	@PostMapping(value = "/board/dutchpay/dutchpayWritePro") // 글내용 삽입 (insert) 
 	public String insert(Article article ,RedirectAttributes ra, Model model, @AuthenticationPrincipal MemberDetails memberDetails) {
 		
+
 		if (memberDetails != null)  // 로그인한 mem_id를 가지고 글쓰기
 			model.addAttribute("memberInfo", memberDetails.getMemberInfo()); 
-		article.setMem_id(memberDetails.getMemberInfo().getMem_id());
 		
 		System.out.println("start insert button");
 		System.out.println("writePro controller article -> "+article);
@@ -301,11 +307,11 @@ public class DutchpayController {
 		as.JHdutchpayInsert1(article);
 		ra.addFlashAttribute("article", article);  //model.addAttribute와 다른점은 컨트롤러 내에서 매핑할 시 이렇게 사용하는게 좋음
 		
-//		String saveEnddate = "";
-//		if( article.getTrd_saveEnddate() != null ) {
-//			saveEnddate = article.getTrd_saveEnddate().substring(0,10);
-//			article.setTrd_saveEnddate(saveEnddate);
-//		}
+		String saveEnddate = "";
+		if( article.getTrd_saveEnddate() != null ) {
+			saveEnddate = article.getTrd_saveEnddate().substring(0,10);
+			article.setTrd_saveEnddate(saveEnddate);
+		}
 		
 		int brd_id = article.getBrd_id(); //확인 버튼 누르면 드롭다운(카테고리) 에서 고른 해당카테고리로 이동 
 		return "redirect:/board/dutchpay?category="+brd_id;
@@ -329,7 +335,6 @@ public class DutchpayController {
 		ra.addFlashAttribute("article", article);  
 		
 		int brd_id = article.getBrd_id();
-		int art_id = article.getArt_id();
 		return "redirect:/board/dutchpay?category="+brd_id;
 	}
 	

@@ -275,19 +275,18 @@
 			        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
   				}
 	  		});
-		  }
+		  } 
 
-		
-		
-
-	/* function completed() {
-		 if (confirm("거래를 완료 하시겠습니까?") == true){    
+/* 	function completed() {
+		 if (confirm("거래를 완료 하시겠습니까?")){    
 		     document.dutchpay.submit();
 		 }else{   
 		     return false;
 		 }
 		}
- */	</script>
+ */		
+
+</script>
 </head>
 <body>
 	<header>
@@ -479,16 +478,18 @@
 						</span>
 					</div>
 				</div>
-	         
+	         <!-- <form method="post"> -->
 	         			<c:choose> 
 							<c:when test="${memberInfo.mem_id == detail.mem_id}"> 
 								<c:choose> 
 									<c:when test="${detail.comm_id == 402}"> <!-- 거래상태가 402(거래진행중)일 때만 나타나는 거래완료하기 버튼 -->
-										<button class="btns-action"  id="btns-completed"	onclick="goCompleted(${detail.trd_id})">거래완료</button><p>
-									</c:when>
+										<button class="btns-action"  id="btns-completed"	onclick="goCompleted(${detail.trd_id})">거래완료</button><p> 				
+									 		<%-- <input type="submit" value="거래완료" formaction="${pageContext.request.contextPath }/board/dutchpay/payCompleted"  	onclick="return completed()"> --%>
+									 </c:when>
 								</c:choose>
 							</c:when>
 						</c:choose>
+			<!-- </form> -->
 	         
 						<%-- <c:choose> 
 							<c:when test="${memberInfo.mem_id == detail.mem_id && detail.comm_id != 403  && detail.comm_id != 404}"> 
@@ -522,7 +523,7 @@
 					<!-- 게시글 신고 -->
 					<div class="modal-report">
 						<c:if test="${not empty memberInfo}">
-							<svg id="article-report" viewBox="0 0 512 512" width="30" height="30" style="fill: none; stroke: var(--warning); stroke-width: 32px; stroke-linecap: round; stroke-linejoin: round; cursor: pointer;"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"/><path d="M250.26 166.05L256 288l5.73-121.95a5.74 5.74 0 00-5.79-6h0a5.74 5.74 0 00-5.68 6z"/><path d="M256 367.91a20 20 0 1120-20 20 20 0 01-20 20z" style="stroke: none; fill: var(--warning);"/></svg>
+							<svg onclick="goReport(${detail.brd_id },${detail.art_id },${detail.report_id })" id="article-report" viewBox="0 0 512 512" width="30" height="30" style="fill: none; stroke: var(--warning); stroke-width: 32px; stroke-linecap: round; stroke-linejoin: round; cursor: pointer;"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"/><path d="M250.26 166.05L256 288l5.73-121.95a5.74 5.74 0 00-5.79-6h0a5.74 5.74 0 00-5.68 6z"/><path d="M256 367.91a20 20 0 1120-20 20 20 0 01-20 20z" style="stroke: none; fill: var(--warning);"/></svg>
 						</c:if>
 					</div>
 				</div>
@@ -575,7 +576,7 @@
 					<!-- 거래 관련 내용 -->
 					<div class="article-trade">
 						<div class="share-trdHeader display-flex justify-content-space-between align-items-center">
-							<span class="color-subtheme font-size-20px font-weight-bolder">${detail.trd_cost}원 [배송비 포함]</span>
+							<span class="color-subtheme font-size-20px font-weight-bolder">${detail.trd_cost} 원 [배송비 포함]</span>
 							<div class="display-flex justify-content-flex-end align-items-center">
 								<button class="btn" type="button">개시일 : <fmt:formatDate value="${detail.art_regdate}" pattern="yy-MM-dd"/></button>
 								<span class="color-theme-font font-weight-bold margin-hor-2_5px" style="color: rgba(var(--theme-font-rgb), 0.5);">~</span>
@@ -584,15 +585,11 @@
 						</div>
 						<div class="share-trdContent display-flex flex-direction-column justify-content-flex-start" style="border-bottom: 1px solid rgba(128, 128, 128, 0.5);">
 							<div class="display-flex justify-content-space-between align-items-center">
-								<span><span class="color-subtheme font-weight-bolder margin-right-5px">지역제한</span>${detail.reg_name == null ? '제한없음' : detail.reg_name}</span>
+								<span><span class="color-subtheme font-weight-bolder margin-right-5px">지역제한</span>${detail.reg_name}</span>
 								<span><span class="color-subtheme font-weight-bolder">상세장소</span>${detail.trd_loc}</span>
 							</div>
 							<div class="display-flex justify-content-space-between align-items-center">
 								<span><span class="color-subtheme font-weight-bolder margin-right-5px">최대 인원</span>${detail.trd_max}명</span>
-								<%-- <span><span class="color-subtheme font-weight-bolder margin-right-5px">최소 나이</span>${article.trade.trd_minage>0? article.trade.trd_minage:'제한없음' }</span>
-								<span><span class="color-subtheme font-weight-bolder margin-right-5px">최대 나이</span>${article.trade.trd_maxage>0? article.trade.trd_maxage:'제한없음'}</span>
-								<span><span class="color-subtheme font-weight-bolder margin-right-5px">성별 제한</span>${article.trade.trd_gender==201? '남자만':article.trade.trd_gender==202? '여자만':'제한없음'}</span>
-							 --%>
 							</div>
 						</div>
 						

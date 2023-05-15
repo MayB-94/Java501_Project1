@@ -1490,7 +1490,7 @@
 				#{mem_id, 			mode=IN,  jdbcType=NUMERIC},
 				#{art_isnotice, 	mode=IN,  jdbcType=NUMERIC},
 				#{trd_status, 		mode=IN,  jdbcType=NUMERIC},
-				#{trd_enddate, 		mode=IN,  jdbcType=DATE},
+				#{trd_saveEnddate, 	mode=IN,  jdbcType=VARCHAR},
 				#{trd_max, 			mode=IN,  jdbcType=NUMERIC},
 				#{trd_cost, 		mode=IN,  jdbcType=NUMERIC},
 				#{trd_loc, 			mode=IN,  jdbcType=VARCHAR},
@@ -1531,7 +1531,7 @@
 				#{art_tag4, 		mode=IN,  jdbcType=VARCHAR},
 				#{art_tag5, 		mode=IN,  jdbcType=VARCHAR},
 				#{art_content, 		mode=IN,  jdbcType=CLOB},
-				#{trd_saveEnddate, 	mode=IN,  jdbcType=DATE},
+				#{trd_enddate, 		mode=IN,  jdbcType=DATE},
 				#{trd_cost, 		mode=IN,  jdbcType=NUMERIC},
 				#{trd_max, 			mode=IN,  jdbcType=NUMERIC},
 				#{reg_id, 			mode=IN,  jdbcType=NUMERIC},
@@ -1655,7 +1655,7 @@
 			CALL REPORT_INSERT (
 				#{art_id, 			mode=IN,  jdbcType=NUMERIC},
 				#{brd_id, 			mode=IN,  jdbcType=NUMERIC},
-				#{report_id, 		mode=IN,  jdbcType=NUMERIC},
+				#{report_id, 		mode=IN,  jdbcType=NULL},
 				#{mem_id,	 		mode=IN,  jdbcType=NUMERIC},
 				#{report_content, 	mode=IN,  jdbcType=VARCHAR}
 			)

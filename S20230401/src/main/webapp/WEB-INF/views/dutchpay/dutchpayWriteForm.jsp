@@ -310,11 +310,10 @@
 			<h1 class="color-subtheme text-align-center">게시글 작성</h1>
 	
 			<div>
-				<form action="${pageContext.request.contextPath }/dutchpay/dutchpayWritePro" method="post" onsubmit="return writeAction();">
+				<form action="${pageContext.request.contextPath }/board/dutchpay/dutchpayWritePro" method="post" onsubmit="return writeAction();">
 					<%-- <input type="hidden" 	name="category" 		value="${category}">
 					<input type="hidden" 	name="brd_id" 			value="${category}">  --%>
 				<!-- 임시 기본값 저장 -->
-					<input type="hidden" 	name="trd_cost" 	value="0">
 					<input type="hidden" 	name="art_good" 		value="0">
 					<input type="hidden" 	name="art_bad" 			value="0">
 					<input type="hidden" 	name="art_read" 		value="0">
@@ -376,7 +375,7 @@
 									<button type="button" id="region" name="reg_id-button" class="togglePopup theme-button" style="border-color: rgba(128, 128, 128, 0.5);"></button>
 									<div id="region-popup" class="popup-window" style="bottom: 32px; right: auto; left: 81.28px; padding: 0;">
 										<div style="position: relative;">
-											<button type="button" class="subitem-header adv-hover" onclick="$('#reg_id').removeAttr('value'); $('#region').text(''); $('#region-popup').toggle();">없음</button>
+											<button type="button" class="subitem-header adv-hover"> <!-- onclick="$('#reg_id').removeAttr('value'); $('#region').text(''); $('#region-popup').toggle();" --> >없음</button>
 										</div>
 											<select name="reg_id">
 												<c:forEach var="L" items="${loc }">
@@ -409,8 +408,8 @@
 						<div class="form-group display-flex justify-content-space-between align-items-center padding-10px">
 							<div class="form-group display-flex justify-content-flex-start align-items-center">
 								<label for="deadline" class="margin-right-5px">마감일</label>
-								<input type="datetime-local" name="trd_endDate">
-							</div>
+								<input type="date" name="trd_saveEnddate">
+							</div> 
 							
 							<div class="form-group display-flex justify-content-space-between align-items-center padding-10px">
 								<label for="trade.trd_cost" class="margin-right-5px">비용</label>
@@ -423,22 +422,6 @@
 								<label for="max-people" class="margin-right-5px">최대 인원</label>
 								<input type="number" class="width-50px" name="trd_max" min="2" value="2" required="required">
 							</div>
-							
-<!-- 							<div class="form-gender display-flex justify-content-flex-start align-items-center">
-								<label for="gender-limit" class="margin-right-5px">성별</label>
-								<select name="trade.trd_gender">
-									<option value="">제한 없음</option>
-									<option value="201">남자</option>
-									<option value="202">여자</option>
-								</select>
-							</div>
-		
-							<div class="form-age display-flex justify-content-flex-end align-items-center">
-								<label for="age-limit" class="margin-right-5px">나이</label> 
-								<input type="number" class="width-50px" name="trade.trd_minage" min="1" max="100" value="10">
-								<span class="margin-hor-5px font-weight-bolder">~</span>
-								<input type="number" class="width-50px" name="trade.trd_maxage" min="1" max="100" value="30">
-							</div> -->
 						</div>
 					</div>
 	
