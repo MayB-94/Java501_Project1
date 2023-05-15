@@ -185,6 +185,7 @@ public class ShareController {
 		return "share/article";
 	}
 	
+
 	
 	
 	// 게시글 작성 페이지 이동
@@ -255,7 +256,7 @@ public class ShareController {
 									Date trd_endDate,
 									Article article, 
 									RedirectAttributes redirectAttributes, 
-			Integer category) {
+									Integer category) {
 		int result = 0;
 		MemberInfo memberInfo = null;
 		redirectAttributes.addFlashAttribute("category", category);

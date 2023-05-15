@@ -1,12 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="../preset.jsp" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>메인 페이지 ▒ ShareGo</title>
+<title>게시물 수정 ▒ ShareGo</title>
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath }/js/initializer.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath }/js/layout.js"></script>
@@ -16,10 +14,53 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/presets.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/layout.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/index.css">
+
+<script type="text/javascript">
+	$(window).scroll(() => {
+		let scrollTop = $(window).scrollTop();
+		let header = $('header');
+		if (header != null) {
+			if (scrollTop > 21 && !header.hasClass('fix-header')) {
+				header.addClass('fix-header');
+			}
+			else if (scrollTop <= 21 && header.hasClass('fix-header')) {
+				header.removeClass('fix-header');
+			}
+		}
+	});
+	$(() => {
+		$('#scrollToTop').click(e => $(window).scrollTop(0));
+		$('#scrollToBottom').click(e => $(window).scrollTop($(document).height() - 1120));
+	});
+</script>
+<style type="text/css">
+	.btn-tag{
+		width: auto;
+		height: 25px;
+		font-size:12px;
+		font-family: 'Nanum Gothic';
+		color: white;
+		text-align: center;
+		background: gray;
+		border: none;
+		border-radius: 14px;
+	}
+	.btn-cost{
+		width: auto;
+		height: 25px;
+		font-size:15px;
+		font-family: 'Nanum Gothic';
+		color: white;
+		text-align: center;
+		background: red;
+		border: none;
+		border-radius: 8px;
+	}
+</style>
 </head>
 <body>
 	<header>
-		<div id="usernav">
+<div id="usernav">
 			<a href="">이용 약관</a>
 			<a href="">개인정보 취급 방침</a>
 		</div>
@@ -166,102 +207,47 @@
 		
 	</aside>
 	<main>
-		<!-- 내용작성 -->
-	<div class="container" align="center">
-	
-	<h1>고객센터</h1>
-	
-	<p>
-		<div class="board-category" align="center" style="font-size: 20px">
-		<span class="item">
-			<a href="/board/customer?category=1500" class="active">&nbsp;전체&nbsp;</a>
-		</span>
-		<span class="item">
-			<a href="/board/customer?category=1510" class="active">&nbsp;공지&nbsp;</a>
-		</span>
-		<span class="item">
-			<a href="/board/customer?category=1520" class="active">&nbsp;Q&A&nbsp;</a>
-		</span>
-		<span class="item">
-			<a href="/board/customer?category=1530" class="active">&nbsp;이벤트&nbsp;</a>
-		</span>
-		<span class="item">
-			<a href="/board/customer?category=1540" class="active">&nbsp;문의/건의&nbsp;</a>
-		</span>
-	</div>
-	
-	<%-- <p style="text-align:left">게시글수: ${totalCustomer}</p> --%>
-	<c:set var="num" value="${page.total-page.start+1 }"></c:set>
-	
-	<table border="1">
-		<tr><th>글번호</th><th>제목</th><th>작성자</th><th>프사</th><th>태그</th><th>작성일</th><th>댓글수</th><th>조회수</th><th>추천수</th><th>비추천수</th></tr>
-		<c:forEach var="article" items="${listCustomer }">
-			<tr>
-			<td>${article.art_id }</td>
-			<td><a href="${pageContext.request.contextPath}/board/customer/detailCustomer?art_id=${article.art_id}&brd_id=${article.brd_id}&category=${category}">${article.art_title}</a></td>
-			<td>${article.mem_nickname }</td>
-			<td><img src="${pageContext.request.contextPath}/uploads/profile/${article.mem_image }" alt="예시" style="max-height: 30px; max-width: 30px;">
-			<td>
-			${article.art_tag1 != '' ? article.art_tag1 : ''}
-  			${article.art_tag2 != '' ? article.art_tag2 : ''}
-  			${article.art_tag3 != '' ? article.art_tag3 : ''}
-  			${article.art_tag4 != '' ? article.art_tag4 : ''}
-  			${article.art_tag5 != '' ? article.art_tag5 : ''}
-  			</td>
-			<td style="font-size : 12px">
-			<fmt:formatDate value="${article.art_regdate }" pattern="yy-MM-dd"/>
-			</td>
-			<td>${article.rep_count}</td>
-			<td>${article.art_read}</td>
-			<td>${article.art_good}</td>
-			<td>${article.art_bad}</td>
-			</tr>
-			<c:set var="num" value="${num - 1 }"></c:set>
-		</c:forEach>
-	</table>	
-	
-	<c:if test="${page.startPage > page.pageBlock }">
-		<a href="${pageContext.request.contextPath}/board/customer?currentPage=${page.startPage-page.pageBlock}&category=${category}">[이전]</a>
-	</c:if>
-	<c:forEach var="i" begin="${page.startPage}" end="${page.endPage}">
-		<a href="${pageContext.request.contextPath}/board/customer?currentPage=${i}&category=${brd_id}">[${i}]</a>
-	</c:forEach>
-	<c:if test="${page.endPage < page.totalPage }">
-		<a href="${pageContext.request.contextPath}/board/customer?currentPage=${page.startPage+page.pageBlock}&category=${category}">[다음]</a>
-	</c:if>	
-	<!-- 글쓰기 버튼 -->
-	<br>
-	<c:choose>
-		<c:when test="${memberInfo != null }">
-			<p align="right"><button onclick="location.href='${pageContext.request.contextPath}/board/customer/customerWriteForm?category=${category }'">글쓰기</button></p>
-		</c:when>
-	</c:choose>
-	
-	<!--  글쓰기버튼끝 -->
-	
-	<br>
-	
-	<!--  글 검색 -->
-	
-	<form action="${pageContext.request.contextPath}/board/customer/shSearch?brd_id=${category}&category=${category}" method="post" name="shSearch">
-   		<select name="search">
-				<option value="shs_title">제목</option>
-				<option value="shs_content">내용</option>
-				<option value="shs_title_content">제목+내용</option>
-				<option value="shs_nickname">닉네임</option>
-		</select> 
-   
-        <input type="text" name="search_keyword" placeholder="검색할 내용을 입력하세요">
-        <button type="submit">검색 </button><p>
-    </form>
-    
-    <!-- 글 검색 끝 -->
-	
-	</div>
-	
-	<!-- 여기까지 -->
-	
-		<button id="scrollToTop" class="adv-hover">
+<form action="${pageContext.request.contextPath }/board/information/modify" method = "post" id = "modify">
+	<input type="hidden" name="art_id" value="${article.art_id }">
+	<input type="hidden" name="brd_id" value="${article.brd_id }">
+	<input type="hidden" name="category" value="${category}">
+      <div id="wrap" >
+        <h1>게시글 수정</h1>
+            <table>
+                <tr>
+                    <th>제목</th>
+                    <td><input type="text" name="art_title" value="${article.art_title}"></td>
+                </tr>
+                <tr>
+                    <th>태그1</th>
+                    <td><input type="text" name="art_tag1" value="${article.art_tag1}"></td>
+                </tr>
+                <tr>
+                    <th>태그2</th>
+                    <td><input type="text" name="art_tag2" value="${article.art_tag2}"></td>
+                </tr>
+                <tr>
+                    <th>태그3</th>
+                    <td><input type="text" name="art_tag3" value="${article.art_tag3}"></td>
+                </tr>
+                <tr>
+                    <th>태그4</th>
+                    <td><input type="text" name="art_tag4" value="${article.art_tag4}"></td>
+                </tr>
+                <tr>
+                    <th>태그5</th>
+                    <td><input type="text" name="art_tag5" value="${article.art_tag5}"></td>
+                </tr>
+                <tr>
+                    <th>내용</th>
+                    <td><textarea rows="15" cols="70" name="art_content">${article.art_content}</textarea></td>
+                </tr>
+            </table>
+    	<button type="submit">수정하기</button>
+    	<button onclick="window.history.back()">뒤로가기</button>
+</div>
+</form>
+	<button id="scrollToTop" class="adv-hover">
 			<svg style="fill: var(--subtheme); stroke: var(--subtheme); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" width="20" height="10" viewBox="0 0 32 16">
 				<path d="M 15 1 L 1 15 31 15 Z"/>
 			</svg>
@@ -272,6 +258,9 @@
 			</svg>
 		</button>
 	</main>
+	
+	
+	
 	<aside id="rightside">
 		
 	</aside>

@@ -42,6 +42,18 @@ public class ReportDaoImpl implements ReportDao {
 	public Object hgGetInstanceByReportId(int report_id, String pascalClassName) {
 		return session.selectOne("hgGet" + pascalClassName + "ByReportId", report_id);
 	}
+	@Override
+	public int hgUpdateInstanceAboutReport(Report report, String pascal) {
+		return session.update(String.format("hgUpdate%sAboutReport", pascal), report);
+	}
+	@Override
+	public int hgUpdateReportBatch(Report report) {
+		return session.update("hgUpdateReportBatch", report);
+	}
+	@Override
+	public int hgRejectReport(Report report) {
+		return session.delete("hgRejectReport", report);
+	}
 
 	// 양동균
 	@Override

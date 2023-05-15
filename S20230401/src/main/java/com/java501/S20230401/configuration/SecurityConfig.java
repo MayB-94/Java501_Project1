@@ -36,8 +36,8 @@ public class SecurityConfig {
 		http.csrf().disable(); // 추후 각주처리... POST 마다 CSRF TOKEN 값을 hidden type으로 넣어주면 됨...
 		http.authorizeRequests()
 			.antMatchers("/user/**").authenticated()
-			//.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
-			.antMatchers("/admin/**").authenticated()
+			.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
+			//.antMatchers("/admin/**").authenticated()
 			.anyRequest().permitAll()
 			.and()
 			.formLogin()

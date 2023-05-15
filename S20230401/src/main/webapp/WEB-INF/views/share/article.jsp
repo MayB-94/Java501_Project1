@@ -290,8 +290,7 @@
 							</c:forEach>
 						</form>
 					</div>
-				</div>
-				<c:if test="${not empty article.trade.trd_id}">
+					
 					<!-- 본문 내용 -->
 					<div class="article_content" style="padding: 20px 10px;">
 						${article.art_content }
@@ -427,7 +426,7 @@
 							<c:if test="${memberInfo == null}"><div class="login display-flex justify-content-center align-items-center"><a href="${pageContext.request.contextPath}/login"><h3 class="color-subtheme">로그인</h3></a><span> 후 이용 가능합니다</span></div></c:if>
 						</div>
 					</div>
-				</c:if>
+				</div>
 				
 				<div class="article-body" style="border-bottom: 1px solid rgba(128, 128, 128, 0.5);">
 					<!-- 추천 비추천 -->
@@ -464,7 +463,7 @@
 							<div class="reply-view display-flex flex-direction-column justify-content-flex-start align-items-stretch" style="${(reply.rep_id != reply.rep_parent) ? 'margin-left: 32px; background-color: rgba(var(--subtheme-rgb), 0.125);' : ''}">
 								<div class="reply-header display-flex justify-content-flex-start align-items-center">
 								<div class="user-profile-image-in-list">
-									<img src="${pageContext.request.contextPath}/uploads/profile/${reply.member.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';">
+									<img src="${pageContext.request.contextPath}/uploads/profile/${reply.member.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg'; $(this).removeAttr('onerror');">
 								</div>
 								<div class="reply-header-info modal-report display-flex justify-content-flex-start align-items-center">
 									<span id="member_nickname" class="font-weight-bolder">${reply.member.mem_nickname}</span>
@@ -476,7 +475,9 @@
 									<span class="color-theme-font font-size-14px" style="color: rgba(var(--theme-font-rgb), 0.5);">(<fmt:formatDate value="${reply.rep_regdate}" pattern="yy-MM-dd :HH:mm:ss"/>)</span>
 								</div>
 								<div class="flex-grow-1 display-flex justify-content-flex-end align-items-center">
+									<c:if test="${memberInfo != null }">
 										<button class="btns-repWrite font-weight-bolder">댓글 달기</button>
+									</c:if>
 									<c:if test="${reply.mem_id == memberInfo.mem_id || memberInfo.mem_authority > 108}">
 										<button class="btns-repUpdate font-weight-bolder">수정</button>
 										<button class="btns-repComplete font-weight-bolder" style="display: none;" onclick="rep_Update(${status.index})">완료</button>

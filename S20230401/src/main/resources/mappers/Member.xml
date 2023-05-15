@@ -13,6 +13,17 @@
 	<select id="hgGetMemberByNickname" parameterType="java.lang.String" resultType="Member">
 		SELECT * FROM MEMBER WHERE MEM_NICKNAME = #{nickname}
 	</select>
+	<select id="hgGetMemberByUsernameWithExcept" parameterType="hashmap" resultType="Member">
+		SELECT * FROM MEMBER WHERE MEM_USERNAME = #{value} AND MEM_ID != #{except}
+	</select>
+	<select id="hgGetMemberByEmailWithExcept" parameterType="hashmap" resultType="Member">
+		SELECT * FROM MEMBER WHERE MEM_EMAIL = #{value} AND MEM_ID != #{except}
+	</select>
+	<select id="hgGetMemberByNicknameWithExcept" parameterType="hashmap" resultType="Member">
+		SELECT * FROM MEMBER WHERE MEM_NICKNAME = #{value} AND MEM_ID != #{except}
+	</select>
+	
+	
 	<insert id="hgRegistMember" parameterType="Member">
 		INSERT INTO MEMBER(MEM_ID, MEM_USERNAME, MEM_PASSWORD, MEM_NICKNAME,
 						   MEM_EMAIL, MEM_TEL, MEM_REGION1, MEM_REGION2,
@@ -29,7 +40,63 @@
 	<update id="hgSetAuthority" parameterType="Member">
 		UPDATE MEMBER SET MEM_AUTHORITY = #{mem_authority, jdbcType=NUMERIC} WHERE MEM_ID = #{mem_id, jdbcType=NUMERIC}
 	</update>
-
+	<select id="hgGetCountAllMembers" resultType="int">
+		SELECT COUNT(*) FROM MEMBER
+	</select>
+	<select id="hgGetMembersForAdmin" parameterType="Member" resultType="Member">
+		SELECT *
+		FROM (SELECT TEMP.*, ROWNUM RN
+				 FROM (SELECT MEM.MEM_ID, MEM.MEM_USERNAME, MEM.MEM_NICKNAME, MEM.MEM_EMAIL, MEM.MEM_TEL, MEM.MEM_REGION1,
+									MEM.MEM_REGION2, MEM.MEM_AUTHORITY, MEM.MEM_REGDATE, MEM.MEM_IMAGE, MEM.MEM_GENDER,
+								    MEM.MEM_NAME, MEM.MEM_BIRTHDAY, MEM.MEM_LATEST, MEM.ISDELETE, MEM.REPORT_ID,
+							        NVL(MR.MEMBER_REPORT_CNT, 0) MEMBER_REPORT_CNT,
+							        NVL(AR.ARTICLE_REPORT_CNT, 0) ARTICLE_REPORT_CNT,
+							        NVL(RR.REPLY_REPORT_CNT, 0) REPLY_REPORT_CNT
+						  FROM MEMBER MEM,
+							       (SELECT M.MEM_ID, RJ1.MEMBER_REPORT_CNT
+			 				      	FROM MEMBER M LEFT OUTER JOIN (SELECT TM1.REPORT_ID, COUNT(*) MEMBER_REPORT_CNT
+												                                   FROM MEMBER TM1 LEFT OUTER JOIN REPORT TR1 ON(TM1.REPORT_ID = TR1.REPORT_ID)
+												                                   WHERE TM1.REPORT_ID IS NOT NULL
+												                                   GROUP BY TM1.REPORT_ID) RJ1 ON (M.REPORT_ID = RJ1.REPORT_ID)) MR,
+							       (SELECT M.MEM_ID, RJ2.ARTICLE_REPORT_CNT
+							      	FROM MEMBER M LEFT OUTER JOIN (SELECT TA2.MEM_ID, COUNT(*) ARTICLE_REPORT_CNT
+												                                   FROM ARTICLE TA2 LEFT OUTER JOIN REPORT TR2 ON (TA2.REPORT_ID = TR2.REPORT_ID)
+			 									                                   WHERE TA2.REPORT_ID IS NOT NULL
+												                                   GROUP BY TA2.MEM_ID) RJ2 ON (M.MEM_ID = RJ2.MEM_ID)) AR,
+							       (SELECT M.MEM_ID, RJ3.REPLY_REPORT_CNT
+							      	FROM MEMBER M LEFT OUTER JOIN (SELECT TREP3.MEM_ID, COUNT(*) REPLY_REPORT_CNT
+												                                   FROM REPLY TREP3 LEFT OUTER JOIN REPORT TR3 ON (TREP3.REPORT_ID = TR3.REPORT_ID)
+												                                   WHERE TREP3.REPORT_ID IS NOT NULL
+												                                   GROUP BY TREP3.MEM_ID) RJ3 ON (M.MEM_ID = RJ3.MEM_ID)) RR
+						  WHERE MEM.MEM_ID = MR.MEM_ID AND MEM.MEM_ID = AR.MEM_ID AND MEM.MEM_ID = RR.MEM_ID
+						  ORDER BY MEM.MEM_ID DESC) TEMP)
+		WHERE RN BETWEEN #{start} AND #{end}
+	</select>
+	<!-- <select id="hgGetMemberById" parameterType="int" resultType="Member">
+		SELECT MEM_ID, MEM_USERNAME, MEM_NICKNAME, MEM_EMAIL, MEM_TEL, MEM_REGION1,
+		          MEM_REGION2, MEM_AUTHORITY, MEM_REGDATE, MEM_IMAGE, MEM_GENDER,
+			      MEM_NAME, MEM_BIRTHDAY, MEM_LATEST, ISDELETE, REPORT_ID
+		FROM MEMBER
+		WHERE MEM_ID = #{mem_id}
+	</select> -->
+	<update id="hgUpdateAuthorityByMember" parameterType="Member">
+		UPDATE MEMBER SET MEM_AUTHORITY = #{mem_authority} WHERE MEM_ID = #{mem_id}
+	</update>
+	<update id="hgUpdateIsdeleteByMember" parameterType="Member">
+		UPDATE MEMBER SET ISDELETE = #{isdelete} WHERE MEM_ID = #{mem_id}
+	</update>
+	<update id="hgUpdateMember" parameterType="Member">
+		UPDATE MEMBER SET MEM_NICKNAME = #{mem_nickname},
+									MEM_TEL = #{mem_tel},
+									MEM_BIRTHDAY = #{mem_birthday},
+									MEM_GENDER = #{mem_gender},
+									<if test="mem_image != null">
+										MEM_IMAGE = #{mem_image},
+									</if>
+									MEM_REGION1 = #{mem_region1, jdbcType=NUMERIC},
+									MEM_REGION2 = #{mem_region2, jdbcType=NUMERIC}
+		WHERE MEM_ID = #{mem_id}
+	</update>
 
 
 
@@ -52,7 +119,7 @@
 		<result column="mem_birthday"	property="mem_birthday"/>
 		<result column="mem_latest"		property="mem_latest"/>
 		<result column="isdelete"		property="isdelete"/>
-		<result column="memReport_id"		property="report_id"/>
+		<result column="report_id"		property="report_id"/>
 		<collection property="comm" 	resultMap="com.java501.S20230401.model.CommMapper.dgCommMap"/>
 	</resultMap>
 	

@@ -7,7 +7,7 @@ import com.java501.S20230401.model.Join;
 
 public interface JoinDao {
 	// 김진현
-	public int jhJoinListYN(Article article);
+	public int JHJoinListYN(Article article);
 	
 
 	// 양동균

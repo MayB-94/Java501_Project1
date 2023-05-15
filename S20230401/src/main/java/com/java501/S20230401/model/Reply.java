@@ -26,6 +26,7 @@ public class Reply {
 	// 백준
 	private Integer	rep_cnt;
 	private String	mem_nickname;
+	private String	mem_username;
 	private String	mem_image;
 	
 }

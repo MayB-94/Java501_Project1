@@ -33,7 +33,18 @@ public class ReportServiceImpl implements ReportService {
 	public Object hgGetInstanceByReportId(int report_id, String pascalClassName) {
 		return pd.hgGetInstanceByReportId(report_id, pascalClassName);
 	}
-	
+	@Override
+	public int hgUpdateInstanceAboutReport(Report report, String pascal) {
+		return pd.hgUpdateInstanceAboutReport(report, pascal);
+	}
+	@Override
+	public int hgUpdateReportBatch(Report report) {
+		return pd.hgUpdateReportBatch(report);
+	}
+	@Override
+	public int hgRejectReport(Report report) {
+		return pd.hgRejectReport(report);
+	}
 	
 	// 양동균
 	@Override

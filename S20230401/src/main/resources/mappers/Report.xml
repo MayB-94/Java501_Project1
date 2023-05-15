@@ -17,7 +17,7 @@
 	</select>
 	<select id="hgGetAllUnprocessedReports" parameterType="Report" resultType="Report">
 		SELECT *
-		FROM (SELECT ROWNUM RN, R.*, M.MEM_NICKNAME, T.TYPE
+		FROM (SELECT ROWNUM RN, R.*, M.MEM_NICKNAME, M.MEM_USERNAME, T.TYPE
 			  FROM (SELECT *
 			  		FROM REPORT
 			  		WHERE REPORT_STATUS = 0
@@ -32,14 +32,41 @@
 		WHERE RN BETWEEN #{start} AND #{end}
 	</select>
 	<select id="hgGetMemberByReportId" parameterType="int" resultType="Member">
-		SELECT * FROM MEMBER WHERE REPORT_ID = #{report_id}
+		SELECT *
+		FROM (SELECT TM.MEM_ID, TM.MEM_USERNAME, TM.MEM_NICKNAME, TM.MEM_EMAIL, TM.MEM_TEL, TM.MEM_REGION1,
+						   TM.MEM_REGION2, TM.MEM_AUTHORITY, TM.MEM_REGDATE, TM.MEM_IMAGE, TM.MEM_GENDER,
+						   TM.MEM_NAME, TM.MEM_BIRTHDAY, TM.MEM_LATEST, TM.ISDELETE, TM.REPORT_ID
+				 FROM MEMBER TM WHERE REPORT_ID = #{report_id}) A,
+				(SELECT COUNT(CASE WHEN (R.REPORT_STATUS = 1 AND REPORT_ID = #{report_id}) THEN 1 END) MEMBER_REPORT_CNT,
+						  COUNT(CASE WHEN (A.MEM_ID = (SELECT MEM_ID FROM MEMBER WHERE REPORT_ID = #{report_id}) AND R.REPORT_STATUS = 1) THEN 1 END) ARTICLE_REPORT_CNT,
+						  COUNT(CASE WHEN (REP.MEM_ID = (SELECT MEM_ID FROM MEMBER WHERE REPORT_ID = #{report_id}) AND R.REPORT_STATUS = 1) THEN 1 END) REPLY_REPORT_CNT
+				 FROM REPORT R LEFT OUTER JOIN ARTICLE A USING (REPORT_ID) LEFT OUTER JOIN REPLY REP USING (REPORT_ID))
 	</select>
 	<select id="hgGetArticleByReportId" parameterType="int" resultType="Article">
-		SELECT * FROM ARTICLE WHERE REPORT_ID = #{report_id}
+		SELECT A.*, M.MEM_NICKNAME, M.MEM_USERNAME
+		FROM ARTICLE A LEFT OUTER JOIN MEMBER M ON (A.MEM_ID = M.MEM_ID)
+		WHERE A.REPORT_ID = #{report_id}
 	</select>
 	<select id="hgGetReplyByReportId" parameterType="int" resultType="Reply">
-		SELECT * FROM REPLY WHERE REPORT_ID = #{report_id}
+		SELECT R.*, M.MEM_NICKNAME, M.MEM_USERNAME, M.MEM_IMAGE
+		FROM REPLY R LEFT OUTER JOIN MEMBER M ON (R.MEM_ID = M.MEM_ID)
+		WHERE R.REPORT_ID = #{report_id}
 	</select>
+	<update id="hgUpdateMemberAboutReport" parameterType="Report">
+		UPDATE MEMBER SET MEM_AUTHORITY = 102 WHERE REPORT_ID = #{report_id}
+	</update>
+	<update id="hgUpdateArticleAboutReport" parameterType="Report">
+		UPDATE ARTICLE SET ISDELETE = 1 WHERE REPORT_ID = #{report_id}
+	</update>
+	<update id="hgUpdateReplyAboutReport" parameterType="Report">
+		UPDATE REPLY SET ISDELETE = 1 WHERE REPORT_ID = #{report_id}
+	</update>
+	<update id="hgUpdateReportBatch" parameterType="Report">
+		UPDATE REPORT SET REPORT_STATUS = 1 WHERE REPORT_ID = #{report_id}
+	</update>
+	<delete id="hgRejectReport" parameterType="Report">
+		DELETE FROM REPORT WHERE REPORT_ID = #{report_id} AND MEM_ID = #{mem_id}
+	</delete>
 	
 	
 	<!-- 양동균 -->

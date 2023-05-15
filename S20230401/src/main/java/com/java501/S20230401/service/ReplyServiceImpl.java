@@ -64,12 +64,8 @@ public class ReplyServiceImpl implements ReplyService {
 		return countReply;
 	}
 	@Override
-	public List<Reply> replyList(Reply reply) {
-
-		List<Reply> listReply = null;
-		listReply = rd.replyList(reply);
-		System.out.println("댓글 서비스 시작"+ listReply);
-		return listReply;
+	public List<Reply> replyList(Article article) {
+		return rd.replyList(article);
 	}
 	@Override
 	public int customerWriteReply(Reply reply) {
@@ -106,6 +102,22 @@ public class ReplyServiceImpl implements ReplyService {
 	@Override
 	public List<ReplyMember> hgGetRepliesOfMember(int mem_id) {
 		return rd.hgGetRepliesOfMember(mem_id);
+	}
+	@Override
+	public List<Reply> hgGetRepliesOfArticle(Article searcher) {
+		return rd.hgGetRepliesOfArticle(searcher);
+	}
+	@Override
+	public int hgDeleteReply(Reply reply) {
+		return rd.hgDeleteReply(reply);
+	}
+	@Override
+	public Reply hgGetReplyById(Reply reply) {
+		return rd.hgGetReplyById(reply);
+	}
+	@Override
+	public int hgRealDeleteReply(Reply reply) {
+		return rd.hgRealDeleteReply(reply);
 	}
 	
 	

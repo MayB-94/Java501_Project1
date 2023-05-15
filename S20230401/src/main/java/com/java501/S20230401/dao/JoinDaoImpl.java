@@ -60,7 +60,7 @@ public class JoinDaoImpl implements JoinDao {
 	
 	// 김진현
 	@Override
-	public int jhJoinListYN(Article article) {
+	public int JHJoinListYN(Article article) {
 		return session.selectOne("JHJoinListYN", article);
 	}
 
