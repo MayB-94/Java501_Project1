@@ -352,7 +352,7 @@
 					<div class="btns-right" style="display: flex; justify-content: flex-end; flex-grow: 1;">
 						<span>
 							<c:if test="${memberInfo != null}">
-								<button class="btn-write adv-hover" onclick="location.href='${pageContext.request.contextPath}/board/share/write?category=${category}';">글쓰기</button>
+								<button style="height: 40px; width: 80px; background-clip: border: 0 solid #e5e7eb; padding: 10px;" class="btn-write adv-hover" onclick="location.href='${pageContext.request.contextPath}/board/share/write?category=${category}';">글쓰기</button>
 							</c:if>
 						</span>
 					</div>
