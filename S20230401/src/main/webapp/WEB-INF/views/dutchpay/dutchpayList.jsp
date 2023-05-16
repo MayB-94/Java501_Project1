@@ -149,7 +149,7 @@
 
 	function goWriteForm(p_mem_id) {
 		 if ( p_mem_id != null ) {
-			location.href="/board/dutchpay/dutchpayWriteForm";
+			location.href="/board/dutchpay/dutchpayWriteForm?mem_id=" +p_mem_id;
 		 } else {
 			alert('로그인이 필요한 서비스입니다.');
 		    location.href = '/login';

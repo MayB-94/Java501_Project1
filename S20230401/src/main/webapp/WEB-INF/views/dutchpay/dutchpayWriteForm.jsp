@@ -318,6 +318,7 @@
 					<input type="hidden" 	name="art_bad" 			value="0">
 					<input type="hidden" 	name="art_read" 		value="0">
 					<input type="hidden" 	name="isdelete" 		value="0">
+											<input type="hidden" name="mem_id" value="${memberInfo.mem_id}">
 					
 					
 					<div class="display-flex justify-content-space-between align-items-center">
