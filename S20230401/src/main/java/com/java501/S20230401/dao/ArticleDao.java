@@ -26,6 +26,8 @@ public interface ArticleDao {
 	public int hgRestoreArticle(Article article);
 	public int hgInsertAdminArticle(Article article);
 	public List<Article> hgAdminArticleList(Article searcher);
+	public int hgGetCountAllArticle();
+	public List<Article> hgGetArticles(Article searcher);
 	
 	
 	// 양동균
@@ -42,7 +44,7 @@ public interface ArticleDao {
 
 	
 	// 백준
-	Integer 						totalArticle(int brd_id);
+	Integer 						bjTotalArticle(Article article);
 	List<Article> 					articleTotal(Article article);
 	Article 						detailContent(Article article);
 	Integer							replyCount(int art_id);
@@ -57,6 +59,10 @@ public interface ArticleDao {
 	List<Article>					bjArtSearch(Article article);
 	Integer 						bjGood(Article article);
 	Integer							bjBad(Article article);
+	List<Comm> 						bjcommList(int comm_id);
+	String 							bjCategoryName(int comm_id);
+	
+	
 	
 	// 임동빈
 	int 			dbtotalArticle(Article article);
@@ -76,6 +82,7 @@ public interface ArticleDao {
 	int 			dbTradeDeleteWaiting(Article article);
 	int 			dbJoinDelete(Article article);
 	int 			dbFavoriteArticle(Article article);
+	int 			dbFavoriteArticleDelete(Article article);
 	int 			dbChangeStatus(Article article);
 	int 			dbChangeEndStatus(Article article);
 	int 			dbChangeCancelStatus(Article article);
@@ -83,6 +90,8 @@ public interface ArticleDao {
 	int 			dbArticleBadUp(Article article);
 	int             dbReplyGoodUp(Article article);
 	int				dbReplyBadUp(Article article);
+	int 			dbCondArticleCnt(Article article);
+	List<Article>   dbListSearchArticle(Article article);
 	
 	
 	
@@ -94,31 +103,33 @@ public interface ArticleDao {
 	
 	
 	// 김찬영
-	int				totalArticle();								
-	List<Article> 	listArticle(Article article);				
-//	List<Article> 	listReply(Article article);				
+	int				cytotalArticle();								
+	List<Article> 	cylistArticle(Article article);				
+//	List<Article> 	cylistReply(Article article);				
 	Article			cyArticlereadDetail(Article article);		
 	Article 		cyArticlereadupdate(Article article);		
-	Article 		detatilArticle(int art_title);				
+	Article 		cydetatilArticle(int art_title);				
 	int				cyArticleinsert(Article article);			
 	int				cyArticlemodify(Article article);			
 	public int 		cyArticledelete(Article article);			
-	int				updateView(Article article);
-	int				updateGood(Article article);
-	int				updateBad(Article article);
-//	public int 		totalArticleSearch(Article article);
+	int				cyupdateView(Article article);
+	int				cyupdateGood(Article article);
+	int				cyupdateBad(Article article);
+//	public int 		cytotalArticleSearch(Article article);
 	
 	// 최승환
+	int 			totalCustomer(Article article);
 	List<Article> 	listCustomer(Article article);
 	Article 		detailCustomer(Article article);
-	List<Article> 	listCustomerMenu(Article article);
+	//List<Article> 	listCustomerMenu(Article article); //??
 	int 			insertCustomer(Article article);
-	int updateCustomer(Article article);
-	int deleteCustomer(Article article);
-	Integer customerViewCount(Article article);
-	int totalCustomer(Article article);
-	List<Article> shCustomerSearch(Article article);
-
+	int 			updateCustomer(Article article);
+	int 			deleteCustomer(Article article);
+	Integer 		customerViewCount(Article article);
+	List<Article> 	shCustomerSearch(Article article);
+	int 			customLike(Article article);
+	int 			customDislike(Article article);
+	
 	
 	
 	// 김진현
@@ -149,6 +160,10 @@ public interface ArticleDao {
 	public void             JHartBad2(Article article);
 	public void 			JHrepGood2(Article article);
 	public void 			JHrepBad2(Article article);
+
+	
+	
+	
 	
 	
 }

@@ -737,7 +737,7 @@
 							<div class="reply-view display-flex flex-direction-column justify-content-flex-start align-items-stretch" style="${(Rep.rep_id != Rep.rep_parent) ? 'margin-left: 32px; background-color: rgba(var(--subtheme-rgb), 0.125);' : ''}">
 								<div class="reply-header display-flex justify-content-flex-start align-items-center">
 								<div class="user-profile-image-in-list">
-									<img alt="profile" src="${pageContext.request.contextPath}/uploads/profile/${Rep.mem_image}">
+									<img src="${pageContext.request.contextPath}/uploads/profile/${Rep.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg'; $(this).removeAttr('onerror');">
 								</div>
 								<div class="reply-header-info modal-report display-flex justify-content-flex-start align-items-center">
 									<span id="member_nickname" class="font-weight-bolder">${Rep.mem_nickname}</span>
@@ -749,8 +749,10 @@
 									<span class="color-theme-font font-size-14px" style="color: rgba(var(--theme-font-rgb), 0.5);">(<fmt:formatDate value="${Rep.rep_regdate}" pattern="yy-MM-dd :HH:mm:ss"/>)</span>
 								</div>
 								<div class="flex-grow-1 display-flex justify-content-flex-end align-items-center">
-									<c:if test="${Rep.mem_id == memberInfo.mem_id || memberInfo.mem_authority > 108}">
+									<c:if test="${memberInfo != null }">
 										<button class="btns-repWrite font-weight-bolder">댓글 달기</button>
+									</c:if>
+									<c:if test="${Rep.mem_id == memberInfo.mem_id || memberInfo.mem_authority > 108}">
 										<button class="btns-repUpdate font-weight-bolder">수정</button>
 										<button class="btns-repComplete font-weight-bolder" style="display: none;" onclick="rep_Update(${status.index})">완료</button>
 										<button class="btns-delete font-weight-bolder" onclick="goreplyDelete(${detail.brd_id},${detail.art_id },${Rep.rep_id })">삭제</button>

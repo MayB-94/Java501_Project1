@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +25,7 @@ import com.java501.S20230401.model.Article;
 import com.java501.S20230401.model.Comm;
 import com.java501.S20230401.model.Member;
 import com.java501.S20230401.model.MemberDetails;
+import com.java501.S20230401.model.MemberInfo;
 import com.java501.S20230401.model.Reply;
 import com.java501.S20230401.model.Report;
 import com.java501.S20230401.service.ArticleService;
@@ -79,7 +81,7 @@ public class AdminController {
 		switch(type) {
 			case "notice":
 				searcher.setBrd_id(1510);
-				paging = new Paging(as.allTotalArt(searcher), Integer.toString(page));
+				paging = new Paging(as.allTotalArt(searcher), Integer.toString(page), 20, 10);
 				searcher.setStart(paging.getStart());
 				searcher.setEnd(paging.getEnd());
 				articles = as.hgAdminArticleList(searcher);
@@ -93,7 +95,7 @@ public class AdminController {
 				return "admin/adminTemplate";
 			case "event":
 				searcher.setBrd_id(1530);
-				paging = new Paging(as.allTotalArt(searcher), Integer.toString(page));
+				paging = new Paging(as.allTotalArt(searcher), Integer.toString(page), 20, 10);
 				searcher.setStart(paging.getStart());
 				searcher.setEnd(paging.getEnd());
 				articles = as.hgAdminArticleList(searcher);
@@ -117,18 +119,68 @@ public class AdminController {
 					if (reportItems.containsKey(rpt_id)) continue;
 					String rawType = rpt.getType();
 					String pascal = rawType == null ? null : rawType.substring(0, 1).toUpperCase() + rawType.toLowerCase().substring(1);
-//					Object resultInstance = repos.hgGetInstanceByReportId(rpt_id, pascal);
-					try { reportItems.put(rpt_id, Class.forName("com.java501.S20230401.model." + pascal).cast(repos.hgGetInstanceByReportId(rpt_id, pascal))); }
-					catch (Exception e) { reportItems.put(rpt_id, null); }
-//					switch(rawType.toUpperCase()) {
-//						case "MEMBER": reportItems.put(rpt_id, (Member)resultInstance); break;
-//						case "ARTICLE": reportItems.put(rpt_id, (Article)resultInstance); break;
-//						default: reportItems.put(rpt_id, (Reply)resultInstance); break;
-//					}
+					Object resultInstance = repos.hgGetInstanceByReportId(rpt_id, pascal);
+//					try { reportItems.put(rpt_id, Class.forName("com.java501.S20230401.model." + pascal).cast(repos.hgGetInstanceByReportId(rpt_id, pascal))); }
+//					catch (Exception e) { e.printStackTrace(); reportItems.put(rpt_id, null); }
+					switch(rawType.toUpperCase()) {
+						case "MEMBER": reportItems.put(rpt_id, (Member)resultInstance); break;
+						case "ARTICLE": reportItems.put(rpt_id, (Article)resultInstance); break;
+						default: reportItems.put(rpt_id, (Reply)resultInstance); break;
+					}
 				}
+				model.addAttribute("start", paging.getStart());
+				model.addAttribute("end", paging.getEnd());
+				model.addAttribute("startPage", paging.getStartPage());
+				model.addAttribute("endPage", paging.getEndPage());
+				model.addAttribute("total", paging.getTotal());
+				model.addAttribute("totalPage", paging.getTotalPage());
 				model.addAttribute("reportItems", reportItems);
 				model.addAttribute("reports", reports);
 				return "admin/adminReportTemplate";
+			case "member":
+				Member member = new Member();
+				paging = new Paging(ms.hgGetCountAllMembers(), Integer.toString(page), 10, 10);
+				member.setStart(paging.getStart());
+				member.setEnd(paging.getEnd());
+				List<Member> members = ms.hgGetMembersForAdmin(member);
+				model.addAttribute("start", paging.getStart());
+				model.addAttribute("end", paging.getEnd());
+				model.addAttribute("startPage", paging.getStartPage());
+				model.addAttribute("endPage", paging.getEndPage());
+				model.addAttribute("total", paging.getTotal());
+				model.addAttribute("totalPage", paging.getTotalPage());
+				model.addAttribute("members", members);
+				return "admin/adminMemberTemplate";
+			case "article":
+				paging = new Paging(as.hgGetCountAllArticle(), Integer.toString(page), 20, 10);
+				searcher.setStart(paging.getStart());
+				searcher.setEnd(paging.getEnd());
+				articles = as.hgGetArticles(searcher);
+				List<Comm> categoryNames = cs.hgGetCategoryNames();
+				Map<Integer, String> categories = categoryNames.stream().collect(Collectors.toMap(Comm::getComm_id, Comm::getComm_value));
+				model.addAttribute("categories", categories);
+				model.addAttribute("start", paging.getStart());
+				model.addAttribute("end", paging.getEnd());
+				model.addAttribute("startPage", paging.getStartPage());
+				model.addAttribute("endPage", paging.getEndPage());
+				model.addAttribute("total", paging.getTotal());
+				model.addAttribute("totalPage", paging.getTotalPage());
+				model.addAttribute("articles", articles);
+				return "admin/adminArticleTemplate";
+			case "suggest":
+				searcher.setBrd_id(1540);
+				paging = new Paging(as.allTotalArt(searcher), Integer.toString(page), 20, 10);
+				searcher.setStart(paging.getStart());
+				searcher.setEnd(paging.getEnd());
+				articles = as.hgAdminArticleList(searcher);
+				model.addAttribute("start", paging.getStart());
+				model.addAttribute("end", paging.getEnd());
+				model.addAttribute("startPage", paging.getStartPage());
+				model.addAttribute("endPage", paging.getEndPage());
+				model.addAttribute("total", paging.getTotal());
+				model.addAttribute("totalPage", paging.getTotalPage());
+				model.addAttribute("articles", articles);
+				return "admin/adminSuggestTemplate";
 			default: return "";
 		}
 	}
@@ -159,9 +211,22 @@ public class AdminController {
 				article = as.getArticleById(searcher);
 				model.addAttribute("article", article);
 				return "admin/adminViewTemplate";
-			case "report":
-				
-				return "";
+			case "article":
+				searcher.setArt_id((int)data.get("art_id"));
+				searcher.setBrd_id((int)data.get("brd_id"));
+				article = as.getArticleById(searcher);
+				List<Reply> replies = rs.hgGetRepliesOfArticle(searcher);
+				model.addAttribute("article", article);
+				model.addAttribute("replies", replies);
+				return "admin/adminArticleViewTemplate";
+			case "suggest":
+				searcher.setArt_id((int)data.get("art_id"));
+				searcher.setBrd_id(1540);
+				article = as.getArticleById(searcher);
+				List<Reply> replies2 = rs.hgGetRepliesOfArticle(searcher);
+				model.addAttribute("article", article);
+				model.addAttribute("replies", replies2);
+				return "admin/adminSuggestViewTemplate";
 		}
 		
 		return "admin/adminViewTemplate";
@@ -263,11 +328,46 @@ public class AdminController {
 				// Report 업데이트 구문...
 				// result = repos.hgUpdateReport(report);
 				// 여기엔 같은 신고번호에 대한 일괄 처리 관련 구문 넣으면 됨
-				result = 1; // for Test
+				String submit = (String)data.get("submit");
+				String pascal = submit == null ? null : submit.substring(0, 1).toUpperCase() + submit.toLowerCase().substring(1);
+				switch(submit) {
+					case "MEMBER":
+					case "ARTICLE":
+					case "REPLY":
+						result = repos.hgUpdateInstanceAboutReport(report, pascal);
+						repos.hgUpdateReportBatch(report);
+						break;
+					default: // Reject Submit Type
+						result = repos.hgRejectReport(report);
+						break;
+				}
 				jsonObj.append("result", result);
+			case "member":
+				Member member = ms.getMemberById((int)data.get("mem_id"));
+				switch(((String)data.get("change")).toUpperCase()) {
+					case "BAN":
+						member.setMem_authority(member.getMem_authority() == 102 ? 103 : 102);
+						result = ms.hgUpdateAuthorityByMember(member);
+						break;
+					case "DELETE":
+						member.setIsdelete(member.getIsdelete() == 0 ? 1 : 0);
+						result = ms.hgUpdateIsdeleteByMember(member);
+						break;
+					case "AUTH":
+						member.setMem_authority((int)data.get("value"));
+						result = ms.hgUpdateAuthorityByMember(member);
+						break;
+				}
+				jsonObj.append("result", result);
+				break;
+			case "suggest":
+				Reply reply = mapper.convertValue(data, Reply.class);
+				reply.setBrd_id(1540);
+				reply.setMem_id(memberDetails.getMemberInfo().getMem_id());
+				result = rs.hgInsertReply(reply);
+				jsonObj.append("result", result);
+				break;
 		}
-		
-		//response.setCharacterEncoding("UTF-8");
 		return jsonObj.toString();
 	}
 	
@@ -315,7 +415,7 @@ public class AdminController {
 	@ResponseBody
 	@RequestMapping(value = "/admin/{type}/delete")
 	public String adminDelete(@AuthenticationPrincipal MemberDetails memberDetails,
-						      @PathVariable String type, @RequestBody(required = false) Article article,
+						      @PathVariable String type, @RequestBody(required = false) Map<String, Object> data,
 						      HttpServletRequest request, HttpServletResponse response,
 						      Model model) {
 		if (memberDetails == null)
@@ -325,20 +425,42 @@ public class AdminController {
 		model.addAttribute("type", type);
 		
 		JSONObject jsonObj = new JSONObject();
-		
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        Article article;
 		int result;
 		switch(type) {
 			case "notice":
+				article = mapper.convertValue(data, Article.class);
 				article.setBrd_id(1510);
 				result = as.hgDeleteArticle(article);
 				jsonObj.append("result", result);
 				jsonObj.append("art_id", article.getArt_id());
 				break;
 			case "event":
+				article = mapper.convertValue(data, Article.class);
 				article.setBrd_id(1530);
 				result = as.hgDeleteArticle(article);
 				jsonObj.append("result", result);
 				jsonObj.append("art_id", article.getArt_id());
+				break;
+			case "article":
+				article = mapper.convertValue(data, Article.class);
+				result = as.hgDeleteArticle(article);
+				jsonObj.append("result", result);
+				jsonObj.append("art_id", article.getArt_id());
+				break;
+			case "reply":
+				Reply reply = mapper.convertValue(data, Reply.class);
+				reply = rs.hgGetReplyById(reply);
+				reply.setIsdelete(reply.getIsdelete() == 1 ? 0 : 1);
+				result = rs.hgDeleteReply(reply);
+				break;
+			case "suggest":
+				Reply reply2 = mapper.convertValue(data, Reply.class);
+				reply2.setBrd_id(1540);
+				result = rs.hgRealDeleteReply(reply2);
 				break;
 		}
 		
@@ -370,6 +492,11 @@ public class AdminController {
 			break;
 		case "event":
 			article.setBrd_id(1530);
+			result = as.hgRestoreArticle(article);
+			jsonObj.append("result", result);
+			jsonObj.append("art_id", article.getArt_id());
+			break;
+		case "article":
 			result = as.hgRestoreArticle(article);
 			jsonObj.append("result", result);
 			jsonObj.append("art_id", article.getArt_id());

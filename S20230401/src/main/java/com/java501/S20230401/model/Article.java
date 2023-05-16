@@ -6,6 +6,22 @@ import lombok.Data;
 
 @Data
 public class Article {
+	public String getKeyword() {
+		return keyword;
+	}
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+	
+	
+	public String getKeyWord() {
+		return keyWord;
+	}
+	public void setKeyWord(String keyWord) {
+		this.keyWord = keyWord;
+	}
+
+
 	private Integer art_id;			// PK
 	private Integer brd_id;			// PK
 	private Integer mem_id;			// FK
@@ -63,6 +79,8 @@ public class Article {
 	private String 		c1_comm_value;
 	private Integer 	c2_comm_id;
 	private String 		c2_comm_value;
+	private Integer     c3_comm_id;
+	private String		c3_comm_value;
 	// TRADE
 	private Integer 	trd_status;
 	private Integer 	trd_max;

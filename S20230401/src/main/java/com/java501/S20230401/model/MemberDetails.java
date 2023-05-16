@@ -3,19 +3,20 @@ package com.java501.S20230401.model;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.java501.S20230401.dao.CommDao;
+//import com.java501.S20230401.dao.CommDao;
 
 import lombok.Data;
 
 @Data
 public class MemberDetails implements UserDetails {
 	private final MemberInfo memberInfo;
-	@Autowired
-	private CommDao cd;
+//	@Autowired
+//	private CommDao cd;
 	
 	public MemberDetails(MemberInfo memberInfo) {
 		this.memberInfo = memberInfo;
@@ -35,7 +36,16 @@ public class MemberDetails implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		Collection<GrantedAuthority> collect = new ArrayList<>();
-		collect.add(() -> cd.getValueById(memberInfo.getMem_authority()));
+		//String role = cd.getValueById(memberInfo.getMem_authority());
+		String role = null;
+		switch(memberInfo.getMem_authority()) {
+			case 101: role = "ROLE_GUEST"; break;
+			case 102: role = "ROLE_BANNED"; break;
+			case 103: role = "ROLE_USER"; break;
+			case 108: role = "ROLE_MANAGER"; break;
+			case 109: role = "ROLE_ADMIN"; break;
+		}
+		collect.add(new SimpleGrantedAuthority(role));
 		return collect;
 	}
 	

@@ -60,8 +60,11 @@ public class CommDaoImpl implements CommDao {
 	public List<Comm> getCategoryListBySuper(Integer superId) {
 		return session.selectList("hgGetCategoryListBySuper", superId);
 	}
-
-
+	
+	@Override
+	public List<Comm> hgGetCategoryNames() {
+		return session.selectList("hgGetCategoryNames");
+	}
 
 
 
@@ -84,6 +87,32 @@ public class CommDaoImpl implements CommDao {
 		System.out.println("CommDaoImpl CommList.size()=> " + GenderList.size());
 		return GenderList;
 	}
+
+	
+	// 최승환
+//	@Override
+//	public String shcategoryName(int comm_id) {
+//		String shcategoryName = "";
+//		try {
+//			shcategoryName = session.selectOne("shCategoryName", comm_id);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return shcategoryName;
+//	}
+//
+//	@Override
+//	public List<Comm> shcommList(int comm_id) {
+//		List<Comm> shcommList = null;
+//		try {
+//			shcommList = session.selectList("shCommList", comm_id);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return shcommList;
+//	}
+	
+	
 
 	
 	
@@ -114,3 +143,4 @@ public class CommDaoImpl implements CommDao {
 	
 
 }
+

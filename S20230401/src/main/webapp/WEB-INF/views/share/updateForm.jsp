@@ -361,13 +361,14 @@
 					<div class="display-flex justify-content-space-between align-items-center">
 						<div class="form-group display-flex justify-content-flex-start align-items-center">
 							<label for="category" class="margin-right-5px">카테고리</label>
-							<select name="brd_id" id="brd_id">
-								<option value="1210" ${article.brd_id == 1210? 'selected':''}>식품</option>
-								<option value="1220" ${article.brd_id == 1220? 'selected':''}>패션/잡화</option>
-								<option value="1230" ${article.brd_id == 1230? 'selected':''}>가전/가구</option>
-								<option value="1240" ${article.brd_id == 1240? 'selected':''}>기타</option>
+							<select name="brd_id" id="brd_id" disabled="disabled">
+								<c:forEach var="comm" items="${categoryList}">
+									<option value="${comm.comm_id}" ${article.brd_id == comm.comm_id? 'selected':''}>${comm.comm_value }</option>
+								</c:forEach>
 							</select>
 						</div>
+						
+						
 						
 						<!-- 매니저 이상의 권한만 공지 설정 가능 -->
 						<c:if test="${memberInfo.mem_authority >= 108}">
@@ -434,7 +435,7 @@
 										</div>
 										<c:forEach var="region" items="${superRegions }">
 											<div style="position: relative;">
-												<button type="button" class="subitem-header adv-hover" onclick="$('#region-value').val(${region.reg_id}); $('#region').text('${region.reg_name }'); $('#region-popup').toggle();">${region.reg_name }</button>
+												<button type="button" class="subitem-header adv-hover" onclick="$('#reg_id').val(${region.reg_id}); $('#region').text('${region.reg_name }'); $('#region-popup').toggle();">${region.reg_name }</button>
 												<c:if test="${not empty regions[region] }">
 													<div class="subitem-list">
 														<button type="button" class="adv-hover" onclick="$('#reg_id').removeAttr('value'); $('#region').text(''); $('#region-popup').toggle();">없음</button>

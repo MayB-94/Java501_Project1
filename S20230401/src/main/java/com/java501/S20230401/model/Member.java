@@ -32,4 +32,14 @@ public class Member {
 	private String pageNum;
 	private Integer start;
 	private Integer end;
+	
+	// 유현규
+	private String mem_region1name;
+	private String mem_region2name;
+	private String mem_authname;
+	private String mem_gendername;
+	
+	private Integer member_report_cnt;
+	private Integer article_report_cnt;
+	private Integer reply_report_cnt;
 }

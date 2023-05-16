@@ -9,6 +9,9 @@ public interface ReportService {
 	public int hgGetCountAllUnprocessedReports();
 	public List<Report> hgGetAllUnprocessedReports(Report report);
 	public Object hgGetInstanceByReportId(int report_id, String pascalClassName);
+	public int hgUpdateInstanceAboutReport(Report report, String pascal);
+	public int hgUpdateReportBatch(Report report);
+	public int hgRejectReport(Report report);
 	
 	// 김찬영
 	int 			cyReportinsert(Report report);
@@ -17,5 +20,6 @@ public interface ReportService {
 	// 양동균
 	// 신고
 	int shareReport(Report report);
+	boolean shareIsReport(Report report);
 
 }

@@ -33,6 +33,7 @@
 				}
 			});
 		});
+		$('.side-menu[data-value="notice"]').click();
 	});
 </script>
 <style type="text/css">
@@ -341,7 +342,7 @@
 		opacity: 0.5;
 	}
 	
-	div.admin-board-1-page {
+	div.admin-board-1-page, div.admin-board-2-page {
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -475,6 +476,9 @@
 		border: 2.5px solid var(--subtheme);
 		border-width: 2.5px 0;
 	}
+	div.admin-board-2 div.list-item:not(:last-child) {
+		border-bottom: 1px solid var(--subtheme);
+	}
 	div.admin-report-container {
 		display: flex;
 		flex-direction: column;
@@ -525,7 +529,7 @@
 <body>
 	<aside>
 		<div id="admin-profile">
-			<div class="image-container">
+			<div class="image-container background-color-theme">
 				<img src="${pageContext.request.contextPath }/uploads/profile/${memberInfo.mem_image }" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';">
 			</div>
 			<span id="admin-nickname">${memberInfo.mem_nickname }</span>

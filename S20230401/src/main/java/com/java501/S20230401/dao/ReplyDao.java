@@ -25,7 +25,7 @@ public interface ReplyDao {
 	
 	// 최승환
 	int 			shReplyCount(Reply reply);
-	List<Reply> 	replyList(Reply reply);
+	List<Reply> 	replyList(Article article);
 	int 			customerWriteReply(Reply reply);
 	int 			customerDeleteReply(Reply reply);
 	int 			customerUpdateReply(Reply reply);
@@ -34,6 +34,10 @@ public interface ReplyDao {
 	public List<ReplyMember> getReplyByArticle(Article article);
 	public int hgInsertReply(Reply reply);
 	public List<ReplyMember> hgGetRepliesOfMember(int mem_id);
+	public List<Reply> hgGetRepliesOfArticle(Article searcher);
+	public int hgDeleteReply(Reply reply);
+	public Reply hgGetReplyById(Reply reply);
+	public int hgRealDeleteReply(Reply reply);
 	
 	// 임동빈
 	int 	dbInsertReply(Reply reply);

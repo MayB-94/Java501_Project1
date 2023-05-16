@@ -235,14 +235,23 @@ public class ArticleDaoImpl implements ArticleDao {
 		return session.selectList("hgAdminArticleList", searcher);
 	}
 	
+	@Override
+	public int hgGetCountAllArticle() {
+		return session.selectOne("hgGetCountAllArticle");
+	}
+	
+	@Override
+	public List<Article> hgGetArticles(Article searcher) {
+		return session.selectList("hgGetArticles", searcher);
+	}
+	
 	
 	// 백준
 	@Override
-	public Integer totalArticle(int brd_id) {
+	public Integer bjTotalArticle(Article article) {
 		int totArticleCount = 0;
 		try {
-			if (brd_id % 100 == 0) totArticleCount = session.selectOne("bjarticleIndex", brd_id);
-			else totArticleCount = session.selectOne("bjarticlePart", brd_id);
+			totArticleCount = session.selectOne("bjarticleCnt", article);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -423,6 +432,29 @@ public class ArticleDaoImpl implements ArticleDao {
 		return bad;
 	}
 	
+	@Override
+	public List<Comm> bjcommList(int comm_id) {
+		List<Comm> commList = null;
+		try {
+			commList = session.selectList("dgCommList", comm_id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return commList;
+	}
+	
+	@Override
+	public String bjCategoryName(int comm_id) {
+		String categoryName = "";
+		try {
+			categoryName = session.selectOne("dgCategoryName", comm_id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return categoryName;
+	}
+	
+	
 	//=================================================================================================
 	
 	
@@ -434,7 +466,7 @@ public class ArticleDaoImpl implements ArticleDao {
 
 		try {
 			if (article.getBrd_id() == 1000) {
-				totArticleCount = session.selectOne("dbArticleTotalCnt");
+				totArticleCount = session.selectOne("dbArticleTotalCnt", article);
 			} else {
 				totArticleCount = session.selectOne("dbArticleBoardCnt", article);
 			}
@@ -489,11 +521,6 @@ public class ArticleDaoImpl implements ArticleDao {
 	@Override
 	public void dbWriteArticle(Article article) {
 		try {
-			if (article.getReg_id2() == null) {
-				article.setReg_id(article.getReg_id1());
-			} else {
-				article.setReg_id(article.getReg_id2());
-			}
 			session.selectOne("dbInsertArticle", article);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -513,11 +540,6 @@ public class ArticleDaoImpl implements ArticleDao {
 	@Override
 	public void dbUpdateArticle(Article article) {
 		try {
-			if (article.getReg_id2() == null) {
-				article.setReg_id(article.getReg_id1());
-			} else {
-				article.setReg_id(article.getReg_id2());
-			}
 			session.selectOne("dbUpdateArticle", article);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -643,6 +665,17 @@ public class ArticleDaoImpl implements ArticleDao {
 	}
 	
 	@Override
+	public int dbFavoriteArticleDelete(Article article) {
+		int dbFavoriteArticleDelete = 0;
+		try {
+			dbFavoriteArticleDelete = session.delete("dbFavoriteArticleDelete", article);
+		} catch (Exception e) {
+			e.printStackTrace();	
+		}
+		return dbFavoriteArticleDelete;
+	}
+	
+	@Override
 	public int dbChangeStatus(Article article) {
 		int changeStatus = 0;
 		try {
@@ -719,23 +752,49 @@ public class ArticleDaoImpl implements ArticleDao {
 		return dbReplyBadUp;
 	}
 	
+	@Override
+	public int dbCondArticleCnt(Article article) {
+		int dbCondArticleCnt = 0;
+		try {
+			dbCondArticleCnt = session.selectOne("dbCondArticleCnt", article);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return dbCondArticleCnt;
+	}
 	
+	
+	@Override
+	public List<Article> dbListSearchArticle(Article article) {
+		List<Article> dbListSearchArticle = null;
+		try {
+			dbListSearchArticle = session.selectList("dbListSearchArticle", article);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return dbListSearchArticle;
+	}
+	
+	
+	
+	
+
 	
 	// 김찬영
 	// 총리스트
 	@Override
-	public int totalArticle() {
-		int totArticleCount = 0;
+	public int cytotalArticle() {
+		int cytotArticleCount = 0;
 		System.out.println("ArticleImpl Start total...");
 		
 		try {
-			totArticleCount = session.selectOne("ArticleTotal");
-			System.out.println("ArticleImpl totalArticle totArticleCount->" + totArticleCount);
+			cytotArticleCount = session.selectOne("cyArticleTotal");
+			System.out.println("ArticleImpl totalArticle cytotArticleCount->" + cytotArticleCount);
 		} catch (Exception e) {
-			System.out.println("ArticleImpl totalArticle Exception->"+e.getMessage());
+			System.out.println("ArticleImpl cytotalArticle Exception->"+e.getMessage());
 		}
 		
-		return totArticleCount;
+		return cytotArticleCount;
 	}
 	//검색
 //	@Override
@@ -753,15 +812,15 @@ public class ArticleDaoImpl implements ArticleDao {
 	
 	// 리스트조회
 	@Override
-	public List<Article> listArticle(Article article) {
-		List<Article> articleList = null;
+	public List<Article> cylistArticle(Article article) {
+		List<Article> cylistArticle = null;
 		System.out.println("ArticleDaoImpl listArticle Start...");
 		try {
-			articleList = session.selectList("cyArticleListAll", article);
+			cylistArticle = session.selectList("cyArticleListAll", article);
 		} catch (Exception e) {
 			System.out.println("ArticleImpl listArticle e.getMessage()->"+e.getMessage());
 		}
-		return articleList;
+		return cylistArticle;
 	}
 	
 
@@ -779,7 +838,7 @@ public class ArticleDaoImpl implements ArticleDao {
 	}
 	// 상세페이지
 	@Override
-	public Article detatilArticle(int art_title) {
+	public Article cydetatilArticle(int art_title) {
 		System.out.println("ArticleDaoImpl detail start..");
 		Article article = new Article();
 		
@@ -843,7 +902,7 @@ public class ArticleDaoImpl implements ArticleDao {
 	}
 		//조회수
 		@Override
-		public int updateView(Article article) {
+		public int cyupdateView(Article article) {
 			System.out.println(article);
 			System.out.println("ArticleDaoImpl updateView Start..article");
 			int result = 0;
@@ -856,7 +915,7 @@ public class ArticleDaoImpl implements ArticleDao {
 		}
 		//추천
 		@Override
-		public int updateGood(Article article) {
+		public int cyupdateGood(Article article) {
 			System.out.println(article);
 			System.out.println("ArticleDaoImpl updateView Start..article");
 			int result = 0;
@@ -869,7 +928,7 @@ public class ArticleDaoImpl implements ArticleDao {
 		}
 		//비추천
 		@Override
-		public int updateBad(Article article) {
+		public int cyupdateBad(Article article) {
 			System.out.println(article);
 			System.out.println("ArticleDaoImpl updateView Start..article");
 			int result = 0;
@@ -889,6 +948,23 @@ public class ArticleDaoImpl implements ArticleDao {
 		
 	
 	// 최승환
+		
+	@Override
+	public int totalCustomer(Article article) {
+		int totCustomerCount = 0;
+		System.out.println("ArticleDaoImpl Start int totalCustomer...");
+		
+		try {
+			totCustomerCount = session.selectOne("shCustomerCount", article);
+			System.out.println("ArticleDaoImpl shCustomerCount int totCustomerCount->" +totCustomerCount);
+			
+		} catch (Exception e) {
+			System.out.println("ArticleDaoImpl int shCustomerCount Exception->"+e.getMessage());
+		}
+		return totCustomerCount;
+	}	
+		
+	// 전체글 조회
 	@Override
 	public List<Article> listCustomer(Article article) {
 		List<Article> customerList = null;
@@ -904,7 +980,7 @@ public class ArticleDaoImpl implements ArticleDao {
 	}
 	
 	
-	
+	// 상세페이지
 	@Override
 	public Article detailCustomer(Article article) {
 		System.out.println("ArticleDaoImpl detailCustomer start...");
@@ -917,19 +993,17 @@ public class ArticleDaoImpl implements ArticleDao {
 		}
 		return customerDetail;
 	}
-
-	@Override
-	public List<Article> listCustomerMenu(Article article) {
-		List<Article> listMenu = null;
-		try {
-			listMenu = session.selectList("shListCustomerMenu", article);
-			System.out.println("다오 리스트메뉴"+listMenu);
-		} catch (Exception e) {
-			System.out.println("메뉴에러"+e.getMessage());
-		}
-			
-		return listMenu;
-	}
+	
+	// 넌뭐냐
+	/*
+	 * @Override public List<Article> listCustomerMenu(Article article) {
+	 * List<Article> listMenu = null; try { listMenu =
+	 * session.selectList("shListCustomerMenu", article);
+	 * System.out.println("다오 리스트메뉴"+listMenu); } catch (Exception e) {
+	 * System.out.println("메뉴에러"+e.getMessage()); }
+	 * 
+	 * return listMenu; }
+	 */
 	
 	@Override
 	public int insertCustomer(Article article) {
@@ -985,21 +1059,7 @@ public class ArticleDaoImpl implements ArticleDao {
 		}
 		return vCount;
 	}
-	
-	@Override
-	public int totalCustomer(Article article) {
-		int totCustomerCount = 0;
-		System.out.println("ArticleDaoImpl Start int totalCustomer...");
-		
-		try {
-			totCustomerCount = session.selectOne("shCustomerCount", article);
-			System.out.println("ArticleDaoImpl shCustomerCount int totCustomerCount->" +totCustomerCount);
-			
-		} catch (Exception e) {
-			System.out.println("ArticleDaoImpl int shCustomerCount Exception->"+e.getMessage());
-		}
-		return totCustomerCount;
-	}
+
 	
 	@Override
 	public List<Article> shCustomerSearch(Article article) {
@@ -1013,12 +1073,31 @@ public class ArticleDaoImpl implements ArticleDao {
 		return shCustomerSearch;
 	}
 	
+	@Override
+	public int customLike(Article article) {
+		int result = 0;
+		try {
+			result = session.update("shCustomLike", article);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	@Override
+	public int customDislike(Article article) {
+		int result = 0;
+		try {
+			result = session.update("shCustomDislike", article);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
 	
 	
 	
 	
 	//김진현
-	
 		@Override
 		public List<Article> JHgetDutchpayList(Article article) {
 			List<Article> dutchpayList2 = null;
@@ -1037,7 +1116,7 @@ public class ArticleDaoImpl implements ArticleDao {
 				}
 				System.out.println("Dao brd_id -> "+article.getBrd_id());
 			} catch (Exception e) {
-				System.out.println("ArticleImpl dutchpayList2 e.getMessage()->"+e.getMessage());
+				System.out.println("ArticleDaoImpl dutchpayList2 Exception -> "+e.getMessage());
 			}
 			return dutchpayList2;
 		}
@@ -1322,4 +1401,5 @@ public class ArticleDaoImpl implements ArticleDao {
 		}
 		
 		
+
 }

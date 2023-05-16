@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ include file="../preset.jsp" %>
+<%@ include file="/WEB-INF/views/preset.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>메인 페이지 ▒ ShareGo</title>
+<title>${boardName } ${param.search == null ? '' : '검색 ' }${currentPage == null ? '1' : currentPage } 페이지 ▒ ShareGo</title>
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath }/js/initializer.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath }/js/layout.js"></script>
@@ -12,22 +12,143 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/preference.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/presets.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/layout.css">
-<script type="text/javascript">
-	$(() => {
-		$('.board-toggle').click(e => {
-			let parent = $(e.target).closest('.board-summary');
-			let children = parent.find('.board-summary-part');
-			children.toggle();
-		});
-	});
-</script>
+<style type="text/css">
+	button{
+		width: auto;
+		height: 25px;
+		font-size:12px;
+		font-family: 'Nanum Gothic';
+		color: white;
+		text-align: center;
+		background: gray;
+		border: none;
+		border-radius: 14px;
+	}
+	.btn-write {
+		background-color: var(--subtheme);
+		color: var(--subtheme-font);
+		font-weight: bolder;
+		cursor: pointer;
+	}
+	.btns-tag{
+		padding: 0px 2px;
+		background-color: transparent;
+		color: var(--subtheme);
+		font-weight: bold;
+		cursor: pointer;
+	}
+	.btns-tag::before{
+		content: '#';
+	}
+	
+	span.article-title > a:hover {
+		color: var(--subtheme);
+	}
+	
+	div.article-info:not(:last-child) {
+		border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+	}
+	
+	/* Search style */
+	div.board-search > form svg {
+		fill: none;
+		stroke: var(--subtheme);
+		stroke-width: 64px;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		width: 20px;
+		height: 20px;
+		margin-right: 5px;
+	}
+	
+	div.board-search > form select {
+		outline: none;
+		border: 2.5px solid var(--subtheme);
+		border-width: 0 0 2.5px 0;
+		color: var(--subtheme);
+		font-weight: bolder;
+		background-color: transparent;
+	}
+	
+	div.board-search > form input[type="text"] {
+		outline: none;
+		border: 2.5px solid var(--subtheme);
+		border-width: 0 0 2.5px 0;
+		background-color: transparent;
+	}
+	
+	div.board-search > form button[type="submit"] {
+		outline: none;
+		border: 0;
+		background-color: var(--subtheme);
+		color: var(--subtheme-font);
+		font-size: 14px;
+		font-weight: bold;
+		cursor: pointer;
+		border-radius: 5px;
+	}
+	
+	/* Paging style */
+	div.board_paging {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	button.paging-block, button.paging-page {
+		border-radius: 12px;
+		min-width: 24px;
+		height: 24px;
+		cursor: pointer;
+		padding: 0;
+		background-color: transparent;
+		border: 0;
+		outline: none;
+	}
+	button.paging-block *, button.paging-page * {
+		pointer-events: none;
+	}
+	button.paging-block {
+		width: 16px;
+		height: 16px;
+	}
+	button.paging-block > svg {
+		width: 50%;
+		height: 100%;
+		fill: none;
+		stroke: var(--subtheme);
+		cursor: default;
+		stroke-width: 64px;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+	button.paging-block:disabled > svg {
+		stroke: rgba(var(--subtheme-rgb), 0.5);
+	}
+	button.paging-page {
+		color: var(--theme-font);
+		font-size: 16px;
+		font-weight: bolder;
+	}
+	button.paging-page > span {
+		color: inherit;
+		font-size: inherit;
+		font-weight: inherit;
+	}
+	button.paging-page:hover:not(:disabled) {
+		background-color: rgba(var(--theme-font-rgb), 0.25);
+	}
+	button.paging-block:disabled {
+		cursor: default;
+	}
+	button.paging-page:disabled {
+		color: var(--subtheme);
+		cursor: default;
+	}
+</style>
 </head>
 <body>
 	<header>
-		<div id="usernav">
-			<!-- <a href="">로그인</a>
-			<a href="">회원가입</a>
-			<a href="">마이페이지</a> -->
+<div id="usernav">
 			<a href="">이용 약관</a>
 			<a href="">개인정보 취급 방침</a>
 		</div>
@@ -172,108 +293,230 @@
 	</header>
 	<aside id="leftside">
 		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	</aside>
 	<main>
-		<h1>함께 해요 게시판</h1>
-		<p>
-		<p>
-			<c:choose>
-				<c:when test="${memberInfo.mem_id != null}">
-				<input type="button" value="글쓰기" onclick="${pageContext.request.contextPath}location.href='writeFormArticle'">
-				</c:when>
-			</c:choose>	
-		<p>
-			<input type="button" value="전체"
-				onclick="location.href='${pageContext.request.contextPath}/board/together?category=1000'">
-			<input type="button" value="밥 & 카페"
-				onclick="location.href='${pageContext.request.contextPath}/board/together?category=1010'">
-			<input type="button" value="스포츠"
-				onclick="location.href='${pageContext.request.contextPath}/board/together?category=1020'">
-			<input type="button" value="쇼핑"
-				onclick="location.href='${pageContext.request.contextPath}/board/together?category=1030'">
-			<input type="button" value="문화생활"
-				onclick="location.href='${pageContext.request.contextPath}/board/together?category=1040'">
-			<input type="button" value="취미생활"
-				onclick="location.href='${pageContext.request.contextPath}/board/together?category=1050'">
-			<input type="button" value="기타"
-				onclick="location.href='${pageContext.request.contextPath}/board/together?category=1060'">
-
-
-			<c:set var="num" value="${page.total-page.start+1 }"></c:set>
-		<table>
-			<tr>
-				<th>거래상태</th>
-				<th>태그1</th>
-				<th>태그2</th>
-				<th>태그3</th>
-				<th>태그4</th>
-				<th>태그5</th>
-				<th>제목</th>
-				<th>작성시간</th>
-				<th>지역제한</th>
-				<th>장소</th>
-				<th>모집인원</th>
-				<th>마감일자</th>
-				<th>최소연령</th>
-				<th>최대연령</th>
-				<th>성별</th>
-				<th>글쓴이</th>
-				<th>프로필 사진</th>
-				<th>조회수</th>
-				<th>추천수</th>
-				<th>관심수</th>
-				<th>댓글수</th>
-
-			</tr>
-			<c:forEach var="art" items="${listArticle }">
-					<input type="hidden" value ="${art.trd_id }">
-				<tr style="cursor: pointer;" onclick="location.href='detailArticle?brd_id=${art.brd_id}&art_id=${art.art_id}';">
-					<td>${art.c1_comm_value }</td>
-					<td>${art.art_tag1 }</td>
-					<td>${art.art_tag2 }</td>
-					<td>${art.art_tag3 }</td>
-					<td>${art.art_tag4 }</td>
-					<td>${art.art_tag5 }</td>
-					<td>${art.art_title }</td>
-					<td>${art.rest_regdate }일전</td>
-					<td>${art.reg_name }</td>
-					<td>${art.trd_loc }</td>
-					<td>${art.trd_max }</td>
-					<td>${art.trd_finish }까지</td>
-					<td>${art.trd_minage }세</td>
-					<td>${art.trd_maxage }세</td>
-					<td><c:set var="gender" value="${art.c2_comm_id }" />
-						<c:choose>
-							<c:when test="${gender eq 201 }">남성</c:when>
-							<c:when test="${gender eq 202 }">여성</c:when>
-							<c:otherwise>성별무관</c:otherwise>
-						</c:choose></td>
-					<td>${art.mem_nickname }</td>
-					<td><img
-						src="${pageContext.request.contextPath}/image/picture/${art.mem_image}"
-						width="50" height="50" alt="사진이 없습니다"></td>
-					<td>${art.art_read }</td>
-					<td>${art.art_good }</td>
-					<td>${art.favoriteCount}</td>
-					<td>${art.repCount }</td>
-
-				</tr>
-				<c:set var="num" value="${num - 1 }"></c:set>
-			</c:forEach>
-		</table>
-
-		<c:if test="${page.startPage > page.pageBlock }">
-			<a
-				href="${pageContext.request.contextPath}/board/together?category=${category }&currentPage=${page.startPage-page.pageBlock}">[이전]</a>
-		</c:if>
-		<c:forEach var="i" begin="${page.startPage}" end="${page.endPage}">
-			<a
-				href="${pageContext.request.contextPath}/board/together?category=${category }&currentPage=${i}">[${i}]</a>
-		</c:forEach>
-		<c:if test="${page.endPage < page.totalPage }">
-			<a
-				href="${pageContext.request.contextPath}/board/together?category=${category }&currentPage=${page.startPage+page.pageBlock}">[다음]</a>
-		</c:if>
+		<div class="container padding-10px">
+			<div class="article-view">
+				<div class="board-title" align="center">
+					<h1 class="color-subtheme">${categoryName} 게시판</h1>
+				</div>
+				
+				<div class="display-flex justify-content-flex-end align-items-center"><span class="font-size-14px" style="color: rgba(var(--theme-font-rgb), 0.5);">총 ${totalArticle }개의 게시글이 있습니다</span></div>
+				<!-- 게시판 목록 출력 -->
+				<div class="board-category display-flex justify-content-flex-start font-size-16px font-weight-bolder" align="center">
+					<c:forEach var="comm" items="${categories}">
+						<div class="item full-width" style="border-bottom: 2px solid var(--subtheme); ${comm.comm_id == category? 'border: 2px solid var(--subtheme); border-bottom: 0px;':''}">
+							<a href="${pageContext.request.contextPath}/board/together?category=${comm.comm_id}" ${comm.comm_id != category ? 'style="color: rgba(var(--theme-font-rgb), 0.5);"' : '' } class="active full-width full-height display-block padding-5px padding-hor-0">${comm.comm_id == 1000 ? '전체' : comm.comm_value}</a>
+						</div>
+					</c:forEach>
+				</div>
+				
+				<!-- 왼쪽 오른쪽(글쓰기) 버튼 -->
+				<div class="board-btns display-flex flex-grow-1" style="margin: 5px 0px;">
+					<div class="btns-right" style="display: flex; justify-content: flex-end; flex-grow: 1;">
+						<span>
+							<c:if test="${category % 100 != 0 && memberInfo != null}">						
+								<button class="btn-write adv-hover" onclick="location.href='${pageContext.request.contextPath}/board/together/writeFormArticle?category=${category}';">글쓰기</button>
+							</c:if>
+						</span>
+					</div>
+				</div>
+				<!-- 공지사항 -->
+				<div class="notice-customer"></div>
+				<div class="notice-board"></div>
+				
+				<!-- 글 출력 -->
+				<div class="board-articleList" style="display: flex; flex-direction: column;">
+					<c:forEach var="article" items="${listArticle}">
+					<!-- 글 시작 -->
+						<div class="article-info" style="display: flex; padding: 10px; flex-grow: 1;">
+							<div class="view-preview" style="display: flex; align-items: center; margin-right: 14px; border: 1px solid rgba(128, 128, 128, 0.5); border-radius: 2.5px; width: 82px; height: 82px;">
+								<img class="article-thumbnail" style="width: 80px; height: 80px; object-fit: cover;" src="${pageContext.request.contextPath }/image/ShareGo_Img.png" onload="$(this).attr('src', getThumbnail('<c:out value="${article.art_content}" escapeXml="true"/>', true));this.onload=null;$(this).removeAttr('onload');" onerror="this.onerror=null;this.src='${pageContext.request.contextPath }/image/ShareGo_Not_Found_Image.png';$(this).removeAttr('onerror');">
+							</div>
+							<div class="view-inner" style="display: flex; flex-direction: column; justify-content: center; flex-grow: 1;">
+								<!-- 글의 첫 줄 -->
+								<div class="view-top flex-grow-1 display-flex justify-content-space-between align-items-center">
+									<div class="flex-grow-1 display-flex justify-content-flex-start align-items-center">
+										<c:if test="${article.brd_id != category }">
+											<span class="category-name color-subtheme font-size-12px font-weight-bold display-flex justify-content-center align-items-center margin-right-5px" style="border-radius: 2.5px; border: 2px solid var(--subtheme); padding: 1.25px 2.5px;">${article.c3_comm_value}</span>
+										</c:if>
+										<span class="article-title span-ellipsis font-weight-bolder"><a href="${pageContext.request.contextPath}/board/together/${article.art_id}?brd_id=${article.brd_id}&category=${category}">${article.art_title}</a></span>
+									</div>
+									
+									<div>
+										<c:set var="sysdate" value="<%=new java.util.Date() %>"/>
+										<c:set var="interval" value="${sysdate.time - article.art_regdate.time }"/>
+										<fmt:formatNumber var="date" value="${interval / 1000 / 60 / 60 / 24}" type="number" pattern="0"/>
+										<span class="font-size-14px" style="color: rgba(var(--theme-font-rgb), 0.5);">
+											<c:choose>
+												<c:when test="${(interval / 1000) < 60 }">
+													<fmt:formatNumber var="date" value="${interval / 1000 }" type="number" pattern="0"/>
+													${date}초 전
+												</c:when>
+												<c:when test="${(interval / 1000 / 60) < 60 }">
+													<fmt:formatNumber var="date" value="${interval / 1000 / 60 }" type="number" pattern="0"/>
+													${date}분 전
+												</c:when>
+												<c:when test="${(interval / 1000 / 60 / 60) < 24 }">
+													<fmt:formatNumber var="date" value="${interval / 1000 / 60 / 60 }" type="number" pattern="0"/>
+													${date}시간 전
+												</c:when>
+												<c:when test="${(interval / 1000 / 60 / 60 / 24) < 7 }">
+													<fmt:formatNumber var="date" value="${interval / 1000 / 60 / 60 / 24 }" type="number" pattern="0"/>
+													${date}일 전
+												</c:when>
+												<c:otherwise>
+													<fmt:formatDate var="date" value="${article.art_regdate }" pattern="yy-MM-dd hh:mm:ss"/>
+													${date }
+												</c:otherwise>
+											</c:choose>
+										</span>
+									</div>
+								</div>
+								<div class="view-middle display-flex justify-content-space-between align-items-center padding-5px padding-hor-0">
+									<span class="font-weight-bolder">${article.mem_nickname}</span>
+									<div class="display-flex justify-content-flex-end align-items-center">
+										<c:if test="${article.c1_comm_value != null}">
+											<button class="btn margin-right-5px font-weight-bolder" ${article.trd_status == 401 ? 'style="background-color: var(--subtheme);"' : '' }>${article.c1_comm_value}</button>
+										</c:if>
+										<c:choose>
+											<c:when test="${article.trd_cost == null || article.trd_cost == 0}">
+												<!-- <span class="font-size-20px font-weight-bolder color-subtheme">무료</span> -->
+												<span class="font-size-20px font-weight-bolder color-subtheme"/>
+											</c:when>
+											<c:when test="${article.trd_cost != null && article.trd_cost != 0}">
+												<span class="font-size-20px font-weight-bolder color-theme-font"><fmt:formatNumber value="${article.trd_cost}" pattern="###,###,###,###,###"/> 원</span>
+											</c:when>
+										</c:choose>
+									</div>
+								</div>
+								<!-- 글의 마지막 줄 -->
+								<div class="view-bottom">
+									<div class="display-flex justify-content-space-between align-items-center">
+									
+									
+									
+									
+										<!-- 태그 출력 및 클릭 시 검색 -->
+										<div class="view-tag display-flex justify-content-flex-start flex-grow-1">
+											<form action="${pageContext.request.contextPath}/board/together/listSearch">
+												<input type="hidden" name="category" value="${category}">
+												<input type="hidden" name="brd_id" value="${article.brd_id}">
+												<input type="hidden" name="search" value="s_art_tag">
+												<c:forEach begin="1" end="5" varStatus="status">
+													<c:set var="art_tag" value="art_tag${status.index}"/>
+														<c:if test="${article[art_tag] != null}">
+															<button class="btns-tag" name="keyword" value="${article[art_tag]}">${article[art_tag]}</button>
+														</c:if>
+												</c:forEach>
+											</form>
+										</div>
+										
+										<div class="display-flex justify-content-flex-end align-items-center">
+											<div class="display-flex justify-content-flex-start align-items-center margin-hor-2_5px">
+												<!-- https://ionic.io/ionicons -->
+												<svg viewBox="0 0 121.86 122.88" style="width: 12px; height: 12px;">
+													<!-- https://uxwing.com/comment-icon/ -->
+													<path d="M30.28,110.09,49.37,91.78A3.84,3.84,0,0,1,52,90.72h60a2.15,2.15,0,0,0,2.16-2.16V9.82a2.16,2.16,0,0,0-.64-1.52A2.19,2.19,0,0,0,112,7.66H9.82A2.24,2.24,0,0,0,7.65,9.82V88.55a2.19,2.19,0,0,0,2.17,2.16H26.46a3.83,3.83,0,0,1,3.82,3.83v15.55ZM28.45,63.56a3.83,3.83,0,1,1,0-7.66h53a3.83,3.83,0,0,1,0,7.66Zm0-24.86a3.83,3.83,0,1,1,0-7.65h65a3.83,3.83,0,0,1,0,7.65ZM53.54,98.36,29.27,121.64a3.82,3.82,0,0,1-6.64-2.59V98.36H9.82A9.87,9.87,0,0,1,0,88.55V9.82A9.9,9.9,0,0,1,9.82,0H112a9.87,9.87,0,0,1,9.82,9.82V88.55A9.85,9.85,0,0,1,112,98.36Z"/>
+												</svg>
+												<span class="margin-hor-2_5px">${article.repCount == null ? 0 : article.repCount}</span>
+											</div>
+											<div class="display-flex justify-content-flex-start align-items-center margin-hor-2_5px">
+												<!-- https://ionic.io/ionicons -->
+												<svg viewBox="0 0 512 512" style="width: 16px; height: 16px; fill: none; stroke: var(--theme-font); stroke-linecap: round; stroke-linejoin: round; stroke-width: 32px;">
+													<path d="M255.66 112c-77.94 0-157.89 45.11-220.83 135.33a16 16 0 00-.27 17.77C82.92 340.8 161.8 400 255.66 400c92.84 0 173.34-59.38 221.79-135.25a16.14 16.14 0 000-17.47C428.89 172.28 347.8 112 255.66 112z"/>
+													<circle cx="256" cy="256" r="80"/>
+												</svg>
+												<span class="margin-hor-2_5px">${article.art_read}</span>
+											</div>
+											<div class="display-flex justify-content-flex-start align-items-center margin-hor-2_5px">
+												<!-- https://ionic.io/ionicons -->
+												<svg viewBox="0 0 512 512" style="width: 16px; height: 16px; fill: var(--theme-font); stroke: var(--theme-font); stroke-linecap: round; stroke-linejoin: round; stroke-width: 32px;">
+													<path d="M320 458.16S304 464 256 464s-74-16-96-32H96a64 64 0 01-64-64v-48a64 64 0 0164-64h30a32.34 32.34 0 0027.37-15.4S162 221.81 188 176.78 264 64 272 48c29 0 43 22 34 47.71-10.28 29.39-23.71 54.38-27.46 87.09-.54 4.78 3.14 12 7.95 12L416 205"/>
+													<path d="M416 271l-80-2c-20-1.84-32-12.4-32-30h0c0-17.6 14-28.84 32-30l80-4c17.6 0 32 16.4 32 34v.17A32 32 0 01416 271zM448 336l-112-2c-18-.84-32-12.41-32-30h0c0-17.61 14-28.86 32-30l112-2a32.1 32.1 0 0132 32h0a32.1 32.1 0 01-32 32zM400 464l-64-3c-21-1.84-32-11.4-32-29h0c0-17.6 14.4-30 32-30l64-2a32.09 32.09 0 0132 32h0a32.09 32.09 0 01-32 32zM432 400l-96-2c-19-.84-32-12.4-32-30h0c0-17.6 13-28.84 32-30l96-2a32.09 32.09 0 0132 32h0a32.09 32.09 0 01-32 32z"/>
+												</svg>
+												<span class="margin-hor-2_5px">${article.art_good}</span>
+											</div>
+											<div class="display-flex justify-content-flex-start align-items-center margin-hor-2_5px">
+												<!-- https://ionic.io/ionicons -->
+												<svg viewBox="0 0 512 512" style="width: 16px; height: 16px; fill: var(--theme-font); stroke: var(--theme-font); stroke-linecap: round; stroke-linejoin: round; stroke-width: 32px;">
+													<path d="M192 53.84S208 48 256 48s74 16 96 32h64a64 64 0 0164 64v48a64 64 0 01-64 64h-30a32.34 32.34 0 00-27.37 15.4S350 290.19 324 335.22 248 448 240 464c-29 0-43-22-34-47.71 10.28-29.39 23.71-54.38 27.46-87.09.54-4.78-3.14-12-8-12L96 307"/>
+													<path d="M96 241l80 2c20 1.84 32 12.4 32 30h0c0 17.6-14 28.84-32 30l-80 4c-17.6 0-32-16.4-32-34v-.17A32 32 0 0196 241zM64 176l112 2c18 .84 32 12.41 32 30h0c0 17.61-14 28.86-32 30l-112 2a32.1 32.1 0 01-32-32h0a32.1 32.1 0 0132-32zM112 48l64 3c21 1.84 32 11.4 32 29h0c0 17.6-14.4 30-32 30l-64 2a32.09 32.09 0 01-32-32h0a32.09 32.09 0 0132-32zM80 112l96 2c19 .84 32 12.4 32 30h0c0 17.6-13 28.84-32 30l-96 2a32.09 32.09 0 01-32-32h0a32.09 32.09 0 0132-32z"/>
+												</svg>
+												<span class="margin-hor-2_5px">${article.art_bad}</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</c:forEach>
+				</div>
+				<!-- 검색 -->
+				<div class="board-search" align="center" style="height: 20px; margin: 15px;">
+					<form action="${pageContext.request.contextPath}/board/together/listSearch">
+						<input type="hidden" name="category" value="${category}">
+						<input type="hidden" name="brd_id" value="${category}">
+						<svg viewBox="0 0 512 512">
+							<path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64z"/>
+							<path d="M338.29 338.29L448 448"/>
+						</svg>
+						<select name="search">
+		<!-- 					<option value="article">제목+내용</option>
+							<option value="title">제목</option>
+							<option value="content">내용</option>
+							<option value="nickname">닉네임</option>
+							<option value="articleTag">태그</option> -->
+							<option value="s_art_title">제목</option>
+							<option value="s_mem_nickname">닉네임</option>
+						</select>
+							<input type="text" name="keyword" placeholder="검색어를 입력하세요" required="required">
+	        				<button type="submit" class="adv-hover">검색 </button><p>
+					</form>
+				</div>
+				<!-- 페이징 -->
+				<div class="board_paging" align="center" style="font-size: 18px; clear: both;">
+					<button class="paging-block display-flex justify-content-center align-items-center" 	onclick="location.href='${pageContext.request.contextPath }/board/together?currentPage=${page.startPage-page.pageBlock }&category=${category}${param.search == null ? '' : '&search='.concat(param.search) }${param.keyword == null ? '' : '&keyword='.concat(param.keyword) }';" ${page.startPage <= page.pageBlock ? 'disabled' : '' }>
+						<svg viewBox="0 0 256 512">
+							<path d="M 224 32 L 32 256 224 480"/>
+						</svg>
+					</button>
+					<c:forEach var="i" begin="${page.startPage }" end="${page.endPage }">
+						<button class="paging-page display-flex justify-content-center align-items-center" 	onclick="location.href='${pageContext.request.contextPath }/board/together?currentPage=${i }&category=${category}${param.search == null ? '' : '&search='.concat(param.search) }${param.keyword == null ? '' : '&keyword='.concat(param.keyword) }';" ${page.currentPage == i ? 'disabled' : '' }>
+							<span>${i }</span>
+						</button>
+					</c:forEach>
+					<button class="paging-block display-flex justify-content-center align-items-center" 	onclick="location.href='${pageContext.request.contextPath }/board/together?currentPage=${page.endPage + 1 }&category=${category}${param.search == null ? '' : '&search='.concat(param.search) }${param.keyword == null ? '' : '&keyword='.concat(param.keyword) }';" ${page.endPage == page.totalPage ? 'disabled' : '' }>
+						<svg viewBox="0 0 256 512">
+							<path d="M 32 32 L 224 256 32 480"/>
+						</svg>
+					</button>
+				</div>
+				<%-- <c:set var="params" value=""/>
+				<c:forEach var='test' items="${param }" varStatus="status">
+					<c:choose>
+						<c:when test="${status.index == 0 }"><c:set var="params" value="?"/></c:when>
+						<c:otherwise><c:set var="params" value="${params}&"/></c:otherwise>
+					</c:choose>
+					<c:url var="params" value="${params}${test.key }=${test.value }"/>
+				</c:forEach> --%>
+				<c:out value="${params }"/>
+			</div>
+		</div>
 		
 		<button id="scrollToTop" class="adv-hover">
 			<svg style="fill: var(--subtheme); stroke: var(--subtheme); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" width="20" height="10" viewBox="0 0 32 16">
@@ -286,6 +529,9 @@
 			</svg>
 		</button>
 	</main>
+	
+	
+	
 	<aside id="rightside">
 		
 	</aside>

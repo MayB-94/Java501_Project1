@@ -19,6 +19,11 @@
 	<select id="hgGetCategoryListBySuper" parameterType="int" resultType="Comm">
 		SELECT * FROM COMM WHERE TRUNC(COMM_ID / 100) * 100 = #{superId} AND COMM_ID != #{superId}
 	</select>
+	<select id="hgGetCategoryNames" resultType="Comm">
+		<![CDATA[
+			SELECT * FROM COMM WHERE COMM_ID >= 1000
+		]]>
+	</select>
 	
 	
 	
@@ -79,6 +84,19 @@
 		SELECT * FROM comm WHERE comm_id BETWEEN 1100 and 1160
 	</select>
 	
+	
+	<!-- 최승환 -->
+<!-- 	<select id="shCategoryName" parameterType="int" resultType="java.lang.String">
+		SELECT  comm_value
+		FROM    comm
+		WHERE   comm_id = #{comm_id}
+	</select>
+	
+	<select id="shCommList" parameterType="int" resultType="Comm">
+		SELECT  *
+		FROM    comm
+		WHERE   comm_id BETWEEN #{comm_id} AND #{comm_id}+99
+	</select> -->
 	
 	
 	

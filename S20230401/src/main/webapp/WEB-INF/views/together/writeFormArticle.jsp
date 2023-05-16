@@ -1,63 +1,159 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ include file="../preset.jsp" %>
+<%@ include file="/WEB-INF/views/preset.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>메인 페이지 ▒ ShareGo</title>
+<title>[페이지 이름] ▒ ShareGo</title>
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/initializer.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/layout.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/index.js"></script>
-<script>
-
-	$(document).ready(function(){
-	    // reg_parent가 선택되면
-	    $('#reg_parent').change(function(){
-	        var reg_parent = $(this).val();
-	        
-	        // reg_id 드롭다운 메뉴 초기화
-	        $('#reg_id').empty();
-	        
-	        // 제한없음 옵션 추가
-	        $('#reg_id').append('<option value="">제한없음</option>');
-	        
-	        // 선택된 reg_parent를 가진 region들을 동적으로 추가
-	        <c:forEach var="region" items="${regions}">
-	            if (${region.reg_parent} == reg_parent) {
-	                $('#reg_id').append('<option value="' + ${region.reg_id} + '">' + '${region.reg_name}' + '</option>');
-	            }
-	        </c:forEach>
-	    });
-	});
-
-
-	function setMinValue() {
-		  // 현재 시간을 가져옵니다.
-		  var now = new Date();
-		  // 선택한 날짜를 가져옵니다.
-		  var selectedDate = new Date(document.getElementById("dateTimeLocal").value);
-		  // 선택한 날짜가 현재 시간 이전이라면 경고 메시지를 출력하고 오늘 날짜를 선택합니다.
-		  if (selectedDate < now) {
-		    alert("현재 시간 이전의 날짜는 선택할 수 없습니다.");
-		    var today = new Date();
-		    var month = today.getMonth() + 1;
-		    var day = today.getDate();
-		    var year = today.getFullYear();
-		    if (month < 10) month = "0" + month;
-		    if (day < 10) day = "0" + day;
-		    var minDate = year + "-" + month + "-" + day;
-		    document.getElementById("dateTimeLocal").value = minDate;
-		  }
+<script type="text/javascript" src="${pageContext.request.contextPath }/js/quill/quill.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/js/quill/image-resize.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/js/quill/image-drop.min.js"></script>
+<script type="text/javascript">
+	function writeAction () {
+		if ($('#article-title').val() == '' || $('#article-title').val() == null) {
+			return false;
 		}
+		if ($('#art_content').val() == '' || $('#art_content').val() == null) {
+			return false;
+		}
+		let tagIndex = 1;
+		$('.tag-box-tag').each((index, value) => {
+			let tag = $(value).find('.tag-box-tag-value').html();
+			$('#art_tag' + tagIndex++).val(tag);
+		});
+		return true;
+	}
+	const quillInit = (id) => {
+		let fontArray = [];
+		for (let i = 8; i <= 30; i++) fontArray[fontArray.length] = i + 'px';
+		var Size = Quill.import('attributors/style/size');
+		Size.whitelist = fontArray;
+		Quill.register(Size, true);
+		var option = {
+			modules: {
+				toolbar: [
+						[{size: fontArray}],
+						[{'color': [
+							'#FFFFFF', '#FF0000', '#FFFF00', '#00FF00', '#00FFFF', '#0000FF', '#FF00FF',
+							'#E0E0E0', '#E00000', '#E0E000', '#00E000', '#00E0E0', '#0000E0', '#E000E0',
+							'#C0C0C0', '#C00000', '#C0C000', '#00C000', '#00C0C0', '#0000C0', '#C000C0',
+							'#A0A0A0', '#A00000', '#A0A000', '#00A000', '#00A0A0', '#0000A0', '#A000A0',
+							'#808080', '#800000', '#808000', '#008000', '#008080', '#000080', '#800080',
+							'#606060', '#600000', '#606000', '#006000', '#006060', '#000060', '#600060',
+							'#404040', '#400000', '#404000', '#004000', '#004040', '#000040', '#400040',
+							'#202020', '#200000', '#202000', '#002000', '#002020', '#000020', '#200020',
+							'#000000', '#000000', '#000000', '#000000', '#000000', '#000000', '#000000'
+						]}],
+						['bold', 'italic', 'underline', 'strike'],
+						['image', 'video', 'link'],
+						[{list: 'ordered'}, {list: 'bullet'}]
+				],
+				imageResize: {
+					displaySize: true
+				},
+				imageDrop: true
+			},
+			placeholder: '내용을 입력해주세요',
+			theme: 'snow'
+		};
+		editor = new Quill('#' + id, option);
+	};
+	var editor;
+	$(() => {
+		// checkbox 이벤트
+		$('#btns-checkbox').change(()=>{
+			if($('#btns-checkbox').is(':checked')){
+				$('#art_isnotice').val('1');
+			}else{
+				$('#art_isnotice').val('0');
+			}
+			console.info($('#art_isnotice').val());
+		});
+		// Load Editor
+		quillInit('articleEditor');
 		
+		// input keydown event
+		$('form input').keydown(e => {
+			if (e.keyCode == 13) e.preventDefault();
+		});
+		
+		// Tag input Effects
+		$('#tag-input').keydown(e => {
+			if ($('#tag-box').find('.tag-box-tag').length >= 5 && e.keyCode != 8) {
+				e.preventDefault();
+				e.target.value = null;
+				return;
+			}
+			if (e.keyCode == 32) {
+				e.preventDefault();
+				if (e.target.value == '' || !e.target.value || e.target.value == null) return;
+				$(e.target).blur();
+				e.target.value = null;
+				$(e.target).focus();
+			} else if (e.keyCode == 13) e.preventDefault();
+			else if (e.keyCode == 8) {
+				if (e.target.selectionStart == 0 && e.target.selectionEnd == 0) {
+					$('#tag-box').find('div.tag-box-tag:last-child').remove();
+					e.preventDefault();
+				}
+			}
+		});
+		$('#tag-input').blur(e => {
+			if ($('#tag-box').find('.tag-box-tag').length >= 5) {
+				e.target.value = null;
+				return;
+			}
+			if (e.target.value == '' || !e.target.value || e.target.value == null) return;
+			let elem = '<div class="tag-box-tag"><span class="tag-box-tag-value">' + e.target.value + '</span><button class="tag-box-tag-remove adv-hover" type="button"><svg class="tag-box-tag-remove-svg" width="10" height="10" viewBox="0 0 12 12" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M 2 2 L 10 10 M 10 2 L 2 10"/></svg></button></div>';
+			$('#tag-box').append(elem);
+			$('#tag-box').find('div.tag-box-tag:last-child > button.tag-box-tag-remove').click(e => {
+				$(e.target).parent().remove();
+			});
+			e.target.value = null;
+		});
+		editor.on('text-change', () => {
+			$('#art_content').val(editor.root.innerHTML);
+		});
+		const selectLocalImage = () => {
+			const fileInput = document.createElement('input');
+			fileInput.setAttribute('type', 'file');
+			fileInput.click();
+			fileInput.addEventListener('change', e => {
+				const formData = new FormData();
+				const file = fileInput.files[0];
+				formData.append('uploadFile', file);
+				
+				$.ajax({
+					type: 'post',
+					enctype: 'multipart/form-data',
+					url: '/board/share/imageUpload',
+					data: formData,
+					//data: fileInput.value,
+					processData: false,
+					contentType: false,
+					dataType: 'json',
+					success: function(data) {
+						const range = editor.getSelection();
+						//data.uploadPath = data.uploadPath.replace(/\\/g, '/');
+						data.url = data.url.toString().replace(/\\/g, '/');
+						editor.insertEmbed(range.index, 'image', data.url);
+					}
+				});
+			});
+		};
+		editor.getModule('toolbar').addHandler('image', () => selectLocalImage());
+	});
 </script>
-
 <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/share/writeForm.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/preference.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/presets.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/layout.css">
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/index.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/js/quill/quill.core.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/js/quill/quill.snow.css">
 </head>
 <body>
 	<header>
@@ -190,7 +286,7 @@
 											</div>
 										</div>
 									</div>
-									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/';">
+									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/user/mypage';">
 										마이 페이지
 									</button>
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px; margin-bottom: 10px;" class="subtheme-button" onclick="location.href = '${pageContext.request.contextPath }/logout';">
@@ -208,114 +304,167 @@
 		
 	</aside>
 	<main>
-		<h2>게시글 작성</h2>
-	<c:if test="${msg!=null }">${msg }</c:if>
-	<form action="${pageContext.request.contextPath }/board/writeArticle" method="POST" name="frm">
-		<table>
-			<tr>
-				<th>카테고리</th>
-				<td><select name="brd_id">
-						<c:forEach var="category" items="${categories }">
-							<option value="${category.comm_id }">${category.comm_value }</option>
-						</c:forEach>
-				</select></td>
-			</tr>
-			<tr>
-				<th>제목</th>
-				<td><input type="text" name="art_title" required="required"></td>
-			</tr>
-			<tr>
-				<th>태그1</th>
-				<td><input type="text" name="art_tag1"></td>
-			</tr>
-			<tr>
-				<th>태그2</th>
-				<td><input type="text" name="art_tag2"></td>
-			</tr>
-			<tr>
-				<th>태그3</th>
-				<td><input type="text" name="art_tag3"></td>
-			</tr>
-			<tr>
-				<th>태그4</th>
-				<td><input type="text" name="art_tag4"></td>
-			</tr>
-			<tr>
-				<th>태그5</th>
-				<td><input type="text" name="art_tag5"></td>
-			</tr>
- 		<tr>
-				<th>지역제한</th>
-				<td>
-				<select id="reg_parent" name="reg_id1">
-					<option value="">제한없음</option>
-					<c:forEach var="parentRegion" items="${parentRegions }">
-						<option value="${parentRegion.reg_id }">${parentRegion.reg_name }</option>
-					</c:forEach>
-				</select>
-				</td>
-			</tr>
-			 <tr>
-				<th></th>
-				<td><select id="reg_id" name="reg_id2">
-<%-- 						<option value="">제한없음</option>
-						<c:forEach var="region" items="${regions }">
-							<option value="${region.reg_id }">${region.reg_name }</option>
-						</c:forEach> --%>
-				</select></td>
-			</tr>
-			<tr>
-				<th>장소(세부)</th>
-				<td><input type="text" name="trd_loc"></td>
-			</tr>
-			<tr>
-				<th>마감일자</th>
-				<td><input type="date" name="trd_enddate1" id="dateTimeLocal" 
-				onchange="setMinValue()" required="required"></td>
-			</tr>
-			<tr>
-				<th>모집인원 (본인 포함)</th>
-				<td><input type="number" name="trd_max" min="1" max="100"> 명</td>
-			</tr>
-			<tr>
-				<th>나이제한</th>
-				<td>
-					<input type="number" name="trd_minage" min="1" max="100"> ~
-					<input type="number" name="trd_maxage" min="1" max="100">
-				</td>
-			</tr>
-			<tr>
-				<th>성별</th>
-				<td>
-					<%-- 					<select id = "trd_gender" name="trd_gender">
-						<option value="null">제한없음</option>
-						<c:forEach var="gender" items="${genders }">
-							<option value="${gender.comm_id }">${gender.comm_value }</option>
-						</c:forEach>
-					<c:set var="gender" value ="${gender.comm_id }"/>
-					<c:choose>
-						<c:when test="${gender == 201}">남성</c:when>
-						<c:when test="${gender == 202}">여성</c:when>
-					</c:choose>	
-					</select></td></tr> --%> 
-				<select id="trd_gender" name="trd_gender">
-						<option value="">제한없음</option>
-						<option value="201">남성</option>
-						<option value="202">여성</option>
-				</select>
-			<tr>
-				<th>내용</th>
-				<td><textarea name="art_content" cols="50" rows="10"
-						placeholder="내용을 입력하세요" required="required"></textarea></td>
-			</tr>
-
-			<tr>
-				<td colspan="2"><input type="submit" value="확인"></td>
-			</tr>
-		</table>
-		<input type="button" value="목록"
-			onclick="location.href='together?category=1000'">
-	</form>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		<!-- 각자 페이지 들어갈 공간 시작 -->
+		<div class="container">
+	
+			<h1 class="color-subtheme text-align-center">게시글 작성</h1>
+	
+			<div>
+				<form action="${pageContext.request.contextPath}/board/together/writeArticle" method="post" onsubmit="return writeAction();">
+					<input type="hidden" 	name="category" 		value="${category}">
+					<input type="hidden" 	name="brd_id" 			value="${category}">
+				<!-- 임시 기본값 저장 -->
+					<input type="hidden" 	name="trd_status" 		value="401">
+					<input type="hidden" 	name="trd_cost" 		value="0">
+					<input type="hidden" 	name="art_good" 		value="0">
+					<input type="hidden" 	name="art_bad" 			value="0">
+					<input type="hidden" 	name="art_read" 		value="0">
+					<input type="hidden" 	name="isdelete" 		value="0">
+					
+					
+					<div class="display-flex justify-content-space-between align-items-center">
+						<div class="form-group display-flex justify-content-flex-start align-items-center">
+							<label for="category" class="margin-right-5px">카테고리</label>
+							<select name="brd_id" id="brd_id">
+								<option value="1010" ${category == 1010 ? 'selected' : ''}>밥/카페</option>
+								<option value="1020" ${category == 1020 ? 'selected' : ''}>스포츠/운동</option>
+								<option value="1030" ${category == 1030 ? 'selected' : ''}>쇼핑</option>
+								<option value="1040" ${category == 1040 ? 'selected' : ''}>문화생활</option>
+								<option value="1050" ${category == 1050 ? 'selected' : ''}>취미생활</option>
+								<option value="1060" ${category == 1060 ? 'selected' : ''}>기타</option>
+							</select>
+						</div>
+						
+						<!-- 매니저 이상의 권한만 공지 설정 가능 -->
+						<c:if test="${memberInfo.mem_authority >= 108}">
+							<div class="form-group checkbox-group display-flex justify-content-flex-end align-items-center">
+								<label for="btns-checkbox" class="margin-right-5px">공지 여부</label>
+								<input type="hidden" id="art_isnotice" name="art_isnotice" value="0">
+								<input type="checkbox" id="btns-checkbox" name="btns-checkbox">
+							</div>
+						</c:if>
+					</div>
+	
+					<div class="form-group display-flex justify-content-flex-start align-items-center">
+						<label for="article-title" class="margin-right-5px width-50px">제목</label>
+						<input type="text" class="flex-grow-1" id="article-title" name="art_title" placeholder="제목" required="required">
+					</div>
+					
+					<div class="form-group flex-grow-1 display-flex justify-content-flex-end align-items-center">
+						<input type="hidden" id="art_tag1" name="art_tag1">
+						<input type="hidden" id="art_tag2" name="art_tag2">
+						<input type="hidden" id="art_tag3" name="art_tag3">
+						<input type="hidden" id="art_tag4" name="art_tag4">
+						<input type="hidden" id="art_tag5" name="art_tag5">
+						<label class="margin-right-5px width-50px">태그</label>
+						<div class="input-box display-flex justify-content-flex-start align-items-center" style="border-bottom: 2.5px solid rgba(128, 128, 128, 0.5); margin: 0; flex-grow: 1;" onclick="$('#tag-input').focus();">
+							<div id="tag-box">
+								<!-- 태그들 들어갈 자리 -->
+							</div>
+							<input class="art_tag flex-grow-1" style="border-bottom: 0;" type="text" id="tag-input" name="tag-input" maxlength="10" placeholder="태그를 입력한 후 스페이스바를 눌러 추가하세요">
+						</div>
+					</div>
+					
+					<!-- 글 내용 -->
+					<input type="hidden" id="art_content" name="art_content" required>
+					<div id="articleEditor"></div>
+					
+					<!-- 거래 정보 -->
+					<div class="trade-info-box padding-10px display-flex flex-direction-column justify-content-flex-start align-items-stretch" style="border: 2px solid var(--subtheme); border-radius: 5px;">
+						<h2 class="text-align-center color-subtheme font-weight-bolder" style="margin: 10px; padding-bottom: 20px; border-bottom: 1px solid rgba(128, 128, 128, 0.5);">거래 정보</h2>
+						<div class="display-flex justify-content-space-between align-items-center padding-10px">
+							<div class="form-group" style="display: flex;">
+								<div class="popup-group">
+									<input type="hidden" id="reg_id" name="reg_id">
+									<label for="reg_id-button">지역 제한</label>
+									<button type="button" id="region" name="reg_id-button" class="togglePopup theme-button" style="border-color: rgba(128, 128, 128, 0.5);"></button>
+									<div id="region-popup" class="popup-window" style="bottom: 32px; right: auto; left: 81.28px; padding: 0;">
+										<div style="position: relative;">
+											<button type="button" class="subitem-header adv-hover" onclick="$('#reg_id').removeAttr('value'); $('#region').text(''); $('#region-popup').toggle();">없음</button>
+										</div>
+										<c:forEach var="region" items="${superRegions }">
+											<div style="position: relative;">
+												<button type="button" class="subitem-header adv-hover" onclick="$('#reg_id').val(${region.reg_id}); $('#region').text('${region.reg_name }'); $('#region-popup').toggle();">${region.reg_name }</button>
+												<c:if test="${not empty regions[region] }">
+													<div class="subitem-list">
+														<button type="button" class="adv-hover" onclick="$('#reg_id').removeAttr('value'); $('#region').text(''); $('#region-popup').toggle();">없음</button>
+														<c:forEach var="subRegion" items="${regions[region] }">
+															<button type="button" class="adv-hover" onclick="$('#reg_id').val(${subRegion.reg_id}); $('#region').text('${subRegion.reg_name }'); $('#region-popup').toggle();">${subRegion.reg_name }</button>
+														</c:forEach>
+													</div>
+												</c:if>
+											</div>
+										</c:forEach>
+									</div>
+								</div>
+							</div>
+							
+							<div class="form-group flex-grow-1 margin-left-10px display-flex justify-content-flex-end align-items-center">
+								<label for="trade_trd_loc" class="margin-right-5px">상세 지역</label>
+								<input type="text" class="flex-grow-1" name="trd_loc" placeholder="상세한 지역을 기입해주세요">
+							</div>
+						</div>
+						
+						<div class="form-group display-flex justify-content-space-between align-items-center padding-10px">
+							<div class="form-group display-flex justify-content-flex-start align-items-center">
+								<label for="deadline" class="margin-right-5px">마감일</label>
+								<input type="datetime-local" name="trd_endDate">
+							</div>
+							
+							<div class="form-group display-flex justify-content-space-between align-items-center padding-10px">
+								<label for="trd_cost" class="margin-right-5px">비용</label>
+								<!-- <input type="number" class="font-size-18px font-weight-bolder" name="trd_cost" value="0" min="0" required="required"> -->
+								<input type="text" class="font-size-18px font-weight-bolder" name="trd_cost" value="비용을 설정할 수 없습니다" readonly="readonly">
+							</div>
+						</div>
+						
+						<div class="form-group display-flex justify-content-space-between align-items-center padding-10px">
+							<div class="form-group display-flex justify-content-flex-end align-items-center">
+								<label for="max-people" class="margin-right-5px">최대 인원</label>
+								<input type="number" class="width-50px" name="trd_max" min="2" value="2" required="required">
+							</div>
+							
+							<div class="form-gender display-flex justify-content-flex-start align-items-center">
+								<label for="gender-limit" class="margin-right-5px">성별</label>
+								<select name="trd_gender">
+									<option value="">제한 없음</option>
+									<option value="201">남자</option>
+									<option value="202">여자</option>
+								</select>
+							</div>
+		
+							<div class="form-age display-flex justify-content-flex-end align-items-center">
+								<label for="age-limit" class="margin-right-5px">나이</label> 
+								<input type="number" class="width-50px" name="trd_minage" min="1" max="100" value="10">
+								<span class="margin-hor-5px font-weight-bolder">~</span>
+								<input type="number" class="width-50px" name="trd_maxage" min="1" max="100" value="30">
+							</div>
+						</div>
+					</div>
+	
+					<div class="button-group">
+						<button type="submit" class="btns-submit">작성</button>
+						<button type="button" class="btns-cancel" onclick="location.href='${pageContext.request.contextPath}/board/together?category=${category }';">취소</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<!-- 각자 페이지 들어갈 공간 끝 -->
 		<button id="scrollToTop" class="adv-hover">
 			<svg style="fill: var(--subtheme); stroke: var(--subtheme); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" width="20" height="10" viewBox="0 0 32 16">
 				<path d="M 15 1 L 1 15 31 15 Z"/>
@@ -326,7 +475,6 @@
 				<path d="M 15 15 L 1 1 31 1 Z"/>
 			</svg>
 		</button>
-	</main>
 	</main>
 	<aside id="rightside">
 		

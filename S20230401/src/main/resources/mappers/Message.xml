@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.java501.S20230401.model.MessageMapper">
+
+	<!-- 양동균 -->
+	<resultMap type="Message" id="dgMessageMap">
+		<id 		column="mes_id" 			property="mes_id"/>			<!-- PK -->
+		<id 		column="mem_sender_id" 		property="mem_sender_id"/>	<!-- PK -->
+		<id 		column="mem_receiver_id" 	property="mem_receiver_id"/><!-- PK -->
+		<result 	column="mes_title" 			property="mes_title"/>
+		<result 	column="mes_title" 			property="mes_title"/>
+		<result 	column="mes_content" 		property="mes_content"/>
+		<result 	column="mes_regdate" 		property="mes_regdate"/>
+		<result 	column="mes_isread" 		property="mes_isread"/>
+		<result 	column="mes_status" 		property="mes_status"/>
+		<result 	column="isdelete" 			property="isdelete"/>
+		<collection property="member" 			resultMap="com.java501.S20230401.model.MemberMapper.dgMemberMap"/>
+	</resultMap>
+	<!-- 받은 쪽지함 조회 -->
+	<select id="dgMessageListRec" parameterType="int" resultMap="dgMessageMap">
+		SELECT  *
+		FROM    MESSAGE LEFT OUTER JOIN (SELECT MEM_ID, MEM_USERNAME, MEM_NICKNAME, MEM_REGION1, MEM_REGION2, MEM_REGDATE, MEM_IMAGE, MEM_GENDER, MEM_LATEST, REPORT_ID AS memReport_id
+		                                 FROM 	MEMBER)
+		ON		MEM_SENDER_ID = MEM_ID
+		WHERE   MEM_RECEIVER_ID = #{mem_id}
+		AND		ISDELETE = 0
+	</select>
+	<!-- 보낸 쪽지함 조회 -->
+	<select id="dgMessageListSen" parameterType="int" resultMap="dgMessageMap">
+		SELECT  *
+		FROM    MESSAGE LEFT OUTER JOIN (SELECT MEM_ID, MEM_USERNAME, MEM_NICKNAME, MEM_REGION1, MEM_REGION2, MEM_REGDATE, MEM_IMAGE, MEM_GENDER, MEM_LATEST, REPORT_ID AS memReport_id
+		                                 FROM 	MEMBER)
+		ON		MEM_RECEIVER_ID = MEM_ID
+		WHERE   MEM_SENDER_ID = #{mem_id}
+		AND		ISDELETE = 0
+	</select>
+	<!-- 쪽지 작성 -->
+	<insert id="dgMessageWrite" parameterType="Message">
+		INSERT 	INTO
+		MESSAGE	(MES_ID, MEM_SENDER_ID, MEM_RECEIVER_ID, MES_TITLE, MES_CONTENT, MES_REGDATE, MES_ISREAD, MES_STATUS, ISDELETE)
+		VALUES	((SELECT 	NVL(MAX(MES_ID),0)+1
+				  FROM 		MESSAGE
+				  WHERE		MEM_SENDER_ID = #{mem_sender_id}
+				  AND		MEM_RECEIVER_ID = #{mem_receiver_id}),
+				 #{mem_sender_id},
+				 #{mem_receiver_id},
+				 #{mes_title},
+				 #{mes_content},
+				 SYSDATE,
+				 0,
+				 301,
+				 0)
+	</insert>
+	<!-- 쪽지 보관, 휴지통 이동 -->
+	<update id="dgMessageAction" parameterType="Message">
+		UPDATE	MESSAGE
+		SET		MES_STATUS = #{mes_status}
+		WHERE	MES_ID = #{mes_id}
+		AND 	MEM_SENDER_ID = #{mem_sender_id}
+		AND		MEM_RECEIVER_ID = #{mem_receiver_id}
+	</update>
+	<!-- 쪽지 삭제 -->
+	<update id="dgMessageDelete" parameterType="Message">
+		UPDATE	MESSAGE
+		SET		ISDELETE = 1
+		WHERE	MES_ID = #{mes_id}
+		AND 	MEM_SENDER_ID = #{mem_sender_id}
+		AND		MEM_RECEIVER_ID = #{mem_receiver_id}
+	</update>
+	<!-- 쪽지 읽음 -->
+	<update id="dgMessageRead" parameterType="Message">
+		UPDATE	MESSAGE
+		SET		MES_ISREAD = 1
+		WHERE	MES_ID = #{mes_id}
+		AND 	MEM_SENDER_ID = #{mem_sender_id}
+		AND		MEM_RECEIVER_ID = #{mem_receiver_id}
+	</update>
+
+	
+	
+	
+	
+</mapper>

@@ -54,6 +54,7 @@ button.warning-button * {
 
 /* Presets */
 .width-auto { width: auto; }
+.width-inherit { width: inherit; }
 .full-width { width: 100%; }
 .width-25px { width: 25px; }
 .width-50px { width: 50px; }
@@ -61,6 +62,7 @@ button.warning-button * {
 .width-100px { width: 100px; }
 
 .height-auto { height: auto; }
+.height-inherit { height: inherit; }
 .full-height { height: 100%; }
 .height-25px { height: 25px; }
 .height-50px { height: 50px; }
@@ -117,6 +119,9 @@ button.warning-button * {
 
 .flex-grow-0 { flex-grow: 0; }
 .flex-grow-1 { flex-grow: 1; }
+
+.flex-shrink-0 { flex-shrink: 0; }
+.flex-shrink-1 { flex-shrink: 1; }
 
 .padding-0 { padding: 0; }
 .padding-2_5px { padding: 2.5px; }
@@ -228,8 +233,30 @@ button.warning-button * {
 .position-fixed { position: fixed; }
 .position-inherit { position: inherit; }
 
+.object-fit-none { object-fit: none; }
+.object-fit-fill { object-fit: fill; }
+.object-fit-contain { object-fit: contain; }
+.object-fit-cover { object-fit: cover; }
+.object-fit-scale-down { object-fit: scale-down; }
+
+.border-radius-2_5px { border-radius: 2.5px; }
+.border-radius-5px { border-radius: 5px; }
+.border-radius-10px { border-radius: 10px; }
+.border-radius-50 { border-radius: 50%; }
+
+.background-color-theme { background-color: var(--theme); }
+.background-color-theme-font { background-color: var(--theme-font); }
+.background-color-subtheme { background-color: var(--subtheme); }
+.background-color-subtheme-font { background-color: var(--subtheme-font); }
+.background-color-warning { background-color: var(--warning); }
+.background-color-confirm { background-color: var(--confirm); }
+
+
 .span-ellipsis {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+.translucent-color {
+	color: rgba(128, 128, 128, 0.5);
 }

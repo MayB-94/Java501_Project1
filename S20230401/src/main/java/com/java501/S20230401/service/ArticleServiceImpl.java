@@ -96,6 +96,14 @@ public class ArticleServiceImpl implements ArticleService {
 	public List<Article> hgAdminArticleList(Article searcher) {
 		return ad.hgAdminArticleList(searcher);
 	}
+	@Override
+	public int hgGetCountAllArticle() {
+		return ad.hgGetCountAllArticle();
+	}
+	@Override
+	public List<Article> hgGetArticles(Article searcher) {
+		return ad.hgGetArticles(searcher);
+	}
 	
 	
 	// 양동균
@@ -126,8 +134,8 @@ public class ArticleServiceImpl implements ArticleService {
 	
 	// 백준
 	@Override
-	public Integer totalArticle(int brd_id) {
-		Integer totalArticleCnt = ad.totalArticle(brd_id);
+	public Integer bjTotalArticle(Article article) {
+		Integer totalArticleCnt = ad.bjTotalArticle(article);
 		return totalArticleCnt;
 	}
 	@Override
@@ -209,9 +217,15 @@ public class ArticleServiceImpl implements ArticleService {
 		return ad.bjBad(article);
 	}
 	
+	@Override
+	public List<Comm> bjcommList(int comm_id) {
+		return ad.bjcommList(comm_id);
+	}
 	
-	
-	
+	@Override
+	public String bjCategoryName(int comm_id) {
+		return ad.bjCategoryName(comm_id);
+	}
 	
 	
 	// 임동빈
@@ -370,6 +384,12 @@ public class ArticleServiceImpl implements ArticleService {
 	}
 	
 	@Override
+	public int dbFavoriteArticleDelete(Article article) {
+		int dbFavoriteArticleDelete = ad.dbFavoriteArticleDelete(article);
+		return dbFavoriteArticleDelete;
+	}
+	
+	@Override
 	public int dbChangeStatus(Article article) {
 		int changeStatus = ad.dbChangeStatus(article);
 		return changeStatus;
@@ -410,6 +430,18 @@ public class ArticleServiceImpl implements ArticleService {
 		int dbReplyBadUp = ad.dbReplyBadUp(article);
 		return dbReplyBadUp;
 	}
+	
+	@Override
+	public int dbCondArticleCnt(Article article) {
+		int dbCondArticleCnt = ad.dbCondArticleCnt(article);
+		return dbCondArticleCnt;
+	}
+	@Override
+	public List<Article> dbListSearchArticle(Article article) {
+		List<Article> dbListSearchArticle = null;
+		dbListSearchArticle = ad.dbListSearchArticle(article);
+		return dbListSearchArticle;
+	}
 
 	
 	
@@ -430,15 +462,15 @@ public class ArticleServiceImpl implements ArticleService {
 	// 김찬영
 	// 총리스트 	
 	@Override
-	public int totalArticle() {
+	public int cytotalArticle() {
 		System.out.println("ArticleServiceImpl Start total...");
-		int totArticleCnt = ad.totalArticle();
-		System.out.println("ArticleServiceImpl totalArticle totArticleCnt->" + totArticleCnt);
-		return totArticleCnt;
+		int cytotalArticle = ad.cytotalArticle();
+		System.out.println("ArticleServiceImpl totalArticle totArticleCnt->" + cytotalArticle);
+		return cytotalArticle;
 	}
-	//댓글
+	//검색
 //	@Override
-//	public int totalArticleSearch(Article article) {
+//	public int cytotalArticleSearch(Article article) {
 //		System.out.println("아티클 서비스임플 댓글 스타트");
 //		int totalArticleSearch = ad.totalArticle();
 //		System.out.println("ArticleServiceImpl totlaArticleSearch totalArticleSearch->" + totalArticleSearch);
@@ -446,12 +478,12 @@ public class ArticleServiceImpl implements ArticleService {
 //	}
 	//리스트 조회
 	@Override
-	public List<Article> listArticle(Article article) {
-		List<Article> articleList = null;
+	public List<Article> cylistArticle(Article article) {
+		List<Article> cylistArticle = null;
 		System.out.println("ArticleServiceImpl listManager Start..");
-		articleList = ad.listArticle(article);
-		System.out.println("ArticleServiceImpl listArticle articleList.size()->" +articleList.size());
-		return articleList;
+		cylistArticle = ad.cylistArticle(article);
+		System.out.println("ArticleServiceImpl listArticle articleList.size()->" +cylistArticle.size());
+		return cylistArticle;
 	}
 
 	// 상세페이지 조회
@@ -462,14 +494,14 @@ public class ArticleServiceImpl implements ArticleService {
 		System.out.println("ArticleServiceImpl cyArticlereadDetail article->" +article);
 		return result;
 	}
-	// 상세페이지?
-	@Override
-	public Article detailArticle(int art_title) {
-		System.out.println("ArticleServiceImpl detail...");
-		Article article = null;
-		article = ad.detatilArticle(art_title);
-		return article;
-	}
+//	// 상세페이지?
+//	@Override
+//	public Article cydetailArticle(int art_title) {
+//		System.out.println("ArticleServiceImpl detail...");
+//		Article article = null;
+//		article = ad.cydetailArticle(art_title);
+//		return article;
+//	}
 	// 수정페이지 상세페이지
 	@Override
 	public Article cyArticlereadupdate(Article article) {
@@ -502,23 +534,23 @@ public class ArticleServiceImpl implements ArticleService {
 	}
 	//조회수 증가
 	@Override
-	public int updateView(Article article) {
+	public int cyupdateView(Article article) {
 		System.out.println("ArticleServiceImpl updateView");
-		int result = ad.updateView(article);
+		int result = ad.cyupdateView(article);
 		return result;
 	}
 	// 게시물 좋아요
 	@Override
-	public int updateGood(Article article) {
+	public int cyupdateGood(Article article) {
 		System.out.println("ArticleServiceImpl updateView");
-		int result = ad.updateGood(article);
+		int result = ad.cyupdateGood(article);
 		return result;
 	}
 	// 게시물 싫어요
 	@Override
-	public int updateBad(Article article) {
+	public int cyupdateBad(Article article) {
 		System.out.println("ArticleServiceImpl updateView");
-		int result = ad.updateBad(article);
+		int result = ad.cyupdateBad(article);
 		return result;
 	}
 
@@ -527,6 +559,15 @@ public class ArticleServiceImpl implements ArticleService {
 	
 	
 	// 최승환
+	@Override
+	public int totalCustomer(Article article) {
+		System.out.println("ArticleServiceImpl Start int total...");
+		int totalCustomer = ad.totalCustomer(article);
+		System.out.println("ArticleServiceImpl totalCustomer totCustomerCnt-> " + totalCustomer);
+		
+		return totalCustomer;
+	}
+	
 	@Override
 	public List<Article> listCustomer(Article article) {
 		List<Article> customerList = null;
@@ -542,12 +583,12 @@ public class ArticleServiceImpl implements ArticleService {
 		customerDetail = ad.detailCustomer(article);
 		return customerDetail;
 	}
-	@Override
-	public List<Article> listCustomerMenu(Article article) {
-		List<Article> listMenu = null;
-		listMenu = ad.listCustomerMenu(article);
-		return listMenu;
-	}
+	// 넌 뭐냐
+	/*
+	 * @Override public List<Article> listCustomerMenu(Article article) {
+	 * List<Article> listMenu = null; listMenu = ad.listCustomerMenu(article);
+	 * return listMenu; }
+	 */
 	@Override
 	public int insertCustomer(Article article) {
 		int result = 0;
@@ -574,14 +615,6 @@ public class ArticleServiceImpl implements ArticleService {
 		return ad.customerViewCount(article);
 	}
 	@Override
-	public int totalCustomer(Article article) {
-		System.out.println("ArticleServiceImpl Start int total...");
-		int totCustomerCnt = ad.totalCustomer(article);
-		System.out.println("ArticleServiceImpl totalCustomer totCustomerCnt-> " + totCustomerCnt);
-
-		return totCustomerCnt;
-	}
-	@Override
 	public List<Article> shSearchCustomer(Article article) {
 		List<Article> shCustomerSearch = null;
 		System.out.println("ArticleServiceImpl shSearchCustomer Start..." );
@@ -590,7 +623,17 @@ public class ArticleServiceImpl implements ArticleService {
 		return shCustomerSearch;
 	}
 	
+	@Override
+	public int customLike(Article article) {
+		int result = ad.customLike(article);
+		return result;
+	}
 	
+	@Override
+	public int customDislike(Article article) {
+		int result = ad.customDislike(article);
+		return result;
+	}
 	
 	
 	
@@ -799,5 +842,6 @@ public class ArticleServiceImpl implements ArticleService {
 	public List<Comm> JHcommList1() {
 		return cd.JHcommList2();
 	}
+
 	
 }
