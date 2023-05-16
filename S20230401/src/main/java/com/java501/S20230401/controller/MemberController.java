@@ -91,6 +91,51 @@ public class MemberController {
 		
 		return "joinForm";
 	}
+	@RequestMapping(value = "/resign")
+	public String memberResign(@AuthenticationPrincipal MemberDetails memberDetails) {
+		if (memberDetails == null) return "redirect:/";
+		int result = ms.hgDeleteAccount(memberDetails.getMemberInfo().getMem_id());
+		if (result > 0) return "redirect:/logout";
+		else return "redirect:/user/userinfo";
+	}
+	@RequestMapping(value = "/password/reset")
+	public String pwreset(@AuthenticationPrincipal MemberDetails memberDetails, Model model) {
+		if (memberDetails != null) return "redirect:/";
+		model.addAttribute("type", "password/resetProc");
+		return "getNameAndEmail";
+	}
+	@RequestMapping(value = "/id/search")
+	public String idSearch(@AuthenticationPrincipal MemberDetails memberDetails, Model model) {
+		if (memberDetails != null) return "redirect:/";
+		model.addAttribute("type", "id/searchResult");
+		return "getNameAndEmail";
+	}
+	@PostMapping(value = "/id/searchResult")
+	public String idSearchResult(@RequestParam String name, @RequestParam String email, HttpServletRequest request, HttpServletResponse response, Model model) {
+		response.setCharacterEncoding("UTF-8");
+		Member member = new Member();
+		System.out.println(name);
+		System.out.println(email);
+		member.setMem_name(name);
+		member.setMem_email(email);
+		System.out.println(member);
+		Member existMember = ms.hgGetMemberByNameAndEmail(member);
+		model.addAttribute("username", existMember.getMem_username());
+		return "idSearchResult";
+	}
+	@PostMapping(value = "/password/resetProc")
+	public String pwresetProcess(@RequestParam String name, @RequestParam String email, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+		response.setCharacterEncoding("UTF-8");
+		Member member = new Member();
+		member.setMem_name(name);
+		member.setMem_email(email);
+		Member existMember = ms.hgGetMemberByNameAndEmail(member);
+		if (existMember == null) {
+			return "redirect:/password/reset";
+		}
+		redirectAttributes.addFlashAttribute("member", existMember);
+		return "redirect:/mail/PasswordReset";
+	}
 	
 	@RequestMapping(value = "/user/userinfo")
 	public String modifyMemberInformation(@AuthenticationPrincipal MemberDetails memberDetails, Model model) {
@@ -209,7 +254,7 @@ public class MemberController {
 		Boolean except = (Boolean)data.get("except");
 		MemberSearchKeyword searchType = Enum.valueOf(MemberSearchKeyword.class, type.toUpperCase());
 		Member member = null;
-		if (!except) member = ms.getMember(value, searchType);
+		if (except == null || !except) member = ms.getMember(value, searchType);
 		else {
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("value", value);

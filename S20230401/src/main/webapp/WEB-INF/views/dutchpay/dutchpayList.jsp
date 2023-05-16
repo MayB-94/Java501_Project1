@@ -232,6 +232,12 @@
 				</div>
 			</div>
 			<div id="top-right">
+				<c:if test="${memberInfo != null }">
+					<!-- 메세지 추가 -->
+					<div class="userMessage" onclick="userMessage()">
+						<svg class="userMessage-popup" viewBox="0 0 512 512" style="width: 30; height: 30;"><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg>
+					</div>
+				</c:if>
 				<!-- <button id="viewMode">
 					<div id="viewModeButton"></div>
 				</button> -->
@@ -292,6 +298,11 @@
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/';">
 										마이 페이지
 									</button>
+									<c:if test="${memberInfo.mem_authority >= 108 }">
+										<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/admin';">
+											관리자 페이지
+										</button>
+									</c:if>
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px; margin-bottom: 10px;" class="subtheme-button" onclick="location.href = '${pageContext.request.contextPath }/logout';">
 										로그아웃
 									</button>
@@ -309,8 +320,9 @@
 	<main>
 		<div class="container padding-10px">
 			<div class="article-view">
-				<div class="board-title" align="center">
-					<h1 class="color-subtheme">${boardName} 게시판</h1>
+				<div class="board-title margin-50px margin-hor-0" align="center" style="border: 1px solid transparent; border-radius: 20px; background-color: rgba(var(--subtheme-rgb), 0.25)">
+					<h1 class="color-subtheme text-align-left padding-10px padding-hor-20px">${boardName} 게시판</h1>
+					<p class="translucent-theme-font text-align-left padding-10px padding-hor-20px" style="padding-top: 0;">혼자서 사기는 많고... 나눠가질 사람은 어디 없을까요?</p>
 				</div>
 				
 				<div class="display-flex justify-content-flex-end align-items-center"><span class="font-size-14px" style="color: rgba(var(--theme-font-rgb), 0.5);">총 ${totalArticle }개의 게시글이 있습니다</span></div>
@@ -327,9 +339,9 @@
 				<div class="board-btns display-flex flex-grow-1" style="margin: 5px 0px;">
 					<div class="btns-right" style="display: flex; justify-content: flex-end; flex-grow: 1;">
 						<span>
-							<%-- <c:if test="${article.category % 100 != 0 && memberInfo != null}"> --%>
+							<c:if test="${memberInfo != null}">
 								<button class="btn-write adv-hover" onclick="goWriteForm(${memberInfo.mem_id})">글쓰기</button>
-							<%-- </c:if> --%>
+							</c:if>
 						</span>
 					</div>
 				</div>

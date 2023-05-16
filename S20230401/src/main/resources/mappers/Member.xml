@@ -97,7 +97,15 @@
 									MEM_REGION2 = #{mem_region2, jdbcType=NUMERIC}
 		WHERE MEM_ID = #{mem_id}
 	</update>
-
+	<update id="hgDeleteAccount" parameterType="int">
+		UPDATE MEMBER SET ISDELETE = 1 WHERE MEM_ID = #{mem_id}
+	</update>
+	<update id="hgUpdatePassword" parameterType="Member">
+		UPDATE MEMBER SET MEM_PASSWORD = #{mem_password} WHERE MEM_ID = #{mem_id}
+	</update>
+	<select id="hgGetMemberByNameAndEmail" parameterType="Member" resultType="Member">
+		SELECT MEM_ID, MEM_USERNAME, MEM_NAME, MEM_EMAIL FROM MEMBER WHERE MEM_NAME = #{mem_name} AND MEM_EMAIL = #{mem_email}
+	</select>
 
 
 

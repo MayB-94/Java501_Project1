@@ -90,4 +90,19 @@ public class MemberServiceImpl implements MemberService {
 	public int hgUpdateMember(Member member) {
 		return md.hgUpdateMember(member);
 	}
+	
+	@Override
+	public int hgDeleteAccount(Integer mem_id) {
+		return md.hgDeleteAccount(mem_id);
+	}
+	
+	@Override
+	public int hgUpdatePassword(Member member) {
+		return md.hgUpdatePassword(member);
+	}
+	
+	@Override
+	public Member hgGetMemberByNameAndEmail(Member member) {
+		return md.hgGetMemberByNameAndEmail(member);
+	}
 }

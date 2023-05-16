@@ -57,7 +57,7 @@ body {
 }
 .message-content {
 	flex: 1;
-	padding: 40px;
+	padding: 10px;
 }
 /* 두번째 자식 요소 제외 (받은 쪽지함) */
 .message-content > *:not(:nth-child(2)) {
@@ -67,7 +67,8 @@ body {
 	flex: 1;
 	padding: 20px;
 	font-size: 26px;
-    margin-bottom: 90px;
+    /*margin-bottom: 90px;*/
+    margin: 0;
     color: #333;
 }
 .message-list{

@@ -24,6 +24,9 @@ public interface MemberService {
 	public int hgUpdateAuthorityByMember(Member member);
 	public int hgUpdateIsdeleteByMember(Member member);
 	public int hgUpdateMember(Member member);
+	public int hgDeleteAccount(Integer mem_id);
+	public int hgUpdatePassword(Member member);
+	public Member hgGetMemberByNameAndEmail(Member member);
 
 
 
