@@ -821,7 +821,7 @@
 				
 				<!-- 태그 출력 및 검색 -->
 				<div class="article-info">
-					<div class="view-tag padding-0">
+					<div class="view-tag display-flex justify-content-flex-start flex-grow-1">
 						<!-- 태그검색기능 -->
 						<form action="${pageContext.request.contextPath}/board/together/listSearch">
 							<input type="hidden" name="category" value="${category}">

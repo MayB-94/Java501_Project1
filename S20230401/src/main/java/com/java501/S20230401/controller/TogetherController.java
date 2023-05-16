@@ -144,7 +144,6 @@ public class TogetherController {
 
 		article.setTrd_max(detailArticle.getTrd_max());
 		article.setTrd_id(detailArticle.getTrd_id());
-		System.out.println(detailArticle.getReg_id());
 		
 		if (detailArticle.getTrd_status() != 404) {
 			// 인원 다 차면 게시글 상태 변경 (진행중)
@@ -285,7 +284,6 @@ public class TogetherController {
 		
 		// 게시글 수정 양식 (상세 게시글 값 가져오기)
 		Article updateFormArticle = as.dbdetailArticle(article);
-		System.out.println(updateFormArticle.getReg_id());
 		model.addAttribute("article", updateFormArticle);
 		
 		Map<Region, List<Region>> regionHierachy = new HashMap<Region, List<Region>>();
@@ -441,7 +439,6 @@ public class TogetherController {
 		 
 		 as.dbReportArticle(article);
 		 int result = article.getInsert_result();
-		 System.out.println(result);
 		 
 		 jsonObj.append("result", result);
 		 jsonObj.append("content", article.getReport_content());

@@ -73,18 +73,14 @@ public class CommDaoImpl implements CommDao {
 	@Override
 	public List<Comm> boardName() {
 		List<Comm> BoardList = null;
-		System.out.println("CommDaoImpl CommName Start..");
 		BoardList = session.selectList("SelectBoard");
-		System.out.println("CommDaoImpl CommList.size()=> " + BoardList.size());
 		return BoardList;
 	}
 	
 	@Override
 	public List<Comm> genderName() {
 		List<Comm> GenderList = null;
-		System.out.println("CommDaoImpl CommName Start..");
 		GenderList = session.selectList("SelectGender");
-		System.out.println("CommDaoImpl CommList.size()=> " + GenderList.size());
 		return GenderList;
 	}
 
