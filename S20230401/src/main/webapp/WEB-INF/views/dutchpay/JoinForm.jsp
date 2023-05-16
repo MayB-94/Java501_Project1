@@ -105,9 +105,7 @@
     
     <div class="box2">
     	<strong>상품 확인</strong><br>
-    	
-    	작성자 :<img src="${pageContext.request.contextPath }/uploads/profile/${detail.mem_image }" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';">
-    	${detail.mem_nickname }(${detail.mem_username })<br>
+    	작성자 :${detail.mem_nickname }(${detail.mem_username })<br>
     	가격 : ${detail.trd_cost }원<br>
     	지역 : ${detail.reg_name } ${detail.trd_loc }<br>   <!-- + 상품사진 -->
     	인원 : ${detail.trd_max }명 (작성자 제외)<br>
