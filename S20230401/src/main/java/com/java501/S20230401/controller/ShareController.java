@@ -251,7 +251,7 @@ public class ShareController {
 	@PostMapping(value = "board/share/writeArticleForm")
 	public String writeArticleForm(	@AuthenticationPrincipal
 									MemberDetails memberDetails,
-									@RequestParam("trd_endDate")
+									@RequestParam(name = "trd_endDate", required = false)
 									@DateTimeFormat(pattern="yyyy-MM-dd")
 									Date trd_endDate,
 									Article article, 
@@ -286,7 +286,7 @@ public class ShareController {
 	
 	// 게시글 수정
 	@PostMapping(value = "board/share/updateArticleForm")
-	public String updateShare(@AuthenticationPrincipal MemberDetails memberDetails, @RequestParam("trd_endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date trd_endDate, Article article, Integer category) {
+	public String updateShare(@AuthenticationPrincipal MemberDetails memberDetails, @RequestParam(name = "trd_endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date trd_endDate, Article article, Integer category) {
 		// trd_endDate 저장 (model 이슈 변수명 endDate로)
 		article.getTrade().setTrd_enddate(trd_endDate);
 		System.out.println(article.getArt_isnotice());
