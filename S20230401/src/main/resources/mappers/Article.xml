@@ -1319,6 +1319,59 @@
 	
 	
 	<!-- 김진현 -->
+<!-- 	<select id="JHDutchpay" parameterType="Article" resultType="Article">
+         SELECT  *
+         FROM    (SELECT ROWNUM AS RN, S.*
+                  FROM   (SELECT *
+                          FROM ( SELECT  *
+                                 FROM    ARTICLE A
+                                 JOIN    (   SELECT  C1.COMM_VALUE AS BRD_NAME, B.*
+                                             FROM    BOARD B JOIN COMM C1
+                                             ON      BRD_ID IN COMM_ID
+                                          )USING(BRD_ID)
+                                 JOIN   (   SELECT  C2.COMM_VALUE AS GEN_NAME, M.*
+                                             FROM    MEMBER M JOIN COMM C2
+                                             ON      MEM_GENDER IN COMM_ID
+                                          )USING(MEM_ID)
+                                 LEFT OUTER JOIN    (    SELECT    COUNT(*) AS REP_CNT, ART_ID, BRD_ID
+                                                         FROM    REPLY
+                                                         WHERE    ISDELETE = 0
+                                                         GROUP BY(ART_ID, BRD_ID)
+                                                     )USING(BRD_ID, ART_ID)
+                                   WHERE    A.ISDELETE = 0
+                               AND     BRD_ID <choose>
+                                               <when test="brd_id == 999">
+                                             BETWEEN #{brd_id} and #{brd_id}+600
+                                          </when>
+                                          <when test="brd_id % 100 != 0">
+                                             = #{brd_id}
+                                          </when>
+                                          <otherwise>
+                                             BETWEEN #{brd_id} and #{brd_id}+99
+                                          </otherwise>
+                                       </choose>
+                                )
+                          <choose>
+                             <when test="search == 'article'">
+                                WHERE (ART_TITLE || ART_CONTENT) LIKE '%'|| #{keyWord} ||'%'
+                             </when>
+                             <when test="search == 'title'">
+                                WHERE ART_TITLE LIKE '%'|| #{keyWord} ||'%'
+                             </when>
+                             <when test="search == 'content'">
+                                WHERE ART_CONTENT LIKE '%'|| #{keyWord} ||'%'
+                             </when>
+                             <when test="search == 'nickname'">
+                                WHERE MEM_NICKNAME LIKE '%'|| #{keyWord} ||'%'
+                             </when>
+                             <when test="search == 'articleTag'">
+                                WHERE (ART_TAG1||ART_TAG2||ART_TAG3||ART_TAG4||ART_TAG5) LIKE '%'|| #{keyWord} ||'%'
+                             </when>
+                             <otherwise></otherwise>
+                          </choose>
+                          ORDER BY   ART_REGDATE DESC) S)
+         WHERE    RN BETWEEN #{start} and #{end}
+      </select> -->
 	
 	<select id="JHDutchpay" parameterType="Article" resultType="Article">
 		SELECT * FROM (
@@ -1389,7 +1442,7 @@
 		        	ORDER BY A.ART_REGDATE DESC) TT)
 		WHERE RN BETWEEN #{start} AND #{end}
 	</select> 
-	
+	 
 	<select id="JHDutchpayDetail" parameterType="Article" resultType="Article">
 		SELECT a.art_id, a.brd_id, t.trd_id, mem_id	,c.comm_id ,a.report_id, c2.comm_value AS brd_name,
 			   m.mem_image, m.mem_username, m.mem_nickname,
