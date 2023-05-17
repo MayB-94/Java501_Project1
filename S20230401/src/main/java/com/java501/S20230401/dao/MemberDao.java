@@ -30,6 +30,9 @@ public interface MemberDao {
 	public Member hgFindByMemberEmail(Map<String, Object> param);
 	public Member hgFindByMemberNickname(Map<String, Object> param);
 	public int hgUpdateMember(Member member);
+	public int hgDeleteAccount(Integer mem_id);
+	public int hgUpdatePassword(Member member);
+	public Member hgGetMemberByNameAndEmail(Member member);
 
 
 

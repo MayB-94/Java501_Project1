@@ -1,6 +1,8 @@
 package com.java501.S20230401.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +30,7 @@ import com.java501.S20230401.model.MemberInfo;
 import com.java501.S20230401.model.Region;
 import com.java501.S20230401.service.ArticleService;
 import com.java501.S20230401.service.Paging;
+import com.java501.S20230401.service.RegionService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DutchpayController {
 	private final ArticleService as;
+	private final RegionService rs;
 	
 	@RequestMapping(value = "/board/dutchpay")
 	public String articleList(@AuthenticationPrincipal MemberDetails memberDetails, // 세션의 로그인 유저 정보
@@ -258,6 +262,14 @@ public class DutchpayController {
 		List<Region> loc = as.JHloc1();
 		//for (Region l : loc) System.out.println(l.getReg_id() + " : " + l.getReg_name());
 		System.out.println("dutchpay/dutchpayWriteForm loc.size() ->"+loc.size());
+		
+		// 이 아래는 꼭 들고 다녀야함!!!
+		Map<Region, List<Region>> regionHierachy = new HashMap<Region, List<Region>>();
+		List<Region> superRegions = rs.getSuperRegions();
+		for (Region sups : superRegions) regionHierachy.put(sups, rs.getChildRegions(sups.getReg_id()));
+		model.addAttribute("superRegions", superRegions);
+		model.addAttribute("regions", regionHierachy);
+		// 여기까지는 꼭 들고 다녀야함!!!
 	
 		model.addAttribute("categories", category);
 		model.addAttribute("loc", loc);
@@ -282,6 +294,14 @@ public class DutchpayController {
 		List<Region> loc_ud = as.JHloc_ud1();
 		//for (Region l : loc_ud) System.out.println(l.getReg_id() + " : " + l.getReg_name());
 		System.out.println("dutchpay/dutchpayUpdateForm loc_ud.size()- >"+loc_ud.size());
+
+		// 이 아래는 꼭 들고 다녀야함!!!
+		Map<Region, List<Region>> regionHierachy = new HashMap<Region, List<Region>>();
+		List<Region> superRegions = rs.getSuperRegions();
+		for (Region sups : superRegions) regionHierachy.put(sups, rs.getChildRegions(sups.getReg_id()));
+		model.addAttribute("superRegions", superRegions);
+		model.addAttribute("regions", regionHierachy);
+		// 여기까지는 꼭 들고 다녀야함!!!
 		
 		model.addAttribute("loc_ud", loc_ud);
 		

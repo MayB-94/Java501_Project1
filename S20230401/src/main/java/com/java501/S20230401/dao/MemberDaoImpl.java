@@ -108,4 +108,16 @@ public class MemberDaoImpl implements MemberDao {
 	public int hgUpdateMember(Member member) {
 		return session.update("hgUpdateMember", member);
 	}
+	@Override
+	public int hgDeleteAccount(Integer mem_id) {
+		return session.update("hgDeleteAccount", mem_id);
+	}
+	@Override
+	public int hgUpdatePassword(Member member) {
+		return session.update("hgUpdatePassword", member);
+	}
+	@Override
+	public Member hgGetMemberByNameAndEmail(Member member) {
+		return session.selectOne("hgGetMemberByNameAndEmail", member);
+	}
 }

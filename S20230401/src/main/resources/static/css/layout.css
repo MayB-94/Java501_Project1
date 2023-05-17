@@ -2,9 +2,10 @@
 body {
 	width: 100%;
 	display: grid;
-	/* grid-template-columns: 200px 1fr 200px; */
+	/* grid-template-columns: 360px 1fr 360px; */
+	grid-template-columns: 300px minmax(820px, 1fr) 300px;
 	/* grid-template-columns: 1fr 700px 1fr; */
-	grid-template-columns: 1fr minmax(700px, 1fr) 1fr;
+	/* grid-template-columns: 1fr minmax(700px, 1fr) 1fr; */
 	grid-template-rows: 100px 1fr 200px;
 	grid-template-areas:
 		"header header header"
@@ -19,7 +20,7 @@ header {
 	z-index: 99;
 }
 aside {
-	background-color: var(--backtheme);
+	/* background-color: var(--backtheme); */
 }
 aside#leftside {
 	grid-area: leftside;
@@ -54,12 +55,17 @@ header > div#usernav > a {
 header > div#topbar > div#logo-div, header > div#topbar > div#top-right { width: 200px; }
 header > div#topbar > div#top-right {
 	display: flex;
-	justify-content: space-between;
+	/* justify-content: space-between; */
+	justify-content: flex-end;
 	align-items: center;
+}
+header > div#topbar > div#top-right > *:not(:first-child) {
+	margin-left: 30px;
 }
 header > div#topbar {
 	display: flex;
-	justify-content: space-between;
+	/* justify-content: space-between; */
+	justify-content: center;
 	align-items: center;
 	height: calc(100% - 21px);
 }

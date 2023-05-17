@@ -251,7 +251,7 @@ public class ShareController {
 	@PostMapping(value = "board/share/writeArticleForm")
 	public String writeArticleForm(	@AuthenticationPrincipal
 									MemberDetails memberDetails,
-									@RequestParam("trd_endDate")
+									@RequestParam(name = "trd_endDate", required = false)
 									@DateTimeFormat(pattern="yyyy-MM-dd")
 									Date trd_endDate,
 									Article article, 

@@ -1239,22 +1239,23 @@
 		SELECT *
 		FROM
 		(
-		    SELECT rownum rn, a.*, m.mem_nickname, m.mem_image
+		    SELECT rownum rn, t.*
 		    FROM
-		        (SELECT *
-		         FROM article
+		        (SELECT a.*, m.mem_nickname, m.mem_image, C.COMM_VALUE BRD_NAME
+		         FROM article a
+		         LEFT OUTER JOIN member m ON (a.mem_id = m.mem_id)
+		         LEFT OUTER JOIN COMM C ON (a.brd_id = C.COMM_ID)
 		         WHERE
 		            <choose>
 		                <when test="brd_id == 1400">
-		                    brd_id BETWEEN 1400 AND 1499
+		                    a.brd_id BETWEEN 1400 AND 1499
 		                </when>
 		                <otherwise>
-		                    brd_id = #{brd_id}
+		                    a.brd_id = #{brd_id}
 		                </otherwise>
 		            </choose>
-		         AND isdelete = 0
-		         ORDER BY art_regdate desc) a
-		         JOIN member m ON a.mem_id = m.mem_id
+		         AND a.isdelete = 0
+		         ORDER BY a.art_regdate desc) t
 		)
 		WHERE rn BETWEEN #{start} AND #{end}
 	</select>  

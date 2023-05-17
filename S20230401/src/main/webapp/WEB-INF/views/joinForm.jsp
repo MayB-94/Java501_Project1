@@ -21,7 +21,7 @@
 		let check = len >= 6 && len <= 12;
 		if (!check) {
 			$('#usernameMsg').css('color', window.getComputedStyle(document.documentElement, null).getPropertyValue('--warning'));
-			$('#usernameMsg').text('비밀번호는 8 글자 이상 20글자 이하로 설정하세요');
+			$('#usernameMsg').text('아이디는 6 글자 이상 12글자 이하로 설정하세요');
 		}
 		return true;
 	};

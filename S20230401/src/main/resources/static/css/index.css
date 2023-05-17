@@ -10,8 +10,9 @@ div.board-summary {
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: stretch;
-	margin: 50px 10px;
-	border-bottom: 5px solid var(--subtheme);
+	/* margin: 50px 10px; */
+	padding: 50px 40px;
+	/* border-bottom: 5px solid var(--subtheme); */
 	width: calc(50% - 20px);
 }
 div.board-summary > div.board-summary-title {
@@ -53,7 +54,7 @@ div.board-summary > div.board-summary-section {
 div.board-summary > div.board-summary-section > div.board-summary-part {
 	width: calc(100% - 10px);
 	margin: 5px;
-	height: 304px;
+	height: 404px;
 }
 div.board-summary > div.board-summary-section > div.board-summary-part:nth-child(1) {
 	display: block;
@@ -122,10 +123,11 @@ div.board-summary > div.board-summary-section > div.board-summary-part > div.boa
 	display: grid;
 	grid-template-columns: auto auto;
 	grid-template-rows: 30px 30px;
-	padding: 0 5px;
+	padding: 10px 5px;
 }
 div.board-summary-article:not(:last-child) {
-	border-bottom: 1px solid var(--subtheme);
+	/* border-bottom: 1px solid var(--subtheme); */
+	border-bottom: 1px solid rgba(128, 128, 128, 0.5);
 }
 div.board-summary-article > div.article-part-lt {
 	grid-column-start: 1;
@@ -136,6 +138,9 @@ div.board-summary-article > div.article-part-lt {
 	justify-content: flex-start;
 	align-items: center;
 	line-height: 20px;
+}
+div.board-summary-article > div.article-part-lt > * {
+	padding: 0 1.25px;
 }
 div.board-summary-article > div.article-part-lt > span {
 	font-size: 13px;
@@ -179,20 +184,30 @@ div.board-summary-article > div.article-part-rt {
 div.board-summary-article > div.article-part-rt > span {
 	font-size: 12px;
 }
-div.board-summary-article > div.article-part-rt > span.article-enddate {
+/* div.board-summary-article > div.article-part-rt > span.article-enddate { */
+div.board-summary-article > div.article-part-b > span.article-enddate {
 	background-color: var(--subtheme);
 	color: var(--subtheme-font);
 	padding: 1.25px 2.5px;
 	font-weight: bold;
 	border-radius: 2.5px;
+	font-size: 12px;
 }
-div.board-summary-article > div.article-part-rt > span.article-enddate-end {
-	background-color: var(--theme);
+/* div.board-summary-article > div.article-part-rt > span.article-enddate-end { */
+div.board-summary-article > div.article-part-b > span.article-enddate-end {
+	/* background-color: var(--theme);
 	color: var(--theme-font);
 	padding: 1.25px 2.5px;
 	font-weight: bold;
 	border-radius: 2.5px;
 	border: 2px solid var(--subtheme);
+	font-size: 12px; */
+	background-color: rgb(128, 128, 128);
+	color: var(--subtheme-font);
+	padding: 1.25px 2.5px;
+	font-weight: bold;
+	border-radius: 2.5px;
+	font-size: 12px;
 }
 div.board-summary-article > div.article-part-rt > svg {
 	width: 12px;

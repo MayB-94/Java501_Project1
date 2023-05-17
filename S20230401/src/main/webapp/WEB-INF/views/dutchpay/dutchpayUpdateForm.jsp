@@ -264,6 +264,12 @@
 				</div>
 			</div>
 			<div id="top-right">
+				<c:if test="${memberInfo != null }">
+					<!-- 메세지 추가 -->
+					<div class="userMessage" onclick="userMessage()">
+						<svg class="userMessage-popup" viewBox="0 0 512 512" style="width: 30; height: 30;"><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg>
+					</div>
+				</c:if>
 				<!-- <button id="viewMode">
 					<div id="viewModeButton"></div>
 				</button> -->
@@ -324,6 +330,11 @@
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/user/mypage';">
 										마이 페이지
 									</button>
+									<c:if test="${memberInfo.mem_authority >= 108 }">
+										<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/admin';">
+											관리자 페이지
+										</button>
+									</c:if>
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px; margin-bottom: 10px;" class="subtheme-button" onclick="location.href = '${pageContext.request.contextPath }/logout';">
 										로그아웃
 									</button>
@@ -348,6 +359,7 @@
 				<form action="${pageContext.request.contextPath}/board/dutchpay/dutchpayUpdatePro" method="post" onsubmit="return updateAction();">
 					<%-- <input type="hidden" 	name="category" 		value="${category}"> --%>
 					<input type="hidden" 	name="art_id" 			value="${updateForm.art_id}">
+					<input type="hidden" 	name="brd_id" 			value="${updateForm.brd_id}">
 				<!-- 임시 기본값 저장 -->
 					<input type="hidden" 	name="trade.trd_id" value="${updateForm.trd_id }">
 					<input type="hidden" 	name="trade.trd_status" value="401">
@@ -418,13 +430,13 @@
 									<input type="hidden" id="reg_id" name="reg_id" value="${updateForm.reg_id }">
 									<label for="reg_id-button">지역 제한</label>
 									
-										<select name="reg_id">
+										<%-- <select name="reg_id">
 											<c:forEach var="L_ud" items="${loc_ud }">
 												<option value="${L_ud.reg_id }" ${L_ud.reg_id == updateForm.reg_id ? 'selected' : '' }>${L_ud.reg_name }</option>
 											</c:forEach>
-										</select>
+										</select> --%>
 									
-									<%-- <c:set var="selectedRegion" value=""/>
+									<c:set var="selectedRegion" value=""/>
 									<c:forEach var="region" items="${superRegions }">
 										<c:if test="${region.reg_id == updateForm.reg_id }">
 											<c:set var="selectedRegion" value="${region.reg_name }"/>
@@ -442,7 +454,7 @@
 										</div>
 										<c:forEach var="region" items="${superRegions }">
 											<div style="position: relative;">
-												<button type="button" class="subitem-header adv-hover" onclick="$('#region-value').val(${region.reg_id}); $('#region').text('${region.reg_name }'); $('#region-popup').toggle();">${region.reg_name }</button>
+												<button type="button" class="subitem-header adv-hover" onclick="$('#reg_id').val(${region.reg_id}); $('#region').text('${region.reg_name }'); $('#region-popup').toggle();">${region.reg_name }</button>
 												<c:if test="${not empty regions[region] }">
 													<div class="subitem-list">
 														<button type="button" class="adv-hover" onclick="$('#reg_id').removeAttr('value'); $('#region').text(''); $('#region-popup').toggle();">없음</button>
@@ -453,7 +465,7 @@
 												</c:if>
 											</div>
 										</c:forEach>
-									</div> --%>
+									</div>
 								</div>
 							</div>
 							

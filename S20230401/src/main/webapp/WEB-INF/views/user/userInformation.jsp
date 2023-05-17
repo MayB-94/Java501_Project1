@@ -66,6 +66,10 @@
 	};
 	
 	$(() => {
+		$('#resign-button').click(e => {
+			let isResign = confirm('탈퇴하시겠습니까?');
+			if (isResign) location.href = '${pageContext.request.contextPath}/resign';
+		});
 		$('input[type="text"]').keydown(e => {
 			if (e.keyCode == 32) e.preventDefault();
 		});
@@ -184,7 +188,7 @@
 		font-size: 14px;
 		padding: 2.5px 5px;
 	}
-	button#join-button {
+	button#join-button, button#resign-button {
 		width: 100%;
 		height: 40px;
 		line-height: 36px;
@@ -372,6 +376,12 @@
 				</div>
 			</div>
 			<div id="top-right">
+				<c:if test="${memberInfo != null }">
+					<!-- 메세지 추가 -->
+					<div class="userMessage" onclick="userMessage()">
+						<svg class="userMessage-popup" viewBox="0 0 512 512" style="width: 30; height: 30;"><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg>
+					</div>
+				</c:if>
 				<!-- <button id="viewMode">
 					<div id="viewModeButton"></div>
 				</button> -->
@@ -432,6 +442,11 @@
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/user/mypage';">
 										마이 페이지
 									</button>
+									<c:if test="${memberInfo.mem_authority >= 108 }">
+										<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/admin';">
+											관리자 페이지
+										</button>
+									</c:if>
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px; margin-bottom: 10px;" class="subtheme-button" onclick="location.href = '${pageContext.request.contextPath }/logout';">
 										로그아웃
 									</button>
@@ -595,6 +610,7 @@
 							</div>
 						</div>
 						<button id="join-button" class="subtheme-button adv-hover" type="submit">회원정보 수정</button>
+						<button id="resign-button" class="warning-button margin-10px margin-hor-0 adv-hover" type="button">회원 탈퇴</button>
 					</div>
 				</form>
 			</div>

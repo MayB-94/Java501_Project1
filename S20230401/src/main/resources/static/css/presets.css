@@ -127,6 +127,10 @@ button.warning-button * {
 .padding-2_5px { padding: 2.5px; }
 .padding-5px { padding: 5px; }
 .padding-10px { padding: 10px; }
+.padding-20px { padding: 20px; }
+.padding-30px { padding: 30px; }
+.padding-40px { padding: 40px; }
+.padding-50px { padding: 50px; }
 .padding-left-2_5px { padding-left: 2.5px; }
 .padding-left-5px { padding-left: 5px; }
 .padding-left-10px { padding-left: 10px; }
@@ -137,6 +141,7 @@ button.warning-button * {
 .padding-hor-2_5px { padding-left: 2.5px; padding-right: 2.5px; }
 .padding-hor-5px { padding-left: 5px; padding-right: 5px; }
 .padding-hor-10px { padding-left: 10px; padding-right: 10px; }
+.padding-hor-20px { padding-left: 20px; padding-right: 20px; }
 .padding-custom1 { padding: 2.5px 5px; }
 .padding-custom2 { padding: 5px 10px; }
 
@@ -144,6 +149,10 @@ button.warning-button * {
 .margin-2_5px { margin: 2.5px; }
 .margin-5px { margin: 5px; }
 .margin-10px { margin: 10px; }
+.margin-20px { margin: 20px; }
+.margin-30px { margin: 30px; }
+.margin-40px { margin: 40px; }
+.margin-50px { margin: 50px; }
 .margin-left-2_5px { margin-left: 2.5px; }
 .margin-left-5px { margin-left: 5px; }
 .margin-left-10px { margin-left: 10px; }
@@ -257,6 +266,8 @@ button.warning-button * {
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
-.translucent-color {
-	color: rgba(128, 128, 128, 0.5);
-}
+.translucent-color { color: rgba(128, 128, 128, 0.5); }
+.translucent-theme { color: rgba(var(--theme-rgb), 0.5); }
+.translucent-theme-font { color: rgba(var(--theme-font-rgb), 0.5); }
+.translucent-subtheme { color: rgba(var(--subtheme-rgb), 0.5); }
+.translucent-subtheme-font { color: rgba(var(--subtheme-font-rgb), 0.5); }

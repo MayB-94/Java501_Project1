@@ -58,6 +58,7 @@ public class InformationController {
 		String viewName = "infoindex";
 		System.out.println("ArticleController Start listArticle...");
 		article.setBrd_id(category);
+		
 		//전체 게시글
 		int cytotalArticle = as.cytotalArticle();
 		System.out.println("ArticleController totalArticle=>" + cytotalArticle);
@@ -75,7 +76,8 @@ public class InformationController {
 		List<Article> listArticle = as.cylistArticle(article);
 		System.out.println("ArticleController list listArticle.size()=>" + listArticle.size());
 		
-		
+
+		model.addAttribute("boardName", boardName);
 		model.addAttribute("article", article);
 		model.addAttribute("cytotalArticle", cytotalArticle);
 		model.addAttribute("listArticle", listArticle);
@@ -384,6 +386,7 @@ public class InformationController {
 	public String getwrite(@AuthenticationPrincipal MemberDetails memberDetails, Article article,Integer category, Model model) throws Exception {
 		if(memberDetails != null)
 		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+		model.addAttribute("category", category);
 		System.out.println("작성 겟 Start...");
 		return "information/write";
 	}

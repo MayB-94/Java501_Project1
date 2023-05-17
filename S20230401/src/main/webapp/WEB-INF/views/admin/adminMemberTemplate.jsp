@@ -99,15 +99,15 @@
 		</div>
 		<div>
 			<div class="admin-board-2-head display-flex justify-content-flex-start align-items-center">
-				<span class="font-size-12px span-ellipsis text-align-center" style="width: 30px;">회원<br/>번호</span>
-				<span class="font-size-12px span-ellipsis width-100px text-align-center">아이디</span>
-				<span class="font-size-12px span-ellipsis width-100px text-align-center">닉네임</span>
-				<span class="font-size-12px span-ellipsis text-align-center flex-grow-1">이메일</span>
-				<span class="font-size-12px span-ellipsis width-75px text-align-center">차단 횟수</span>
-				<span class="font-size-12px span-ellipsis width-75px text-align-center">삭제된 글</span>
-				<span class="font-size-12px span-ellipsis width-75px text-align-center">삭제된 댓글</span>
+				<span class="font-size-14px span-ellipsis text-align-center width-50px">회원<br/>번호</span>
+				<span class="font-size-14px span-ellipsis width-100px text-align-center">아이디</span>
+				<span class="font-size-14px span-ellipsis width-100px text-align-center">닉네임</span>
+				<span class="font-size-14px span-ellipsis text-align-center flex-grow-1">이메일</span>
+				<span class="font-size-14px span-ellipsis width-75px text-align-center">차단 횟수</span>
+				<span class="font-size-14px span-ellipsis width-75px text-align-center">삭제된 글</span>
+				<span class="font-size-14px span-ellipsis width-75px text-align-center">삭제된 댓글</span>
 				<div class="flex-shrink-0 display-flex justify-content-flex-end align-items-center">
-					<span class="color-subtheme font-size-12px font-weight-bolder span-ellipsis width-75px text-align-center">권한 관리</span>
+					<span class="color-subtheme font-size-14px font-weight-bolder span-ellipsis width-75px text-align-center">권한 관리</span>
 					<button type="button" class="subtheme-button margin-left-5px" style="padding: 2.5px 5px; background-color: transparent; color: var(--subtheme); cursor: default;" disabled>차단</button>
 					<button type="button" class="warning-button margin-left-5px" style="padding: 2.5px 5px; background-color: transparent; color: var(--warning); cursor: default;" disabled>삭제</button>
 				</div>
@@ -116,10 +116,10 @@
 				<c:forEach var="member" items="${members }">
 					<div class="list-item display-flex justify-content-flex-start align-items-center padding-5px padding-hor-0" data-id="${member.mem_id }" style="${member.isdelete == 1 ? 'background-color: rgba(var(--warning-rgb), 0.25);' : (member.mem_authority == 102 ? 'background-color: rgba(128, 128, 128, 0.25);' : '')  }">
 						<div class="flex-grow-1 display-flex justify-content-flex-start align-items-center">
-							<span class="font-size-12px span-ellipsis text-align-center" style="width: 30px;">${member.mem_id }</span>
-							<span class="font-size-12px span-ellipsis width-100px text-align-center">${member.mem_username }</span>
-							<span class="font-size-12px span-ellipsis width-100px text-align-center">${member.mem_nickname }</span>
-							<span class="font-size-12px span-ellipsis text-align-center flex-grow-1">${member.mem_email }</span>
+							<span class="font-size-14px span-ellipsis text-align-center width-50px">${member.mem_id }</span>
+							<span class="font-size-14px span-ellipsis width-100px text-align-center">${member.mem_username }</span>
+							<span class="font-size-14px span-ellipsis width-100px text-align-center">${member.mem_nickname }</span>
+							<span class="font-size-14px span-ellipsis text-align-center flex-grow-1">${member.mem_email }</span>
 							<span class="color-warning font-size-14px font-weight-bolder span-ellipsis width-75px text-align-center">${member.member_report_cnt }</span>
 							<span class="color-warning font-size-14px font-weight-bolder span-ellipsis width-75px text-align-center">${member.article_report_cnt }</span>
 							<span class="color-warning font-size-14px font-weight-bolder span-ellipsis width-75px text-align-center">${member.reply_report_cnt }</span>

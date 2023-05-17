@@ -120,6 +120,7 @@
 		border: 0;
 		outline: none;
 		cursor: pointer;
+		height: 50px;
 	}
 	aside > div#admin-menu > button.side-menu[data-selected="true"] {
 		background-color: var(--theme);
@@ -172,7 +173,7 @@
 		display: flex;
 		justify-content: flex-start;
 		align-items: stretch;
-		padding: 10px;
+		padding: 75px;
 		height: 100%;
 	}
 	div.admin-main {
@@ -528,7 +529,7 @@
 </head>
 <body>
 	<aside>
-		<div id="admin-profile">
+		<div id="admin-profile" class="padding-20px padding-hor-0">
 			<div class="image-container background-color-theme">
 				<img src="${pageContext.request.contextPath }/uploads/profile/${memberInfo.mem_image }" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';">
 			</div>
@@ -548,11 +549,11 @@
 			<button class="side-menu radio-button adv-hover" data-group="menu" data-selected="false" data-value="article">게시글 관리</button>
 			<button class="side-menu radio-button adv-hover" data-group="menu" data-selected="false" data-value="suggest">건의글 관리</button>
 		</div>
-		<div id="admin-action">
+		<div id="admin-action" class="padding-20px padding-hor-0">
 			<button class="admin-action-button adv-hover" type="button" onclick="location.href = '${pageContext.request.contextPath}/';">
 				<span>메인 페이지</span>
 			</button>
-			<button class="admin-action-button adv-hover" type="button">
+			<button class="admin-action-button adv-hover" type="button" onclick="location.href = '${pageContext.request.contextPath}/logout';">
 				<svg class="admin-action-button-content" viewBox="0 0 512 512">
 					<!-- https://ionic.io/ionicons -->
 					<path d="M336 112a80 80 0 00-160 0v96"/>
