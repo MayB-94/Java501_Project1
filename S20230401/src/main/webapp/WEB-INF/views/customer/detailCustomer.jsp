@@ -67,110 +67,7 @@
 </script>
 
 
-<!-- <script type="text/javascript">
-    $(function() {
-        // 추천 버튼 클릭 시
-        $("#shLike").click(function(event)) {
-        	event.preventDefault();
-        	// 글 정보
-            var brd_id = ${article.brd_id};
-            var art_id = ${article.art_id};
-            
-            var isshCustomLike = true;
-			
-            // ajax 아작스
-            $.ajax({
-                type: "POST",
-                url: "${pageContext.request.contextPath}/board/customer/customLike",
-                data: {
-                    art_id: art_id,
-                    brd_id: brd_Id,
-                    isshCustomLike: isshCustomLike
-                },
-                success: function(response) {
-                    // 추천 성공 시 버튼 상태 변경
-                    $("#shLike").prop("disabled", true);
-                    $("#shDislike").prop("disabled", true);
-                    $("#shcancelLike").prop("disabled", false);
-                }
-            });
-        });
 
-        // 비추천 버튼 클릭 시
-        $("#shDislike").click(function(event)) {
-        	event.preventDefault();
-        	var brd_id = ${article.brd_id};
-            var art_id = ${article.art_id};
-            
-            var isshCustomDislike = true;
-
-            $.ajax({
-                type: "POST",
-                url: "${pageContext.request.contextPath}/board/customer/customDislike",
-                data: {
-                	art_id: art_id,
-                    brd_id: brd_Id,
-                    isshCustomDislike: isshCustomDislike
-                },
-                success: function(response) {
-                    // 비추천 성공 시 버튼 상태 변경
-                    $("#shLike").prop("disabled", true);
-                    $("#shDislike").prop("disabled", true);
-                    $("#shcancelDislike").prop("disabled", false);
-                }
-            });
-        });
- 
-    
-	    // 추천 취소 버튼 클릭 시
-	    $("#shcancelLike").click(function(event)) {
-        	event.preventDefault();
-	    	var brd_id = ${article.brd_id};
-            var art_id = ${article.art_id};
-	        var isshCustomLike = false;
-	
-	        $.ajax({
-	            type: "POST",
-	            url: "cancelRecommendation",
-	            data: {
-	            	art_id: art_id,
-                    brd_id: brd_Id,
-	                isshCustomLike: isshCustomLike
-	            },
-	            success: function(response) {
-	                // 추천 취소 성공 시 버튼 상태 변경
-	                $("#shLike").prop("disabled", false);
-	                $("#shDislike").prop("disabled", false);
-	                $("#shcancelLike").prop("disabled", true);
-	            }
-	        });
-	    });
-	
-	    // 비추천 취소 버튼 클릭 시
-	    $("#shcancelDislike").click(function(event)) {
-        	event.preventDefault();
-	    	var brd_id = ${article.brd_id};
-            var art_id = ${article.art_id};
-	        var isshCustomDislike = false;
-	
-	        $.ajax({
-	            type: "POST",
-	            url: "cancelRecommendation",
-	            data: {
-	            	art_id: art_id,
-                    brd_id: brd_Id,
-	                isshCustomDislike: isshCustomDislike
-	            },
-	            success: function(response) {
-	                // 비추천 취소 성공 시 버튼 상태 변경
-	                $("#shLike").prop("disabled", false);
-	                $("#shDislike").prop("disabled", false);
-	                $("#shcancelDislike").prop("disabled", true);
-	            }
-	        });
-	    });
-	});
-	</script> -->
 </head>
 <body>
 	<header>
@@ -323,36 +220,7 @@
 	<main>
 		<div class="view-content">
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 			<!-- 바꿔 -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 			<!-- 게시글 -->
@@ -393,8 +261,7 @@
 					</div>
 					<!-- 게시글 신고 -->
 					
-					
-					
+									
 					
 					
 					<!-- 신고 아직 기능구현 안됨 -->
@@ -408,8 +275,7 @@
 					<!-- 신고 아직 기능구현 안됨 -->
 					
 					
-					
-					
+										
 				</div>
 				
 				<!-- 작성자 -->
@@ -507,8 +373,8 @@
 								
 								<!-- 대댓글달기 입력버튼 -->
 								<div class="flex-grow-1 display-flex justify-content-flex-end align-items-center">
+									<button class="btns-repWrite font-weight-bolder">댓글 달기</button>
 									<c:if test="${reply.mem_id == memberInfo.mem_id || memberInfo.mem_authority > 108}">
-										<button class="btns-repWrite font-weight-bolder">댓글 달기</button>
 										<button class="btns-repUpdate font-weight-bolder" onclick="location.href='${pageContext.request.contextPath}/board/customer/customerUpdateReply?art_id=${article.art_id }&rep_id=${reply.rep_id }&brd_id=${article.brd_id }&category=${category}'">수정</button>
 										<button class="btns-repComplete font-weight-bolder" style="display: none;" onclick="rep_Update(${status.index})">완료</button>
 										<button class="btns-delete font-weight-bolder" onclick="location.href='${pageContext.request.contextPath}/board/customer/customerDeleteReply?art_id=${article.art_id }&rep_id=${reply.rep_id }&brd_id=${article.brd_id }&category=${category}'")">삭제</button>
@@ -532,7 +398,7 @@
 							
 							<!-- 댓글의 댓글 작성 -->
 							<div class="reply-replyWrite" style="display: none; margin-left: 10%">
-								<form action="${pageContext.request.contextPath}/board/customer/댓글의댓글" method="post">
+								<form action="${pageContext.request.contextPath}/board/customer/replyForm" method="post">
 									<div class="form-box display-flex flex-direction-column justify-content-flex-start align-items-stretch" style="border: 2px solid var(--subtheme); border-radius: 5px;">
 										<input type="hidden" id="brd_id${status.index}" name="brd_id"    value="${article.brd_id}">
 										<input type="hidden" id="art_id${status.index}" name="art_id"    value="${article.art_id}">
