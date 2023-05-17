@@ -14,5 +14,5 @@ public interface WaitingDao {
 	int shareWaitingDel(Article article);
 
 	// 김진현
-	int         jhWaitListYN(Article article);
+	int         JHWaitListYN(Article article);
 }

@@ -15,7 +15,11 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,6 +44,7 @@ import com.java501.S20230401.model.Trade;
 import com.java501.S20230401.model.TradeInfo;
 import com.java501.S20230401.service.ArticleService;
 import com.java501.S20230401.service.CommService;
+import com.java501.S20230401.service.MemberDetailsService;
 import com.java501.S20230401.service.MemberService;
 import com.java501.S20230401.service.RegionService;
 import com.java501.S20230401.service.ReplyService;
@@ -60,6 +65,7 @@ public class MemberController {
 	private final ReplyService reps;
 	private final TradeService ts;
 	private final CommService cs;
+	private final MemberDetailsService mds;
 	
 	@RequestMapping(value = "/login")
 	public String memberLogin(@AuthenticationPrincipal MemberDetails memberDetails,
@@ -84,6 +90,65 @@ public class MemberController {
 		model.addAttribute("regions", regionHierachy);
 		
 		return "joinForm";
+	}
+	@RequestMapping(value = "/resign")
+	public String memberResign(@AuthenticationPrincipal MemberDetails memberDetails) {
+		if (memberDetails == null) return "redirect:/";
+		int result = ms.hgDeleteAccount(memberDetails.getMemberInfo().getMem_id());
+		if (result > 0) return "redirect:/logout";
+		else return "redirect:/user/userinfo";
+	}
+	@RequestMapping(value = "/password/reset")
+	public String pwreset(@AuthenticationPrincipal MemberDetails memberDetails, Model model) {
+		if (memberDetails != null) return "redirect:/";
+		model.addAttribute("type", "password/resetProc");
+		return "getNameAndEmail";
+	}
+	@RequestMapping(value = "/id/search")
+	public String idSearch(@AuthenticationPrincipal MemberDetails memberDetails, Model model) {
+		if (memberDetails != null) return "redirect:/";
+		model.addAttribute("type", "id/searchResult");
+		return "getNameAndEmail";
+	}
+	@PostMapping(value = "/id/searchResult")
+	public String idSearchResult(@RequestParam String name, @RequestParam String email, HttpServletRequest request, HttpServletResponse response, Model model) {
+		response.setCharacterEncoding("UTF-8");
+		Member member = new Member();
+		System.out.println(name);
+		System.out.println(email);
+		member.setMem_name(name);
+		member.setMem_email(email);
+		System.out.println(member);
+		Member existMember = ms.hgGetMemberByNameAndEmail(member);
+		model.addAttribute("username", existMember.getMem_username());
+		return "idSearchResult";
+	}
+	@PostMapping(value = "/password/resetProc")
+	public String pwresetProcess(@RequestParam String name, @RequestParam String email, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+		response.setCharacterEncoding("UTF-8");
+		Member member = new Member();
+		member.setMem_name(name);
+		member.setMem_email(email);
+		Member existMember = ms.hgGetMemberByNameAndEmail(member);
+		if (existMember == null) {
+			return "redirect:/password/reset";
+		}
+		redirectAttributes.addFlashAttribute("member", existMember);
+		return "redirect:/mail/PasswordReset";
+	}
+	
+	@RequestMapping(value = "/user/userinfo")
+	public String modifyMemberInformation(@AuthenticationPrincipal MemberDetails memberDetails, Model model) {
+		model.addAttribute("now", new Date());
+		
+		Map<Region, List<Region>> regionHierachy = new HashMap<Region, List<Region>>();
+		List<Region> superRegions = rs.getSuperRegions();
+		for (Region sups : superRegions) regionHierachy.put(sups, rs.getChildRegions(sups.getReg_id()));
+		model.addAttribute("superRegions", superRegions);
+		model.addAttribute("regions", regionHierachy);
+		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+		
+		return "user/userInformation";
 	}
 	
 	@PostMapping(value = "/joinProc")
@@ -125,6 +190,52 @@ public class MemberController {
 		return "redirect:/mail/JoinAuthentification";
 	}
 	
+	@PostMapping(value = "/updateMemberProc")
+	public String memberUpdateProcess(@AuthenticationPrincipal MemberDetails memberDetails,@RequestParam(value = "image-file", required = false) MultipartFile file, @RequestParam Map<String, String> params, MultipartHttpServletRequest request, RedirectAttributes redirectAttributes) {
+		Member member = new Member();
+		member.setMem_id(memberDetails.getMemberInfo().getMem_id());
+		member.setMem_nickname(params.get("nickname"));
+		member.setMem_tel(params.get("tel1") + params.get("tel2") + params.get("tel3"));
+		int year = Integer.parseInt(params.get("year"));
+		int month = Integer.parseInt(params.get("month"));
+		int day = Integer.parseInt(params.get("day"));
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(year, month, day);
+		Date birthday = calendar.getTime();
+		member.setMem_birthday(birthday);
+		member.setMem_gender(cs.getCommByName(params.get("gender")).getComm_id());
+		String[] regions = { params.get("region1-value").trim(), params.get("region2-value").trim() };
+		for (String reg : regions) {
+			if (!reg.trim().isEmpty()) {
+				int regionCode = Integer.parseInt(reg);
+				if (member.getMem_region1() == null) member.setMem_region1(regionCode);
+				else member.setMem_region2(regionCode);
+			}
+		}
+		String savedName = file.getOriginalFilename();
+		String realPath = request.getSession().getServletContext().getRealPath("/uploads/profile");
+		try {
+			savedName = uploadFile(realPath, savedName, file.getBytes());
+			member.setMem_image(savedName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		int result = ms.hgUpdateMember(member);
+		// 아래 세션 인증 정보 변경
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		MemberDetails newMemberDetails = (MemberDetails)authentication.getPrincipal();
+		SecurityContextHolder.getContext().setAuthentication(createNewAuthentication(authentication, newMemberDetails.getUsername()));
+		
+		return "redirect:/";
+	}
+	// 새로운 인증 정보 생성
+	protected Authentication createNewAuthentication(Authentication currentAuth, String username) {
+		UserDetails newPrincipal = mds.loadUserByUsername(username);
+		UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(newPrincipal, currentAuth.getCredentials(), newPrincipal.getAuthorities());
+		newAuth.setDetails(currentAuth.getDetails());
+		return newAuth;
+	}
+	
 	private String uploadFile(String realPath, String originalName, byte[] fileData) throws Exception {
 		UUID uuid = UUID.randomUUID();
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu_MM_dd_HH_mm_ss");
@@ -136,12 +247,20 @@ public class MemberController {
 	
 	@ResponseBody
 	@PostMapping(value = "/getMember")
-	public Map<String, Object> getMember(@RequestBody Map<String, Object> data){
+	public Map<String, Object> getMember(@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody Map<String, Object> data){
 		Map<String, Object> resp = new HashMap<String, Object>();
 		String type = (String)data.get("type");
 		String value = (String)data.get("value");
+		Boolean except = (Boolean)data.get("except");
 		MemberSearchKeyword searchType = Enum.valueOf(MemberSearchKeyword.class, type.toUpperCase());
-		Member member = ms.getMember(value, searchType);
+		Member member = null;
+		if (except == null || !except) member = ms.getMember(value, searchType);
+		else {
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("value", value);
+			param.put("except", memberDetails.getMemberInfo().getMem_id());
+			member = ms.hgGetMemberWithExcept(param, searchType);
+		}
 		resp.put("value", member);
 		return resp;
 	}
@@ -195,5 +314,23 @@ public class MemberController {
 		model.addAttribute("trades", trades);
 		
 		return "user/myPage";
+	}
+	
+	@RequestMapping(value="/user/passwordCheck")
+	public String reAuth(@AuthenticationPrincipal MemberDetails memberDetails, @RequestParam String go,
+						 Model model) {
+		if (memberDetails == null) return "redirect:/";
+		model.addAttribute("go", go);
+		return "user/reAuth";
+	}
+	
+	@RequestMapping(value="/user/comparePW")
+	public String reAuthProcess(@AuthenticationPrincipal MemberDetails memberDetails, @RequestParam String go,
+								@RequestParam String password) {
+		if (memberDetails == null) return "redirect:/";
+		//if (memberDetails.getPassword().equals(new BCryptPasswordEncoder().encode(password)))
+		if (new BCryptPasswordEncoder().matches(password, memberDetails.getPassword()))
+			return "redirect:/user/" + go;
+		else return "redirect:/user/passwordCheck?go=" + go;
 	}
 }

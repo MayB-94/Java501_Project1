@@ -1,6 +1,9 @@
 package com.java501.S20230401.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,15 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -25,11 +26,18 @@ import com.java501.S20230401.model.Article;
 import com.java501.S20230401.model.Comm;
 import com.java501.S20230401.model.Join;
 import com.java501.S20230401.model.MemberDetails;
+import com.java501.S20230401.model.MemberInfo;
 import com.java501.S20230401.model.Region;
 import com.java501.S20230401.model.Reply;
+import com.java501.S20230401.model.Trade;
 import com.java501.S20230401.service.ArticleService;
+import com.java501.S20230401.service.CommService;
+import com.java501.S20230401.service.FavoriteService;
+import com.java501.S20230401.service.JoinService;
 import com.java501.S20230401.service.Paging;
+import com.java501.S20230401.service.RegionService;
 import com.java501.S20230401.service.ReplyService;
+import com.java501.S20230401.service.WaitingService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +48,11 @@ public class TogetherController {
 
 	private final ArticleService as;
 	private final ReplyService rs;
+	private final CommService cs;
+	private final FavoriteService fs;
+	private final JoinService js;
+	private final WaitingService ws;
+	private final RegionService rgs;	
 
 	@RequestMapping(value = "/board/together")
 	public String articleList(@AuthenticationPrincipal MemberDetails memberDetails, // 세션의 로그인 유저 정보
@@ -51,7 +64,6 @@ public class TogetherController {
 
 		// category 값을 brd_id에 할당.
 		article.setBrd_id(category);
-		int number = article.getBrd_id();
 
 		// 전체 게시글 개수 Count
 		int totalArticle = as.dbtotalArticle(article);
@@ -60,14 +72,22 @@ public class TogetherController {
 		Paging page = new Paging(totalArticle, currentPage);
 		article.setStart(page.getStart()); // 시작시 1
 		article.setEnd(page.getEnd());
+		
+		// 카테고리 리스트
+		List<Comm> categoryList = as.categoryName();
+		model.addAttribute("categories", categoryList);
+		
+		// 카테고리 이름
+		String categoryName = cs.categoryName(category);
 
 		// 게시글 리스트 작업
 		List<Article> listArticle = as.dbListArticle(article);
-
+		
 		model.addAttribute("article", article);
 		model.addAttribute("totalArticle", totalArticle);
 		model.addAttribute("listArticle", listArticle);
-		model.addAttribute("category", number);
+		model.addAttribute("category", category);
+		model.addAttribute("categoryName", categoryName);
 		model.addAttribute("page", page);
 
 		return "together/listArticle";
@@ -75,15 +95,18 @@ public class TogetherController {
 	
 	
 
-	@RequestMapping(value = "/board/detailArticle")
-	public String detailArticle(@AuthenticationPrincipal MemberDetails memberDetails, // 세션의 로그인 유저 정보
+	@RequestMapping(value = "/board/together/{art_number}")
+	public String detailArticle(@AuthenticationPrincipal MemberDetails memberDetails,
+								 @PathVariable String art_number,						// 세션의 로그인 유저 정보
 								 Article article, Join join, 
 								 HttpServletRequest request,
 								 HttpServletResponse response,
-								 Model model) {
-
-		if (memberDetails != null)
-			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+								 Model model,
+								 Integer category) {
+		// url의 글번호 저장
+		article.setArt_id(Integer.parseInt(art_number));
+		
+		
 		
 		int art_id = article.getArt_id();
 		int brd_id = article.getBrd_id();
@@ -102,7 +125,7 @@ public class TogetherController {
 	      if (oldCookie != null) {	// oldCookie가 있으면 그걸 가져와서 값을 설정해준다.
 	          if (!oldCookie.getValue().contains(String.format("[%s_%s]", art_id, brd_id))) {
 	        	 as.dbReadArticleCnt(article); // 조회수 올리는 메서드
-	             oldCookie.setValue(oldCookie.getValue() + String.format("&[%s_%s]", art_id, brd_id));
+	             oldCookie.setValue(oldCookie.getValue() + String.format("[%s_%s]", art_id, brd_id));
 	             oldCookie.setPath("/");
 	             oldCookie.setMaxAge(60 * 60); // 1시간 (초 * 분 * 시간)
 	             response.addCookie(oldCookie);
@@ -121,6 +144,7 @@ public class TogetherController {
 
 		article.setTrd_max(detailArticle.getTrd_max());
 		article.setTrd_id(detailArticle.getTrd_id());
+		System.out.println(detailArticle.getReg_id());
 		
 		if (detailArticle.getTrd_status() != 404) {
 			// 인원 다 차면 게시글 상태 변경 (진행중)
@@ -142,18 +166,48 @@ public class TogetherController {
 		// 게시글 별 신청 대기자 리스트
 		List<Article> waitingList =  as.dbTradeWaitingMember(article);
 		model.addAttribute("waitingList", waitingList);
-	
+		
+		
+		MemberInfo memberInfo = null;
+		if (memberDetails != null) {
+				memberInfo = memberDetails.getMemberInfo();
+			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+		// 로그인 유저의 정보
+		Article shareUser = new Article();
+		shareUser.setArt_id(article.getArt_id());
+		shareUser.setBrd_id(article.getBrd_id());
+		shareUser.setMem_id(memberInfo.getMem_id());
+		// 찜 목록 확인
+		int userFavorite = fs.dgUserFavorite(shareUser);
+		// 대기열 확인
+		int userWaiting = ws.dgUserWaiting(shareUser);
+		// 거래 목록 확인
+		int userJoin = js.shareUserJoin(shareUser);
+		
+		model.addAttribute("userJoin", userJoin);
+		model.addAttribute("userFavorite", userFavorite);
+		model.addAttribute("userWaiting", userWaiting);
+		}
+		
+		model.addAttribute("category", category);
 
 		return "together/detailArticle";
 	}
 
 	
 	
-	@RequestMapping(value = "/board/writeFormArticle")
-	public String writeFormArticle(@AuthenticationPrincipal MemberDetails memberDetails, Model model) {
+	
+	@RequestMapping(value = "/board/together/writeFormArticle")
+	public String writeFormArticle(@AuthenticationPrincipal MemberDetails memberDetails,
+									Article article, Integer category, Model model) {
 		if (memberDetails != null)
 			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
-
+		
+		
+		Map<Region, List<Region>> regionHierachy = new HashMap<Region, List<Region>>();
+		List<Region> superRegions = rgs.getSuperRegions();
+		for (Region sups : superRegions) regionHierachy.put(sups, rgs.getChildRegions(sups.getReg_id()));
+		
 		// 카테고리별 콤보박스
 		List<Comm> categoryList = as.categoryName();
 		model.addAttribute("categories", categoryList);
@@ -163,23 +217,29 @@ public class TogetherController {
 		model.addAttribute("genders", genderList);
 
 		// 지역별 콤보박스
-		List<Region> regionList = as.regionName();
-		model.addAttribute("regions", regionList);
+//		List<Region> regionList = as.regionName();
+//		model.addAttribute("regions", regionList);
 
-		// 지역별 부모 콤보박스
-		List<Region> parentRegionList = as.parentRegionName();
-		model.addAttribute("parentRegions", parentRegionList);
+//		// 지역별 부모 콤보박스
+//		List<Region> parentRegionList = as.parentRegionName();
+//		model.addAttribute("parentRegions", parentRegionList);
 
+		model.addAttribute("superRegions", superRegions);
+		model.addAttribute("regions", regionHierachy);
+		model.addAttribute("category", category);
+		
 		return "together/writeFormArticle";
 	}
 
-	@RequestMapping(value = "/board/writeArticle")
+	
+	
+	@RequestMapping(value = "/board/together/writeArticle")
 	public String writeArticle(@AuthenticationPrincipal MemberDetails memberDetails, Article article, Model model,
-			@RequestParam("trd_enddate1") @DateTimeFormat(pattern = "yyyy-MM-dd") Date trd_enddate) {
+			@RequestParam("trd_endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date trd_endDate) {
 		if (memberDetails != null)
 			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
 
-		article.setTrd_enddate(trd_enddate);
+		article.setTrd_enddate(trd_endDate);
 		article.setMem_id(memberDetails.getMemberInfo().getMem_id());
 
 		// 프로시저 Insert_Article 이용 => 게시글 작성
@@ -194,36 +254,43 @@ public class TogetherController {
 			return "redirect:/board/together?category=" + brd_id;
 		} else {
 			model.addAttribute("msg", "입력실패");
-			return "forward:/board/writeFormArticle";
+			return "forward:/board/together/writeFormArticle";
 		}
 
 	}
 
-	@RequestMapping(value = "/board/deleteArticle")
+	@RequestMapping(value = "/board/together/deleteArticle")
 	public String deleteArticle(@AuthenticationPrincipal MemberDetails memberDetails, // 세션의 로그인 유저 정보
 			Article article, Model model) {
 
 		if (memberDetails != null)
 			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+		
+		int brd_id = article.getBrd_id();
 
 		// 게시글 삭제 (isdelete = 0 => 1)
 		int deleteresult = as.dbdeleteArticle(article);
 		model.addAttribute("result", deleteresult);
 
-		return "redirect:/board/together?category=1000";
+		return "redirect:/board/together?category="+brd_id;
 	}
 
 	
-	@RequestMapping(value = "/board/updateFormArticle")
+	@RequestMapping(value = "/board/together/updateFormArticle")
 	public String updateFormArticle(@AuthenticationPrincipal MemberDetails memberDetails, // 세션의 로그인 유저 정보
-			Article article, Model model) {
+			Article article, Integer category, Model model) {
 
 		if (memberDetails != null)
 			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
-
+		
 		// 게시글 수정 양식 (상세 게시글 값 가져오기)
 		Article updateFormArticle = as.dbdetailArticle(article);
+		System.out.println(updateFormArticle.getReg_id());
 		model.addAttribute("article", updateFormArticle);
+		
+		Map<Region, List<Region>> regionHierachy = new HashMap<Region, List<Region>>();
+		List<Region> superRegions = rgs.getSuperRegions();
+		for (Region sups : superRegions) regionHierachy.put(sups, rgs.getChildRegions(sups.getReg_id()));
 
 		// 카테고리별 콤보박스
 		List<Comm> categoryList = as.categoryName();
@@ -234,29 +301,37 @@ public class TogetherController {
 		model.addAttribute("genders", genderList);
 
 		// 지역별 콤보박스
-		List<Region> regionList = as.regionName();
-		model.addAttribute("regions", regionList);
+		//List<Region> regionList = as.regionName();
+		//model.addAttribute("regions", regionList);
 
 		// 지역별 부모 콤보박스
 		List<Region> parentRegionList = as.parentRegionName();
 		model.addAttribute("parentRegions", parentRegionList);
+		
+		// 조인리스트
+		List<Article> joinList =  as.dbTradeJoinMember(updateFormArticle);
+		model.addAttribute("joinList", joinList);
+		
+		model.addAttribute("isAnyoneJoined", joinList.size()>1 ? true:false);
+		model.addAttribute("superRegions", superRegions);
+		model.addAttribute("regions", regionHierachy);
+		model.addAttribute("category", category);
 
 		return "together/updateFormArticle";
 	}
 
-	@RequestMapping(value = "/board/updateArticle")
+	@RequestMapping(value = "/board/together/updateArticle")
 	public String updateArticle(@AuthenticationPrincipal MemberDetails memberDetails, // 세션의 로그인 유저 정보
-								Article article, Model model,
-								@RequestParam("trd_enddate1") @DateTimeFormat(pattern = "yyyy-MM-dd") Date trd_enddate) {
+								Article article, Trade trade, Model model, Integer category,
+								@RequestParam("trd_endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date trd_endDate) {
 
 		if (memberDetails != null)
 			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
 
-		article.setTrd_enddate(trd_enddate);
+		article.setTrd_enddate(trd_endDate);
 		
 		// 게시글 수정 (프로시저 사용 => Update_Article)
 		as.dbUpdateArticle(article);
-		System.out.println(article.getTrd_max());
 		
 		int updateArticle = article.getInsert_result();
 		int brd_id = article.getBrd_id();
@@ -288,7 +363,7 @@ public class TogetherController {
 
 		model.addAttribute("insertReply", insertReply);
 
-		return "redirect:/board/detailArticle?art_id=" + art_id + "&brd_id=" + brd_id;
+		return "redirect:/board/together/" + art_id +"?brd_id="+ brd_id + "&category=1000";
 	}
 	
 	
@@ -305,14 +380,14 @@ public class TogetherController {
 		int brd_id = reply.getBrd_id();
 		model.addAttribute("deleteReply", deleteReply);
 
-		return "redirect:/board/detailArticle?art_id=" + art_id + "&brd_id=" + brd_id;
+		return "redirect:/board/together/" + art_id +"?brd_id="+ brd_id + "&category=1000";
 	}
 
 	// 댓글 수정
 	@RequestMapping(value = "/board/updateReply")
 	@ResponseBody
 	public String updateReply(@AuthenticationPrincipal MemberDetails memberDetails, // 세션의 로그인 유저 정보
-			@RequestBody Reply reply, Model model, Map<String, Object> data) {
+			@RequestBody Reply reply, Model model) {
 
 		JSONObject jsonObj = new JSONObject();
 
@@ -470,7 +545,7 @@ public class TogetherController {
 	 }
 	 
 	 
-	 // 거래 대기자 -> 거래 신청자 수락 (ajax 사용)
+	 // 거래 대기자 -> 거래 신청자 거절 (ajax 사용)
 	 @RequestMapping(value="/board/joinRefuse")
 	 @ResponseBody
 	 public String TradeJoinRefuse(@AuthenticationPrincipal MemberDetails memberDetails,
@@ -495,9 +570,9 @@ public class TogetherController {
 		 
 		 if (memberDetails != null) model.addAttribute("memberInfo", memberDetails.getMemberInfo());
 		 
-		  int joinDelete = as.dbJoinDelete(article);
+		 int joinDelete = as.dbJoinDelete(article);
 		 
-		  jsonObj.append("result", joinDelete);
+		 jsonObj.append("result", joinDelete);
 		 
 		 return jsonObj.toString();
 	 }
@@ -517,6 +592,23 @@ public class TogetherController {
 	        
 	     return resultStr;
 	 }
+	 
+	 // 관심목록 삭제
+	 @RequestMapping(value="/board/favoriteArticleDelete")
+	 @ResponseBody
+	 public String favoriteArticleDelete(@AuthenticationPrincipal MemberDetails memberDetails,
+	                                @RequestBody Article article, Model model) {
+	    
+		 String resultStr = "";
+	         if (memberDetails != null) model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+
+	         int favoriteArticleDelete = as.dbFavoriteArticleDelete(article);
+	         
+	         resultStr =  Integer.toString(favoriteArticleDelete);
+	        
+	     return resultStr;
+	 }
+	 
 	 
 	 
 	// 작성자가 거래를 취소 (거래 취소)
@@ -560,6 +652,7 @@ public class TogetherController {
 		            }
 		         }
 		      }
+		    
 		    
 		      if (oldCookie != null) {				// oldCookie가 있으면 그걸 가져와서 값을 설정해준다.
 		          if (!oldCookie.getValue().contains(String.format("[%s_%s_%s]", art_id, brd_id, mem_id))) {
@@ -725,5 +818,41 @@ public class TogetherController {
 		 
 		 return jsonObj.toString();
 	 }
+	 
+	 // 검색
+	 @RequestMapping(value = "board/together/listSearch")
+		public String listSearch(@AuthenticationPrincipal MemberDetails memberDetails,
+				Article article, int category, String currentPage, Model model) {
+			
+			/*
+			 * if (memberDetails != null) model.addAttribute("memberInfo",
+			 * memberDetails.getMemberInfo());
+			 * 
+			 * // category 값을 brd_id에 할당. article.setBrd_id(category); int number =
+			 * article.getBrd_id();
+			 * 
+			 * System.out.println("board/listSearch number->"+number); // Article 전체 Count
+			 * int condArticleCnt = as.dbCondArticleCnt(article);
+			 * System.out.println("board/listSearch condArticleCnt->"+condArticleCnt); //
+			 * Paging 작업 Paging page = new Paging(condArticleCnt, currentPage); // Parameter
+			 * Article --> Page만 추가 Setting article.setStart(page.getStart()); // 시작시 1
+			 * article.setEnd(page.getEnd()); // 시작시 10
+			 * 
+			 * List<Article> listSearchArticle = as.dbListSearchArticle(article);
+			 * 
+			 * 
+			 * model.addAttribute("article", article); model.addAttribute("totalArticle",
+			 * condArticleCnt); model.addAttribute("listArticle", listSearchArticle);
+			 * model.addAttribute("category", number); model.addAttribute("page", page);
+			 */
+		 
+		 
+			try {
+				return String.format("redirect:/board/together?category=%s&search=%s&keyword=%s", category, article.getSearch(), URLEncoder.encode(article.getKeyword(), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				return "redirect:/board/together?category="+category;
+			}
+		}
 	 
 }

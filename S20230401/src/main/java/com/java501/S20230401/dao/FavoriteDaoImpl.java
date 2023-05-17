@@ -60,8 +60,16 @@ public class FavoriteDaoImpl implements FavoriteDao {
 		}
 		return result;
 	}
+	
+	//김진현
+	@Override
+	public void JHfavoriteInsert2(Article article) {
+		session.insert("JHFavoriteInsert",article);
+	}
 
-
-
+	@Override
+	public int JHfavoriteInsertYN2(Article article) {
+		return session.selectOne("JHFavoriteInsertYN",article);
+	}
 
 }

@@ -103,6 +103,22 @@ public class ReplyServiceImpl implements ReplyService {
 	public List<ReplyMember> hgGetRepliesOfMember(int mem_id) {
 		return rd.hgGetRepliesOfMember(mem_id);
 	}
+	@Override
+	public List<Reply> hgGetRepliesOfArticle(Article searcher) {
+		return rd.hgGetRepliesOfArticle(searcher);
+	}
+	@Override
+	public int hgDeleteReply(Reply reply) {
+		return rd.hgDeleteReply(reply);
+	}
+	@Override
+	public Reply hgGetReplyById(Reply reply) {
+		return rd.hgGetReplyById(reply);
+	}
+	@Override
+	public int hgRealDeleteReply(Reply reply) {
+		return rd.hgRealDeleteReply(reply);
+	}
 	
 	
 	// 임동빈

@@ -143,6 +143,12 @@
 				</div>
 			</div>
 			<div id="top-right">
+				<c:if test="${memberInfo != null }">
+					<!-- 메세지 추가 -->
+					<div class="userMessage" onclick="userMessage()">
+						<svg class="userMessage-popup" viewBox="0 0 512 512" style="width: 30; height: 30;"><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg>
+					</div>
+				</c:if>
 				<!-- <button id="viewMode">
 					<div id="viewModeButton"></div>
 				</button> -->
@@ -203,6 +209,11 @@
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/user/mypage';">
 										마이 페이지
 									</button>
+									<c:if test="${memberInfo.mem_authority >= 108 }">
+										<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/admin';">
+											관리자 페이지
+										</button>
+									</c:if>
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px; margin-bottom: 10px;" class="subtheme-button" onclick="location.href = '${pageContext.request.contextPath }/logout';">
 										로그아웃
 									</button>
@@ -359,7 +370,7 @@
 							<div class="reply-view display-flex flex-direction-column justify-content-flex-start align-items-stretch" style="${(reply.rep_id != reply.rep_parent) ? 'margin-left: 32px; background-color: rgba(var(--subtheme-rgb), 0.125);' : ''}">
 								<div class="reply-header display-flex justify-content-flex-start align-items-center">
 								<div class="user-profile-image-in-list">
-									<img alt="profile" src="${pageContext.request.contextPath}/uploads/profile/${reply.mem_image}">
+									<img src="${pageContext.request.contextPath}/uploads/profile/${reply.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg'; $(this).removeAttr('onerror');">
 								</div>
 								<div class="reply-header-info modal-report display-flex justify-content-flex-start align-items-center">
 									<span id="member_nickname" class="font-weight-bolder">${reply.mem_nickname}</span>
@@ -374,6 +385,9 @@
 								<!-- 대댓글달기 입력버튼 -->
 								<div class="flex-grow-1 display-flex justify-content-flex-end align-items-center">
 									<button class="btns-repWrite font-weight-bolder">댓글 달기</button>
+									<c:if test="${memberInfo != null }">
+										<button class="btns-repWrite font-weight-bolder">댓글 달기</button>
+									</c:if>
 									<c:if test="${reply.mem_id == memberInfo.mem_id || memberInfo.mem_authority > 108}">
 										<button class="btns-repUpdate font-weight-bolder" onclick="location.href='${pageContext.request.contextPath}/board/customer/customerUpdateReply?art_id=${article.art_id }&rep_id=${reply.rep_id }&brd_id=${article.brd_id }&category=${category}'">수정</button>
 										<button class="btns-repComplete font-weight-bolder" style="display: none;" onclick="rep_Update(${status.index})">완료</button>

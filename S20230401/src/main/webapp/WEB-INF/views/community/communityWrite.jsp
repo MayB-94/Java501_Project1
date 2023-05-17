@@ -1,303 +1,169 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ include file="../preset.jsp" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ include file="/WEB-INF/views/preset.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>메인 페이지 ▒ ShareGo</title>
+<title>[페이지 이름] ▒ ShareGo</title>
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/initializer.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/layout.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/js/quill/quill.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/js/quill/image-resize.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/js/quill/image-drop.min.js"></script>
 <script type="text/javascript">
-	$(window).scroll(() => {
-		let scrollTop = $(window).scrollTop();
-		let header = $('header');
-		if (header != null) {
-			if (scrollTop > 21 && !header.hasClass('fix-header')) {
-				header.addClass('fix-header');
-			}
-			else if (scrollTop <= 21 && header.hasClass('fix-header')) {
-				header.removeClass('fix-header');
-			}
+	function writeAction () {
+		if ($('#article-title').val() == '' || $('#article-title').val() == null) {
+			return false;
 		}
-	});
+		if ($('#art_content').val() == '' || $('#art_content').val() == null) {
+			return false;
+		}
+		let tagIndex = 1;
+		$('.tag-box-tag').each((index, value) => {
+			let tag = $(value).find('.tag-box-tag-value').html();
+			$('#art_tag' + tagIndex++).val(tag);
+		});
+		return true;
+	}
+	const quillInit = (id) => {
+		let fontArray = [];
+		for (let i = 8; i <= 30; i++) fontArray[fontArray.length] = i + 'px';
+		var Size = Quill.import('attributors/style/size');
+		Size.whitelist = fontArray;
+		Quill.register(Size, true);
+		var option = {
+			modules: {
+				toolbar: [
+						[{size: fontArray}],
+						[{'color': [
+							'#FFFFFF', '#FF0000', '#FFFF00', '#00FF00', '#00FFFF', '#0000FF', '#FF00FF',
+							'#E0E0E0', '#E00000', '#E0E000', '#00E000', '#00E0E0', '#0000E0', '#E000E0',
+							'#C0C0C0', '#C00000', '#C0C000', '#00C000', '#00C0C0', '#0000C0', '#C000C0',
+							'#A0A0A0', '#A00000', '#A0A000', '#00A000', '#00A0A0', '#0000A0', '#A000A0',
+							'#808080', '#800000', '#808000', '#008000', '#008080', '#000080', '#800080',
+							'#606060', '#600000', '#606000', '#006000', '#006060', '#000060', '#600060',
+							'#404040', '#400000', '#404000', '#004000', '#004040', '#000040', '#400040',
+							'#202020', '#200000', '#202000', '#002000', '#002020', '#000020', '#200020',
+							'#000000', '#000000', '#000000', '#000000', '#000000', '#000000', '#000000'
+						]}],
+						['bold', 'italic', 'underline', 'strike'],
+						['image', 'video', 'link'],
+						[{list: 'ordered'}, {list: 'bullet'}]
+				],
+				imageResize: {
+					displaySize: true
+				},
+				imageDrop: true
+			},
+			placeholder: '내용을 입력해주세요',
+			theme: 'snow'
+		};
+		editor = new Quill('#' + id, option);
+	};
+	var editor;
 	$(() => {
-		$('#scrollToTop').click(e => $(window).scrollTop(0));
-		$('#scrollToBottom').click(e => $(window).scrollTop($(document).height() - 1120));
+		// checkbox 이벤트
+		$('#btns-checkbox').change(()=>{
+			if($('#btns-checkbox').is(':checked')){
+				$('#art_isnotice').val('1');
+			}else{
+				$('#art_isnotice').val('0');
+			}
+			console.info($('#art_isnotice').val());
+		});
+		// Load Editor
+		quillInit('articleEditor');
+		
+		// input keydown event
+		$('form input').keydown(e => {
+			if (e.keyCode == 13) e.preventDefault();
+		});
+		
+		// Tag input Effects
+		$('#tag-input').keydown(e => {
+			if ($('#tag-box').find('.tag-box-tag').length >= 5 && e.keyCode != 8) {
+				e.preventDefault();
+				e.target.value = null;
+				return;
+			}
+			if (e.keyCode == 32) {
+				e.preventDefault();
+				if (e.target.value == '' || !e.target.value || e.target.value == null) return;
+				$(e.target).blur();
+				e.target.value = null;
+				$(e.target).focus();
+			} else if (e.keyCode == 13) e.preventDefault();
+			else if (e.keyCode == 8) {
+				if (e.target.selectionStart == 0 && e.target.selectionEnd == 0) {
+					$('#tag-box').find('div.tag-box-tag:last-child').remove();
+					e.preventDefault();
+				}
+			}
+		});
+		$('#tag-input').blur(e => {
+			if ($('#tag-box').find('.tag-box-tag').length >= 5) {
+				e.target.value = null;
+				return;
+			}
+			if (e.target.value == '' || !e.target.value || e.target.value == null) return;
+			let elem = '<div class="tag-box-tag"><span class="tag-box-tag-value">' + e.target.value + '</span><button class="tag-box-tag-remove adv-hover" type="button"><svg class="tag-box-tag-remove-svg" width="10" height="10" viewBox="0 0 12 12" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M 2 2 L 10 10 M 10 2 L 2 10"/></svg></button></div>';
+			$('#tag-box').append(elem);
+			$('#tag-box').find('div.tag-box-tag:last-child > button.tag-box-tag-remove').click(e => {
+				$(e.target).parent().remove();
+			});
+			e.target.value = null;
+		});
+		editor.on('text-change', () => {
+			$('#art_content').val(editor.root.innerHTML);
+		});
+		const selectLocalImage = () => {
+			const fileInput = document.createElement('input');
+			fileInput.setAttribute('type', 'file');
+			fileInput.click();
+			fileInput.addEventListener('change', e => {
+				const formData = new FormData();
+				const file = fileInput.files[0];
+				formData.append('uploadFile', file);
+				
+				$.ajax({
+					type: 'post',
+					enctype: 'multipart/form-data',
+					url: '/board/share/imageUpload',
+					data: formData,
+					//data: fileInput.value,
+					processData: false,
+					contentType: false,
+					dataType: 'json',
+					success: function(data) {
+						const range = editor.getSelection();
+						//data.uploadPath = data.uploadPath.replace(/\\/g, '/');
+						data.url = data.url.toString().replace(/\\/g, '/');
+						editor.insertEmbed(range.index, 'image', data.url);
+					}
+				});
+			});
+		};
+		editor.getModule('toolbar').addHandler('image', () => selectLocalImage());
 	});
 </script>
 <link href="https://unpkg.com/sanitize.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/share/writeForm.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/preference.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/presets.css">
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/layout.css">
-<style type="text/css">
-	body {
-		width: 100%;
-		display: grid;
-		grid-template-columns: 200px 1fr 200px;
-		grid-template-rows: 100px 1fr 200px;
-		grid-template-areas:
-			"header header header"
-			"leftside main rightside"
-			"footer footer footer";
-	}
-	header {
-		grid-area: header;
-		height: 100px;
-		background-color: var(--theme);
-		border-bottom: 0.5px solid #CCCCCC;
-		z-index: 99;
-	}
-	aside {
-		background-color: var(--backtheme);
-	}
-	aside#leftside {
-		grid-area: leftside;
-		/* TEST */
-		height: 5000px;
-	}
-	main {
-		grid-area: main;
-		background-color: var(--theme);
-		/* TEST */
-		height: 5000px;
-	}
-	aside#rightside {
-		grid-area: rightside;
-		/* TEST */
-		height: 5000px;
-	}
-	footer {
-		grid-area: footer;
-		height: 200px;
-		border-top: 0.5px solid #CCCCCC;
-		background-color: var(--theme);
-	}
-	
-	header > div#usernav {
-		width: 100%;
-		display: flex;
-		justify-content: flex-end;
-		align-items: center;
-		background-color: var(--backtheme);
-	}
-	header > div#usernav > a {
-		font-size: 14px;
-		color: var(--subtheme);
-		font-weight: bold;
-		margin: 0 5px;
-	}
-	header > div#topbar > div#logo-div, header > div#topbar > div#top-right { width: 200px; }
-	header > div#topbar > div#top-right {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-	header > div#topbar {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		height: calc(100% - 21px);
-	}
-	header > div#topbar > div#topmenu {
-		display: flex;
-		height: 100%;
-		justify-content: flex-start;
-		align-items: stretch;
-	}
-	header > div#topbar > div#topmenu > div.menu-separator {
-		width: 0;
-		height: 20px;
-		border: 1px solid #888888;
-		opacity: 0.25;
-		margin: 29.5px 0;
-	}
-	header > div#topbar > div#topmenu > a.menuitem {
-		display: block;
-		font-size: 18px;
-		background-color: var(--theme);
-		padding: 0 10px;
-		line-height: 79px;
-		font-weight: bold;
-		width: 120px;
-		text-align: center;
-	}
-	div#dropdown {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		position: absolute;
-		top: 100px;
-		left: 0;
-		width: 100%;
-		height: 0px;
-		background-color: var(--theme);
-		border-bottom: 0.5px solid #CCCCCC;
-		transition: height .125s cubic-bezier(.5,1,.5,1);
-		overflow: hidden;
-	}
-	header > div#topbar > div#topmenu > a.menuitem:hover ~ div#dropdown,
-	header > div#topbar > div#topmenu > div.menu-separator:hover ~ div#dropdown,
-	header > div#topbar > div#topmenu > div#dropdown:hover {
-		height: 192.5px;
-	}
-	header > div#topbar > div#topmenu > div#dropdown > div.submenu-items {
-		display: flex;
-		justify-content: flex-start;
-		align-items: stretch;
-	}
-	header > div#topbar > div#topmenu > div#dropdown > div.submenu-items > div.submenu {
-		display: flex;
-		flex-direction: column;
-		justify-content: flex-start;
-		align-items: stretch;
-		width: 120px;
-		margin: 0 1px;
-	}
-	header > div#topbar > div#topmenu > div#dropdown > div.submenu-items > div.submenu > a.submenuitem {
-		display: block;
-		width: 100%;
-		height: 32px;
-		line-height: 32px;
-		font-size: 16px;
-		background-color: var(--theme);
-		text-align: center;
-	}
-	.fix-header {
-		top: -21px;
-		position: fixed;
-		grid-area: none;
-		width: 100%;
-	}
-	
-	/* Dark And Light Mode Switcher */
-	#viewMode {
-		border: 2px solid var(--subtheme-font);
-		border-radius: 14.5px;
-		width: 54px;
-		height: 29px;
-		background-color: var(--subtheme);
-		position: relative;
-	}
-	#viewModeButton {
-		border: 0;
-		background-color: var(--subtheme-font);
-		width: 20px;
-		height: 20px;
-		border-radius: 10px;
-		position: absolute;
-		top: 2.5px;
-		left: 2.5px;
-		transition: left .25s cubic-bezier(.5, 1, .5, 1);
-	}
-	#viewMode[data-toggle="true"] > #viewModeButton {
-		left: 27.5px;
-	}
-	
-	/* User Info Popup */
-	div.popup-group {
-		position: relative;
-	}
-	div.popup-group > button.togglePopup {
-		width: 50px;
-		height: 50px;
-		/*border-radius: 25px;
-		background-color: var(--subtheme);*/
-		overflow: hidden;
-	}
-	div.popup-group > div.popup-window {
-		position: absolute;
-		padding: 10px 20px;
-		border-radius: 5px;
-		background-color: var(--theme);
-		/* border: 2px solid var(--theme-font); */
-		border: 2px solid #CCCCCC;
-		top: 64.5px;
-		right: 0px;
-	}
-	
-	/* Buttons */
-	button.theme-button {
-		background-color: var(--theme);
-		color: var(--theme-font);
-		font-weight: bold;
-		padding: 0;
-		border-radius: 5px;
-		outline: none;
-		border: 2px solid var(--subtheme);
-		cursor: pointer;
-	}
-	button.subtheme-button {
-		background-color: var(--subtheme);
-		color: var(--subtheme-font);
-		font-weight: bold;
-		padding: 0;
-		border-radius: 5px;
-		outline: none;
-		border: 0;
-		cursor: pointer;
-	}
-	button#login-button {
-		width: 100px;
-		height: 32px;
-		line-height: 32px;
-		text-align: center;
-		font-size: 16px;
-	}
-	button.init-button {
-		border: 0;
-		background-color: var(--theme);
-		padding: 0;
-		margin: 0;
-		outline: none;
-		cursor: pointer;
-	}
-	button > svg {
-		pointer-events: none;
-	}
-	button#scrollToTop, button#scrollToBottom {
-		position: fixed;
-		width: 40px;
-		height: 40px;
-		outline: none;
-		border: 0.5px solid var(--subtheme);
-		border-radius: 10px;
-		background-color: var(--theme);
-		cursor: pointer;
-		opacity: 0.5;
-		box-shadow: 0 5px 5px var(--theme-font);
-	}
-	button#scrollToTop {
-		bottom: 60px;
-		right: 10px;
-	}
-	button#scrollToBottom {
-		bottom: 10px;
-		right: 10px;
-	}
-	
-	
-	/* Footer */
-	#footer-info {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-</style>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/layout.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/js/quill/quill.core.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/js/quill/quill.snow.css">
 </head>
 <body>
 	<header>
 		<div id="usernav">
-			<!-- <a href="">로그인</a>
-			<a href="">회원가입</a>
-			<a href="">마이페이지</a> -->
 			<a href="">이용 약관</a>
 			<a href="">개인정보 취급 방침</a>
 		</div>
 		<div id="topbar">
 			<div id="logo-div" class="full-height" style="display: flex; justify-content: flex-start; align-items: center; padding: 0 10px;">
-				<a id="logo" class="full-height" href="/">
-					<!-- <img class="full-height" src="image/ShareGo_forLight.png"/> -->
+				<a id="logo" class="full-height" href="${pageContext.request.contextPath}/">
 					<div style="width: auto; display: flex; flex-direction: column; justify-content: center; align-items: flex-end;">
 						<img src="${pageContext.request.contextPath}/image/ShareGo_Img.png" style="height: 30px;">
 						<span style="font-size: 24px; font-weight: 900; margin: -5px 0 0 0;">ShareGo</span>
@@ -305,40 +171,40 @@
 				</a>
 			</div>
 			<div id="topmenu">
-				<a class="adv-hover menuitem" href="">함께해요</a>
+				<a class="adv-hover menuitem" href="${pageContext.request.contextPath}/board/together?category=1000">함께해요</a>
 				<div class="menu-separator"></div>
-				<a class="adv-hover menuitem" href="">같이사요</a>
+				<a class="adv-hover menuitem" href="${pageContext.request.contextPath}/board/dutchpay?category=1100">같이사요</a>
 				<div class="menu-separator"></div>
-				<a class="adv-hover menuitem" href="">나눔해요</a>
+				<a class="adv-hover menuitem" href="${pageContext.request.contextPath}/board/share?category=1200">나눔해요</a>
 				<div class="menu-separator"></div>
 				<a class="adv-hover menuitem" href="${pageContext.request.contextPath}/board/community?category=1300">커뮤니티</a>
 				<div class="menu-separator"></div>
-				<a class="adv-hover menuitem" href="">정보공유</a>
+				<a class="adv-hover menuitem" href="${pageContext.request.contextPath }/board/information?category=1400">정보공유</a>
 				<div class="menu-separator"></div>
-				<a class="adv-hover menuitem" href="">고객센터</a>
+				<a class="adv-hover menuitem" href="${pageContext.request.contextPath}/board/customer?category=1500">고객센터</a>
 				<div id="dropdown">
 					<div style="width: 200px;"></div>
 					<div class="submenu-items">
 						<div class="submenu">
-							<a class="submenuitem adv-hover" href="">밥 / 카페</a>
-							<a class="submenuitem adv-hover" href="">스포츠 / 운동</a>
-							<a class="submenuitem adv-hover" href="">쇼핑</a>
-							<a class="submenuitem adv-hover" href="">문화생활</a>
-							<a class="submenuitem adv-hover" href="">취미생활</a>
-							<a class="submenuitem adv-hover" href="">기타</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/together?category=1010">밥 / 카페</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/together?category=1020">스포츠 / 운동</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/together?category=1030">쇼핑</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/together?category=1040">문화생활</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/together?category=1050">취미생활</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/together?category=1060">기타</a>
 						</div>
 						<div class="submenu">
-							<a class="submenuitem adv-hover" href="">식료품</a>
-							<a class="submenuitem adv-hover" href="">의류 / 잡화</a>
-							<a class="submenuitem adv-hover" href="">생활용품</a>
-							<a class="submenuitem adv-hover" href="">해외배송</a>
-							<a class="submenuitem adv-hover" href="">기타</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/dutchpay?category=1110">식료품</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/dutchpay?category=1120">의류 / 잡화</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/dutchpay?category=1130">생활용품</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/dutchpay?category=1140">해외배송</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/dutchpay?category=1150">기타</a>
 						</div>
 						<div class="submenu">
-							<a class="submenuitem adv-hover" href="">식품</a>
-							<a class="submenuitem adv-hover" href="">패션 / 잡화</a>
-							<a class="submenuitem adv-hover" href="">가전 / 가구</a>
-							<a class="submenuitem adv-hover" href="">기타</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/share?category=1210">식품</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/share?category=1220">패션 / 잡화</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/share?category=1230">가전 / 가구</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/share?category=1240">기타</a>
 						</div>
 						<div class="submenu">
 							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/community?category=1310">일상수다</a>
@@ -347,22 +213,28 @@
 							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/community?category=1340">질문 / 요청</a>
 						</div>
 						<div class="submenu">
-							<a class="submenuitem adv-hover" href="">동네정보</a>
-							<a class="submenuitem adv-hover" href="">구매정보</a>
-							<a class="submenuitem adv-hover" href="">신규점포</a>
-							<a class="submenuitem adv-hover" href="">지역활동</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1410">동네정보</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1420">구매정보</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1430">신규점포</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath }/board/information?category=1440">지역활동</a>
 						</div>
 						<div class="submenu">
-							<a class="submenuitem adv-hover" href="">공지</a>
-							<a class="submenuitem adv-hover" href="">Q&A</a>
-							<a class="submenuitem adv-hover" href="">이벤트</a>
-							<a class="submenuitem adv-hover" href="">문의 / 건의</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/customer?category=1510">공지</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/customer?category=1520">Q&A</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/customer?category=1530">이벤트</a>
+							<a class="submenuitem adv-hover" href="${pageContext.request.contextPath}/board/customer?category=1540">문의 / 건의</a>
 						</div>
 					</div>
 					<div style="width: 200px;"></div>
 				</div>
 			</div>
 			<div id="top-right">
+				<c:if test="${memberInfo != null }">
+					<!-- 메세지 추가 -->
+					<div class="userMessage" onclick="userMessage()">
+						<svg class="userMessage-popup" viewBox="0 0 512 512" style="width: 30; height: 30;"><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg>
+					</div>
+				</c:if>
 				<!-- <button id="viewMode">
 					<div id="viewModeButton"></div>
 				</button> -->
@@ -420,9 +292,14 @@
 											</div>
 										</div>
 									</div>
-									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/';">
+									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/user/mypage';">
 										마이 페이지
 									</button>
+									<c:if test="${memberInfo.mem_authority >= 108 }">
+										<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/admin';">
+											관리자 페이지
+										</button>
+									</c:if>
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px; margin-bottom: 10px;" class="subtheme-button" onclick="location.href = '${pageContext.request.contextPath }/logout';">
 										로그아웃
 									</button>
@@ -438,54 +315,75 @@
 		
 	</aside>
 	<main>
-		<div class="container" style="position: relative; left: 400px;"  >
-		<span>글쓰기</span>
-		<form action="bjcommunitywrite" method="post" name="frm">
-			<div>작성자 : ${memberInfo.mem_nickname }</div>
+		<!-- 각자 페이지 들어갈 공간 시작 -->
+		<div class="container">
+	
+			<h1 class="color-subtheme text-align-center">게시글 작성</h1>
+	
 			<div>
-			<input type="hidden" name="mem_id" value="${memberInfo.mem_id}">
-			<input type="hidden" name="category" value="${category}">
-			</div>
-			<div>제목 : <input type="text" name="art_title" required="required" maxlength="50"></div>
-			<div>태그 <br>
-					     태그1 : <input type="text" name="art_tag1" class="tag"><br>
-					     태그2 : <input type="text" name="art_tag2" class="tag"><br>
-					     태그3 : <input type="text" name="art_tag3" class="tag"><br>
-					     태그4 : <input type="text" name="art_tag4" class="tag"><br>
-					     태그5 : <input type="text" name="art_tag5" class="tag"><br>
-			</div>				
-			<div>분류 : 		<select name="brd_id" >
-							<option value="1310" selected>일상수다</option>
-							<option value="1320">자랑하기</option>
-							<option value="1330">홍보하기</option>
-							<option value="1340">질문/요청</option>
+				<form action="${pageContext.request.contextPath}/board/community/bjcommunitywrite" method="post" onsubmit="return writeAction();">
+					<input type="hidden" 	name="category" 		value="${category}">
+				<!-- 임시 기본값 저장 -->
+					<input type="hidden" 	name="art_good" 		value="0">
+					<input type="hidden" 	name="art_bad" 			value="0">
+					<input type="hidden" 	name="art_read" 		value="0">
+					<input type="hidden" 	name="isdelete" 		value="0">
+					
+					
+					<div class="display-flex justify-content-space-between align-items-center">
+						<div class="form-group display-flex justify-content-flex-start align-items-center">
+							<label for="category" class="margin-right-5px">카테고리</label>
+							<select name="brd_id" id="brd_id">
+								<option value="1310" ${category == 1310? 'selected':''}>일상수다</option>
+								<option value="1320" ${category == 1320? 'selected':''}>자랑하기</option>
+								<option value="1330" ${category == 1330? 'selected':''}>홍보하기</option>
+								<option value="1340" ${category == 1340? 'selected':''}>질문/요청</option>
 							</select>
-			</div>		
-			<div>
-			<c:choose>
-				<c:when test="${memberInfo.mem_authority == '109' }">
-					<input type="checkbox" name="art_isnotice" value="${art_isnotice +1}">
-					공지사항
-				</c:when>
-			</c:choose>
-			</div>				
-			<div>내용</div>
-			<div><textarea rows="20" cols="100" name="art_content"></textarea></div>
-			
-			<div><input type="submit" value="완료"/></div>
-		</form>
-		
+						</div>
+						
+						<!-- 매니저 이상의 권한만 공지 설정 가능 -->
+						<c:if test="${memberInfo.mem_authority >= 108}">
+							<div class="form-group checkbox-group display-flex justify-content-flex-end align-items-center">
+								<label for="btns-checkbox" class="margin-right-5px">공지 여부</label>
+								<input type="hidden" id="art_isnotice" name="art_isnotice" value="0">
+								<input type="checkbox" id="btns-checkbox" name="btns-checkbox">
+							</div>
+						</c:if>
+					</div>
+	
+					<div class="form-group display-flex justify-content-flex-start align-items-center">
+						<label for="article-title" class="margin-right-5px width-50px">제목</label>
+						<input type="text" class="flex-grow-1" id="article-title" name="art_title" placeholder="제목" required="required">
+					</div>
+					
+					<div class="form-group flex-grow-1 display-flex justify-content-flex-end align-items-center">
+						<input type="hidden" id="art_tag1" name="art_tag1">
+						<input type="hidden" id="art_tag2" name="art_tag2">
+						<input type="hidden" id="art_tag3" name="art_tag3">
+						<input type="hidden" id="art_tag4" name="art_tag4">
+						<input type="hidden" id="art_tag5" name="art_tag5">
+						<label class="margin-right-5px width-50px">태그</label>
+						<div class="input-box display-flex justify-content-flex-start align-items-center" style="border-bottom: 2.5px solid rgba(128, 128, 128, 0.5); margin: 0; flex-grow: 1;" onclick="$('#tag-input').focus();">
+							<div id="tag-box">
+								<!-- 태그들 들어갈 자리 -->
+							</div>
+							<input class="art_tag flex-grow-1" style="border-bottom: 0;" type="text" id="tag-input" name="tag-input" maxlength="10" placeholder="태그를 입력한 후 스페이스바를 눌러 추가하세요">
+						</div>
+					</div>
+					
+					<!-- 글 내용 -->
+					<input type="hidden" id="art_content" name="art_content" required>
+					<div id="articleEditor"></div>
+					
+	
+					<div class="button-group">
+						<button type="submit" class="btns-submit">작성</button>
+						<button type="button" class="btns-cancel" onclick="location.href='${pageContext.request.contextPath}/board/community?category='+${category};">취소</button>
+					</div>
+				</form>
+			</div>
 		</div>
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		<!-- 각자 페이지 들어갈 공간 끝 -->
 		<button id="scrollToTop" class="adv-hover">
 			<svg style="fill: var(--subtheme); stroke: var(--subtheme); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" width="20" height="10" viewBox="0 0 32 16">
 				<path d="M 15 1 L 1 15 31 15 Z"/>

@@ -24,6 +24,17 @@
 		}
 	}
 });
+
+
+// contextPath 할당
+const contextPath = window.location.pathname.split('/')[0];
+function userMessage(){
+    let url = `${contextPath}/message`
+    let name = "message-popup";
+    let option = "resizable=0, width=800, height=600, top=200, left=400, location=no";
+    window.open(url, name, option);
+}
+
 $(() => {
 	//$('#scrollToTop').click(e => $(window).animate({scrollTop : '0'}, 500));
 	$('#scrollToTop').click(e => $(window).scrollTop(0));

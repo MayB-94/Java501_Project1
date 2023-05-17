@@ -3,20 +3,31 @@
 <script type="text/javascript">
 	function report_process(report_id, mem_id) {
 		let submitType = '';
-		if (isset($_POST['member_action'])) submitType = 'MEMBER';
-		else if (isset($_POST['article_action'])) submitType = 'ARTICLE';
-		else submitType = 'REPLY';
-		
+		//if (isset($_POST['member_action'])) submitType = 'MEMBER';
+		if (document.activeElement.value == 'member_action') submitType = 'MEMBER';
+		else if (document.activeElement.value == 'article_action') submitType = 'ARTICLE';
+		else if (document.activeElement.value == 'reply_action') submitType = 'REPLY';
+		else if (document.activeElement.value == 'reject_action') submitType = 'REJECT';
+		else return false;
+		if (!submitType) {
+			alert('유효하지 않은 입력이 발생했습니다');
+			return false;
+		}
 		let dataObj = { 'report_id': report_id, 'mem_id': mem_id, 'submit': submitType };
 		let sendData = JSON.stringify(dataObj);
 		$.ajax({
-			url: '${pageContext.request.contextPath}/admin/report/view',
+			url: '${pageContext.request.contextPath}/admin/report/updateProc',
 			type: 'post',
 			data: sendData,
 			dataType: 'json',
 			contentType: 'application/json',
 			success: data => {
-				if (data.result == 1) alert('딱 대 ㅋㅋ루삥뽕');
+				if (data.result == 1) {
+					if (submitType == 'MEMBER') alert('신고 승인 => 회원이 차단되었습니다');
+					else if (submitType == 'ARTICLE') alert('신고 승인 => 게시글이 삭제되었습니다');
+					else if (submitType == 'REPLY') alert('신고 승인 => 댓글이 삭제되었습니다');
+					else alert('신고가 기각되었습니다');
+				}
 			}
 		});
 		
@@ -59,10 +70,24 @@
 			e.stopPropagation();
 			
 		});
+		$('.paging-button').on('click', e => {
+			let ajaxUrl = '${pageContext.request.contextPath}/admin/${type}';
+			$.ajax({
+				url: ajaxUrl,
+				type: 'post',
+				data: JSON.stringify({ 'page' : parseInt($(e.target).attr('data-page')) }),
+				dataType: 'html',
+				contentType: 'application/json',
+				success: data => {
+					$('main').html(data);
+					$('main').find('div.admin-container').attr('data-page', parseInt($(e.target).attr('data-page')));
+				}
+			});
+		});
 	});
 </script>
 <!-- <div class="admin-container" data-page="1"> -->
-<div class="admin-container full-height">
+<div class="admin-container full-height" data-page="1">
 	<div class="admin-main">
 		<div class="admin-main-title-box">
 			<h2 class="admin-main-title">신고 관리</h2>
@@ -75,6 +100,7 @@
 		</div>
 		<div class="admin-board-2">
 			<c:forEach var="report" items="${reports }">
+				<c:set var="report_item" value="${reportItems[report.report_id] }"/>
 				<div class="admin-report-container toggle" data-id="${report.report_id }" data-toggle="false">
 					<div class="admin-report-item">
 						<span class="width-50px text-align-center">${report.report_id }</span>
@@ -93,13 +119,64 @@
 					</div>
 					<div class="admin-report-info">
 						<div class="admin-report-info-box">
-							<div class="admin-report-target-box display-flex justify-content-flex-start align-items-stretch padding-2_5px">
-								<div class="admin-report-target-info display-flex flex-direction-column justify-content-flex-start align-items-stretch flex-grow-1 margin-2_5px">
+							<div class="display-flex justify-content-flex-start align-items-center">
+								<span class="color-subtheme font-size-18px font-weight-bolder margin-5px margin-hor-10px">신고자</span>
+								<span class="font-weight-bolder">${report.mem_nickname }</span>
+								<span class="font-weight-bolder font-size-14px" style="color: rgba(128, 128, 128, 0.5);">(${report.mem_username })</span>
+							</div>
+							<span class="color-subtheme font-size-18px font-weight-bolder margin-5px margin-hor-10px">신고 대상</span>
+							<div class="admin-report-target-box display-flex justify-content-flex-start align-items-stretch padding-5px">
+								<div class="admin-report-target-info display-flex flex-direction-column justify-content-flex-start align-items-stretch flex-grow-1 padding-custom2 background-color-theme border-radius-5px">
 									<!-- 여기에 신고 대상 내용 간략히... -->
-									<c:set var="report_item" value="${reportItems[report.report_id] }"/>
 									<c:choose>
 										<c:when test="${report.type == 'MEMBER' }">
-											
+											<div class="display-flex flex-direction-column justify-content-flex-start align-items-stretch">
+												<div class="display-flex justify-content-space-between align-items-center">
+													<div class="display-flex justify-content-flex-start align-items-center margin-5px margin-hor-0">
+														<div class="width-50px height-50px overflow-hidden border-radius-50 background-color-theme" style="box-shadow: 0 0 2.5px var(--theme-font);">
+															<img class="width-inherit height-inherit object-fit-cover" src="${pageContext.request.contextPath }/uploads/profile/${report_item.mem_image }" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';$(this).removeAttr('onerror')"/>
+														</div>
+														<div class="display-flex flex-direction-column justify-content-flex-start align-items-center">
+															<div class="display-flex justify-content-flex-start align-items-center">
+																<h3 class="color-theme-font margin-0 margin-left-10px">${report_item.mem_nickname }</h3>
+																<span class="font-weight-bolder font-size-14px" style="color: rgba(128, 128, 128, 0.5);">(${report_item.mem_username })</span>
+															</div>
+															<span class="color-subtheme font-size-14px font-weight-bolder margin-left-10px align-self-flex-start">
+																<c:choose>
+																	<c:when test="${report_item.mem_authority == 101 }">미 인증 회원</c:when>
+																	<c:when test="${report_item.mem_authority == 102 }">차단된 회원</c:when>
+																	<c:when test="${report_item.mem_authority == 103 }">일반 회원</c:when>
+																	<c:when test="${report_item.mem_authority == 108 }">매니저</c:when>
+																	<c:when test="${report_item.mem_authority == 109 }">관리자</c:when>
+																</c:choose>
+															</span>
+														</div>
+													</div>
+													<span class="font-size-14px font-weight-bolder" style="color: rgba(128, 128, 128, 0.5);"><fmt:formatDate value="${report_item.mem_regdate }" pattern="yyyy년 MM월 dd일"/> 가입</span>
+												</div>
+												<div class="display-flex justify-content-flex-start align-items-center margin-5px margin-hor-0">
+													<hr class="width-25px margin-hor-5px"/>
+													<span class="font-weight-bolder margin-hor-5px">신고된 이력</span>
+													<hr class="flex-grow-1 margin-hor-5px"/>
+												</div>
+												<div class="display-flex justify-content-space-between align-items-center margin-5px">
+													<div class="display-flex justify-content-flex-start align-items-center">
+														<span class="color-warning font-weight-bolder text-align-center">차단 횟수</span>
+														<span class="margin-left-5px font-weight-bolder">${report_item.member_report_cnt }</span>
+													</div>
+													<div class="display-flex justify-content-flex-start align-items-center">
+														<span class="color-warning font-weight-bolder text-align-center">삭제된 게시글</span>
+														<span class="margin-left-5px font-weight-bolder">${report_item.article_report_cnt }</span>
+													</div>
+													<div class="display-flex justify-content-flex-start align-items-center">
+														<span class="color-warning font-weight-bolder text-align-center">삭제된 댓글</span>
+														<span class="margin-left-5px font-weight-bolder">${report_item.reply_report_cnt }</span>
+													</div>
+												</div>
+												<div class="display-flex justify-content-flex-start align-items-center">
+													
+												</div>
+											</div>
 										</c:when>
 										<c:when test="${report.type == 'ARTICLE' }">
 											<div class="display-flex justify-content-flex-start align-items-center">
@@ -147,46 +224,69 @@
 												</span>
 											</div>
 											<div class="display-flex justify-content-flex-start align-items-center">
-												<span class="color-subtheme font-weight-bolder font-size-20px">${report_item.art_title }</span>
+												<span class="font-weight-bolder font-size-20px padding-5px padding-hor-0">${report_item.art_title }</span>
+											</div>
+											<div class="display-flex justify-content-space-between align-items-center padding-5px padding-hor-0" style="border-top: 2.5px solid var(--subtheme);">
+												<div class="display-flex justify-content-flex-start align-items-center">
+													<span class="font-weight-bolder">${report_item.mem_nickname }</span>
+													<span class="font-weight-bolder font-size-14px" style="color: rgba(128, 128, 128, 0.5);">(${report_item.mem_username })</span>
+												</div>
+												<span class="font-size-14px" style="color: rgba(128, 128, 128, 0.5);"><fmt:formatDate value="${report_item.art_regdate }" pattern="yyyy-MM-dd hh:mm:ss"/></span>
 											</div>
 											<div class="display-flex justify-content-space-between align-items-center" style="border-top: 2.5px solid var(--subtheme);">
-												<span>${report_item.mem_id }</span>
-												<div class="display-flex justify-content-flex-end align-items-center">
+												<div class="display-flex justify-content-flex-start align-items-center">
 													<c:forEach var="i" begin="1" end="5">
 														<c:set var="tagName" value="art_tag${i }"/>
 														<c:if test="${report_item[tagName] != null }">
-															<span>#${report_item[tagName] }</span>
+															<span class="color-subtheme font-size-14px font-weight-bolder margin-left-2_5px">#${report_item[tagName] }</span>
 														</c:if>
 													</c:forEach>
 												</div>
-											</div>
-											<div class="display-flex justify-content-space-between align-items-center">
 												
 											</div>
-											<div style="border-top: 2.5px solid var(--subtheme);">
+											<div class="padding-custom1">
 												${report_item.art_content }
 											</div>
 										</c:when>
 										<c:otherwise>
-											
+											<div class="padding-custom1 background-color-theme border-radius-5px display-flex flex-direction-column justify-content-flex-start align-items-stretch">
+												<div class="display-flex justify-content-space-between align-items-center">
+													<div class="display-flex justify-content-flex-start align-items-center margin-10px margin-hor-0">
+														<div class="width-50px height-50px border-radius-50 background-color-theme object-fit-cover" style="box-shadow: 0 0 2.5px var(--theme-font);">
+															<img class="width-inherit height-inherit object-fit-cover" src="${pageContext.request.contextPath }/uploads/profile/${report_item.mem_image }" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';$(this).removeAttr('onerror')"/>
+														</div>
+														<span class="font-size-16px font-weight-bolder margin-left-10px">${report_item.mem_nickname }</span>
+														<span class="font-weight-bolder font-size-14px" style="color: rgba(128, 128, 128, 0.5);">(${report_item.mem_username })</span>
+													</div>
+													<span class="font-size-14px" style="color: rgba(128, 128, 128, 0.5);"><fmt:formatDate value="${report_item.rep_regdate }" pattern="yyyy-MM-dd hh:mm:ss"/></span>
+												</div>
+												<div class="padding-custom2">
+													${report_item.rep_content }
+												</div>
+											</div>
 										</c:otherwise>
 									</c:choose>
 								</div>
-								<button class="warning-button width-50px margin-2_5px padding-custom1" type="button">
-									<span>신고<br>기각</span>
-								</button>
 							</div>
+							<span class="color-subtheme font-size-18px font-weight-bolder margin-5px margin-hor-10px">신고 사유</span>
 							<form method="post" onsubmit="return report_process(${report.report_id}, ${report.mem_id});">
+							<!-- <form method="post" onsubmit="return false;"> -->
 								<div class="form-box display-flex justify-content-flex-start align-items-stretch padding-2_5px">
-									<textarea class="flex-grow-1 margin-2_5px" name="report_reason"></textarea>
+									<div class="flex-grow-1 display-flex flex-direction-column justify-content-flex-start align-items-stretch">
+										<div class="margin-5px padding-custom2 margin-hor-2_5px border-radius-5px background-color-theme">
+											${report.report_content }
+										</div>
+										<textarea class="margin-2_5px height-100px padding-custom2" style="border-radius: 5px; outline: none; border: 1px solid var(--subtheme);" name="report_reason" required></textarea>
+									</div>
 									<div class="display-flex flex-direction-column justify-content-flex-start align-items-stretch">
-										<button class="subtheme-button width-50px margin-2_5px padding-custom1" type="submit" name="member_action">회원<br>차단</button>
+										<button class="warning-button width-50px margin-2_5px padding-custom1" type="submit" name="reject_action" value="reject_action">신고<br>기각</button>
+										<button class="flex-grow-1 subtheme-button width-50px margin-2_5px padding-custom1" type="submit" name="member_action" value="member_action">회원<br>차단</button>
 										<c:choose>
 											<c:when test="${report.type == 'ARTICLE' }">
-												<button class="theme-button width-50px margin-2_5px padding-custom1" type="submit" name="article_action">게시글<br>삭제</button>
+												<button class="flex-grow-1 theme-button width-50px margin-2_5px padding-custom1" type="submit" name="article_action" value="article_action">게시글<br>삭제</button>
 											</c:when>
 											<c:otherwise>
-												<button class="theme-button width-50px margin-2_5px padding-custom1" type="submit" name="reply_action">댓글<br>삭제</button>
+												<button class="flex-grow-1 theme-button width-50px margin-2_5px padding-custom1" type="submit" name="reply_action" value="reply_action">댓글<br>삭제</button>
 											</c:otherwise>
 										</c:choose>
 									</div>
@@ -196,6 +296,23 @@
 					</div>
 				</div>
 			</c:forEach>
+		</div>
+		<div class="admin-board-2-page">
+			<button class="paging-button paging-prev" type="button" data-page="${startPage - 1 }" ${startPage != 1 ? '' : 'disabled'}>
+				<svg>
+					<path d="M 11.5 1 L 4.5 8 11.5 14"/>
+				</svg>
+			</button>
+			<c:forEach var="pg" begin="${startPage }" end="${endPage }">
+				<button class="paging-button paging-page" type="button" data-page="${pg }" ${pg == page ? 'disabled' : '' }>
+					<span>${pg }</span>
+				</button>
+			</c:forEach>
+			<button class="paging-button paging-next" type="button" data-page="${endPage + 1 }" ${endPage != totalPage ? '' : 'disabled'}>
+				<svg>
+					<path d="M 4.5 1 L 11.5 8 4.5 14"/>
+				</svg>
+			</button>
 		</div>
 	</div>
 </div>

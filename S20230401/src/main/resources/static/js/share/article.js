@@ -9,7 +9,6 @@ const memId = sessionStorage.getItem("memId");
 const category = sessionStorage.getItem("category");
 const loginUser = sessionStorage.getItem("loginUser");
 console.info('로그인 유저 : '+loginUser);
-
 // 클릭 이벤트
 $(document).ready(()=>{
     // 찜 찜 취소
@@ -44,7 +43,8 @@ $(document).ready(()=>{
 // 댓글 기능 - 댓글 수정
 $(document).ready(() => {
     $('.btns-repUpdate, .btns-cancel, .btns-repComplete').click(e => {
-        let condition = $(e.target).closest('.reply-view').find('textarea.rep-content').prop('disabled');
+        console.log($(e.target).closest('.reply-view').find('.rep-content').val());
+        let condition = $(e.target).closest('.reply-view').find('.rep-content').prop('disabled');
         $(e.target)
         .closest('.reply-view')
         .find('textarea.rep-content').prop('disabled', condition ? false : true).focus().end()
@@ -68,7 +68,8 @@ function rep_Update(pIndex){
         dataType:'json',
         success:function(data){
             console.log(data)
-            $('body').load(location.href);
+            // $('body').load(location.href);
+            location.reload();
             }
     });
 }
@@ -240,42 +241,83 @@ function userListButtonClick(e){
 	}
 }
 
+
+
 // 신고 기능
 $(()=>{
-    let reply_id, member_id, member_nickname, report_id, nickname, action;
+    let reply_id, member_id, report_id, nickname, action;
     // 신고 아이콘 클릭
     $('#article-report, #reply-report, #member-report').click((e)=>{
         if(loginUser > 0){
-            $('#report').css('display', 'flex');
-        }else alert('로그인 하세요');
-        // 게시글 신고
-        if($(e.target).is('#article-report')){
-            nickname = $(e.target).closest('.view-article').find('#member_nickname').text();
-            $('#report-user').text(member_nickname);
-            $('#report-title').text('게시글 신고');
-            action = 'article';
-        }
-        // 댓글 신고
-        if($(e.target).is('#reply-report')){
-            reply_id = $(e.target).closest('.reply-detail').find('#reply_id').val();
-            nickname = $(e.target).closest('.reply-detail').find('#member_nickname').text();
-            report_id = $(e.target).closest('.reply-detail').find('#repReport_id').val();
-            $('#report-user').text(member_nickname);
-            $('#report-title').text('댓글 신고');
-            $('#rep_id').val(reply_id);
-            action = 'reply';
-        }
-        // 유저 신고
-        if($(e.target).is('#member-report')){
-            member_id = $(e.target).closest('.modal-report').find('#member_id').val();
-            nickname = $(e.target).closest('.modal-report').find('#member_nickname').text();
-            report_id = $(e.target).closest('.modal-report').find('#memReport_id').val();
-            $('#report-user').text(member_nickname);
-            $('#report-title').text('유저 신고');
-            action = 'member';
-        }
+            // 게시글 신고
+            if($(e.target).is('#article-report')){
+                report_id = $(e.target).closest('.view-article').find('#artReport_id').val();
 
+                console.info('신고 번호 조회'+report_id);
+                reportCheck(report_id)
+                    .then(isReport => {
+                        if(!isReport){
+                            console.info(isReport);
+                            nickname = $(e.target).closest('.view-article').find('#member_nickname').text();
+                            $('#report-user').text(nickname);
+                            $('#report_id').val(report_id);
+                            $('#report-title').text('게시글 신고');
+                            action = 'article';
+                        }
+                }).catch(error => {
+                    console.error(error);
+                });
+                
+            }
+            // 댓글 신고
+            if($(e.target).is('#reply-report')){
+                report_id = $(e.target).closest('.reply-detail').find('#repReport_id').val();
+
+                console.info('신고 번호 조회'+report_id);
+                reportCheck(report_id)
+                    .then(isReport => {
+                        if(!isReport){
+                            console.info(isReport);
+                            reply_id = $(e.target).closest('.reply-detail').find('#reply_id').val();
+                            nickname = $(e.target).closest('.reply-detail').find('#member_nickname').text();
+                            $('#report-user').text(nickname);
+                            $('#report-title').text('댓글 신고');
+                            $('#rep_id').val(reply_id);
+                            action = 'reply';
+                        }
+                }).catch(error => {
+                    console.error(error);
+                });
+            }
+            // 유저 신고
+            if($(e.target).is('#member-report')){
+                report_id = $(e.target).closest('.modal-report').find('#memReport_id').val();
+                
+                console.info('신고 번호 조회'+report_id);
+                reportCheck(report_id)
+                    .then(isReport => {
+                        if(!isReport){
+                            console.info(isReport);
+                            member_id = $(e.target).closest('.modal-report').find('#member_id').val();
+                            nickname = $(e.target).closest('.modal-report').find('#member_nickname').text();
+                            $('#report-user').text(nickname);
+                            $('#report_id').val(report_id);
+                            $('#reportMem_id').val(member_id);
+                            $('#report-title').text('유저 신고');
+                            action = 'member';
+                            console.info(member_id);
+                        }
+                }).catch(error => {
+                    console.error(error);
+                });
+            }
+        
+        }else {
+            alert('로그인 하세요');
+        }
     });
+
+    // 신고 실행
     $('#btns-reportApply').click(()=>{
         if($('#report-Checkbox').is(':checked')){
             if(confirm('신고 하시겠습니까?')){
@@ -302,3 +344,20 @@ $(()=>{
         }
     });
 });
+
+// 로그인한 유저의 신고 확인
+function reportCheck(report_id){
+    console.info('신고 확인에서 아이디 : '+report_id);
+    return fetch(`${contextPath}/board/share/isReport?report_id=${report_id}`)
+    .then(response => response.json())
+    .then(isReport => {
+        if(isReport)
+            alert('이미 신고 하셨습니다.');
+        else
+            $('#report').css('display', 'flex');
+    })
+    .catch(error => {
+        console.error(error);
+        throw error;
+    });
+}

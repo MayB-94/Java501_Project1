@@ -116,6 +116,12 @@
 				</div>
 			</div>
 			<div id="top-right">
+				<c:if test="${memberInfo != null }">
+					<!-- 메세지 추가 -->
+					<div class="userMessage" onclick="userMessage()">
+						<svg class="userMessage-popup" viewBox="0 0 512 512" style="width: 30; height: 30;"><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg>
+					</div>
+				</c:if>
 				<!-- <button id="viewMode">
 					<div id="viewModeButton"></div>
 				</button> -->
@@ -176,6 +182,11 @@
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/user/mypage';">
 										마이 페이지
 									</button>
+									<c:if test="${memberInfo.mem_authority >= 108 }">
+										<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/admin';">
+											관리자 페이지
+										</button>
+									</c:if>
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px; margin-bottom: 10px;" class="subtheme-button" onclick="location.href = '${pageContext.request.contextPath }/logout';">
 										로그아웃
 									</button>
@@ -246,6 +257,7 @@
 					<div class="article-member" style="display: flex; align-items: center;">
 						<div class="modal-report display-flex justify-content-flex-start align-items-center padding-0">
 						<span id="member_nickname" class="font-weight-bolder margin-right-10px">${article.member.mem_nickname}</span>
+						<span id="member_username" style="color: rgba(var(--theme-font-rgb), 0.5);">${article.member.mem_username}</span>
 						<c:if test="${not empty memberInfo}">
 							<svg id="member-report" viewBox="0 0 512 512" width="24" height="24" style="fill: none; stroke: var(--warning); stroke-width: 32px; stroke-linecap: round; stroke-linejoin: round; cursor: pointer;"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"/><path d="M250.26 166.05L256 288l5.73-121.95a5.74 5.74 0 00-5.79-6h0a5.74 5.74 0 00-5.68 6z"/><path d="M256 367.91a20 20 0 1120-20 20 20 0 01-20 20z" style="stroke: none; fill: var(--warning);"/></svg>
 							<input type="hidden" id="member_id" value="${article.member.mem_id}">
@@ -258,7 +270,7 @@
 						<span>비추천 ${article.art_bad}</span>
 						<span>댓글 ${article.rep_cnt == null ? 0:article.rep_cnt}</span>
 						<span>조회수 ${article.art_read}</span>
-						<span>작성일 <fmt:formatDate value="${article.art_regdate}" pattern="yy.MM.dd HH:mm:ss"/></span>
+						<span>작성일 <fmt:formatDate value="${article.art_regdate}" pattern="yy.MM.dd HH:mm"/></span>
 					</div>
 				</div>
 				
@@ -330,10 +342,10 @@
 									</div>
 									<div class="userList-btns">
 										<c:choose>
-											<c:when test="${article.mem_id == memberInfo.mem_id}">
+											<c:when test="${article.mem_id == memberInfo.mem_id || memberInfo.mem_authority >= 108}">
 												<button class="btns-action adv-hover" id="btns-drop">추방</button>
 											</c:when>
-											<c:when test="${join.mem_id == memberInfo.mem_id}">
+											<c:when test="${join.mem_id == memberInfo.mem_id || memberInfo.mem_authority >= 108}">
 												<button class="btns-action adv-hover" id="btns-joinCancel">취소</button>
 											</c:when>
 										</c:choose>
@@ -368,13 +380,13 @@
 									</div>
 									<div class="userList-btns">
 										<c:choose>
-											<c:when test="${article.mem_id == memberInfo.mem_id}">
+											<c:when test="${article.mem_id == memberInfo.mem_id || memberInfo.mem_authority >= 108}">
 												<c:if test="${article.trade.trd_max ne joinList.size()}">
 													<button class="btns-action" id="btns-accept">승인</button>
 												</c:if>
 												<button class="btns-action" id="btns-refuse">거절</button>
 											</c:when>
-											<c:when test="${waiting.mem_id == memberInfo.mem_id}">
+											<c:when test="${waiting.mem_id == memberInfo.mem_id || memberInfo.mem_authority >= 108}">
 												<button class="btns-action" id="btns-waitCancel">취소</button>
 											</c:when>
 										</c:choose>
@@ -387,6 +399,7 @@
 						<!-- 거래 신청, 찜 -->
 						<div class="share-btns">
 							<c:if test="${memberInfo != null}">
+							<!-- 찜 버튼 -->
 								<div class="btns-favorite">
 									<c:choose>
 										<c:when test="${userFavorite > 0}">
@@ -397,12 +410,13 @@
 										</c:when>
 									</c:choose>
 								</div>
+							<!-- 거래 버튼 -->
 								<div class="btns-trade">
 									<c:choose>
-										<c:when test="${userWaiting == 0 && userJoin == 0 && joinList.size() < article.trade.trd_max}">
+										<c:when test="${userWaiting == 0 && userJoin == 0 && joinList.size() < article.trade.trd_max && article.trade.trd_status == 401}">
 											<button class="btns-action" id="btns-apply">신청</button>
 										</c:when>
-										<c:when test="${joinList.size() == article.trade.trd_max}">
+										<c:when test="${joinList.size() == article.trade.trd_max || article.trade.trd_status > 401}">
 											<button class="btns-action" id="btns-end">모집 완료</button>
 										</c:when>
 									</c:choose>
@@ -448,7 +462,7 @@
 							<div class="reply-view display-flex flex-direction-column justify-content-flex-start align-items-stretch" style="${(reply.rep_id != reply.rep_parent) ? 'margin-left: 32px; background-color: rgba(var(--subtheme-rgb), 0.125);' : ''}">
 								<div class="reply-header display-flex justify-content-flex-start align-items-center">
 								<div class="user-profile-image-in-list">
-									<img src="${pageContext.request.contextPath}/uploads/profile/${reply.member.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';">
+									<img src="${pageContext.request.contextPath}/uploads/profile/${reply.member.mem_image}" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg'; $(this).removeAttr('onerror');">
 								</div>
 								<div class="reply-header-info modal-report display-flex justify-content-flex-start align-items-center">
 									<span id="member_nickname" class="font-weight-bolder">${reply.member.mem_nickname}</span>
@@ -460,8 +474,10 @@
 									<span class="color-theme-font font-size-14px" style="color: rgba(var(--theme-font-rgb), 0.5);">(<fmt:formatDate value="${reply.rep_regdate}" pattern="yy-MM-dd :HH:mm:ss"/>)</span>
 								</div>
 								<div class="flex-grow-1 display-flex justify-content-flex-end align-items-center">
-									<c:if test="${reply.mem_id == memberInfo.mem_id || memberInfo.mem_authority > 108}">
+									<c:if test="${memberInfo != null }">
 										<button class="btns-repWrite font-weight-bolder">댓글 달기</button>
+									</c:if>
+									<c:if test="${reply.mem_id == memberInfo.mem_id || memberInfo.mem_authority > 108}">
 										<button class="btns-repUpdate font-weight-bolder">수정</button>
 										<button class="btns-repComplete font-weight-bolder" style="display: none;" onclick="rep_Update(${status.index})">완료</button>
 										<button class="btns-delete font-weight-bolder" onclick="rep_delete(${article.brd_id},${article.art_id},${reply.rep_id})">삭제</button>
@@ -520,7 +536,7 @@
 												<span class="font-size-18px font-weight-bolder">${memberInfo.mem_nickname }</span>
 												<input class="reply-primitive-submit" type="submit" value="등록">
 											</div>
-											<textarea class="reply-primitive-write" style="margin-top: 10px;" placeholder="댓글을 입력하세요" name="rep_content"></textarea>
+											<textarea class="reply-primitive-write" style="margin-top: 10px;" placeholder="댓글을 입력하세요" name="rep_content" required="required"></textarea>
 										</div>
 									</div>
 								</form>

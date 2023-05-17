@@ -10,18 +10,23 @@ import org.json.JSONObject;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.java501.S20230401.model.Article;
+import com.java501.S20230401.model.Comm;
 import com.java501.S20230401.model.Favorite;
 import com.java501.S20230401.model.MemberDetails;
+import com.java501.S20230401.model.MemberInfo;
 import com.java501.S20230401.model.Reply;
 import com.java501.S20230401.model.Report;
 import com.java501.S20230401.service.ArticleService;
+import com.java501.S20230401.service.CommService;
 import com.java501.S20230401.service.FavoriteService;
 import com.java501.S20230401.service.Paging;
 import com.java501.S20230401.service.ReplyService;
@@ -40,6 +45,8 @@ public class InformationController {
 	private final ReplyService rs;
 	private final FavoriteService fs;
 	private final ReportService ps;
+	private final CommService 		commService;
+	
 	
 	// 리스트 조회 
 	@RequestMapping(value="/board/information")
@@ -47,26 +54,36 @@ public class InformationController {
 		// 유저 정보를 다시 리턴  //memberDetails.getMemberInfo() DB의 유저와 대조 & 권한 확인
 		if(memberDetails != null)
 		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+		
 		String viewName = "infoindex";
 		System.out.println("ArticleController Start listArticle...");
 		article.setBrd_id(category);
+		
 		//전체 게시글
-		int totalArticle = as.totalArticle();
-		System.out.println("ArticleController totalArticle=>" + totalArticle);
+		int cytotalArticle = as.cytotalArticle();
+		System.out.println("ArticleController totalArticle=>" + cytotalArticle);
+		
+		List<Comm> commList = commService.commList((category / 100 * 100));
+		// 접속한 게시판과 카테고리 식별
+		String boardName = commService.categoryName(category);
+		String categoryName = commService.categoryName(article.getBrd_id());
 		
 		//페이징
-		Paging page = new Paging(totalArticle, currentPage);		//전통방식
+		Paging page = new Paging(cytotalArticle, currentPage);		//전통방식
 		article.setStart(page.getStart());
 		article.setEnd(page.getEnd());
 		
-		List<Article> listArticle = as.listArticle(article);
+		List<Article> listArticle = as.cylistArticle(article);
 		System.out.println("ArticleController list listArticle.size()=>" + listArticle.size());
 		
+
+		model.addAttribute("boardName", boardName);
 		model.addAttribute("article", article);
-		model.addAttribute("totalArticle", totalArticle);
+		model.addAttribute("cytotalArticle", cytotalArticle);
 		model.addAttribute("listArticle", listArticle);
 		model.addAttribute("page", page);
 		model.addAttribute("category", category);
+		model.addAttribute("commList", commList);
 		//검색 폼 추가
 		model.addAttribute("searchForm", true);
 
@@ -76,35 +93,56 @@ public class InformationController {
 
 	
 //	// 상세페이지 확인 (원본)
-	@RequestMapping(value="/board/information/detail")
-	public String detail(@AuthenticationPrincipal MemberDetails memberDetails, Article article, Reply reply, Integer category, Model model, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value="/board/information/{art_number}")
+	public String detail(@AuthenticationPrincipal MemberDetails memberDetails, @PathVariable("art_number")String art_number, Article article, Reply reply, Integer category, Model model, HttpServletRequest request, HttpServletResponse response) {
+		Integer art_id = Integer.parseInt(art_number);
+		Integer brd_id = null;
+		Integer mem_id = null;
 	    if (memberDetails != null) {
-	        model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+	    	MemberInfo memberInfo = memberDetails.getMemberInfo();
+	        model.addAttribute("memberInfo", memberInfo);
+	        mem_id = memberInfo.getMem_id();
 	    }
-
-	    Article result = as.cyArticlereadDetail(article); // DB에서 불러오기
-	    System.out.println("controller detail; Article result" + result);
+	    article.setArt_id(art_id);
+	    reply.setArt_id(art_id);
+	    
+	    brd_id = article.getBrd_id();
+	    
+	    Article articleDetail = as.cyArticlereadDetail(article); // DB에서 불러오기
+	    System.out.println("controller detail; Article result" + articleDetail);
 	    System.out.println("detail Start...");
 
-	    // 쿠키를 이용한 조회수 중복 방지
-	    int view = 0;
-	    Cookie[] cookies = request.getCookies();
-	    if (cookies != null) {
-	        for (Cookie cookie : cookies) {
-	            if (cookie.getName().equals("article" + article.getArt_id())) {
-	                view = 1;
-	                break;
+	    // 쿠키를 이름(name) 중복 확인
+		Cookie oldCookie = null;	// oldCookie 객체 생성
+	    Cookie[] cookies = request.getCookies();	// cookies 배열에 모든 쿠키를 담는다.
+	    if (cookies != null) {			// 쿠키가 있으면?
+	         for (Cookie cookie : cookies) {	// 쿠키들로 반복문을 돌려서
+	            if (cookie.getName().equals("ArticleView")) {	// 이름이 viewArticle인 쿠키가 있으면?
+	               oldCookie = cookie;	// 쿠키를 내 oldCookie에 담는다.
 	            }
-	        }
-	    }
-	    if (view == 0) {
-	        Cookie cookie = new Cookie("article" + article.getArt_id(), "1");
-	        cookie.setMaxAge(60 * 60 * 24);
-	        response.addCookie(cookie);
-	        as.updateView(article);
-	        result.setArt_read(result.getArt_read() + 1); // 조회수 증가
-	    }
-
+	         }
+	      }
+	    // 쿠키 값(value) 중복 확인
+	     if (oldCookie != null) {				// oldCookie가 있으면 그걸 가져와서 값을 설정해준다.
+	          if (!oldCookie.getValue().contains(String.format("[%s_%s_%s]", art_id, brd_id, mem_id))) {
+	        	  articleDetail.setArt_read(articleDetail.getArt_read() + 1); // 조회수 증가
+	        	as.cyupdateView(article);
+	        	  
+	        	oldCookie.setValue(oldCookie.getValue() + String.format("[%s_%s_%s]", art_id, brd_id, mem_id));
+	            oldCookie.setPath("/");
+	            oldCookie.setMaxAge(60 * 60); // 1시간 (초 * 분 * 시간)
+	            response.addCookie(oldCookie);
+	          } 
+	      } else {								// oldCookie가 없으면 newCookie를 새로 만든다.
+	    	  articleDetail.setArt_read(articleDetail.getArt_read() + 1); // 조회수 증가
+	    	  	as.cyupdateView(article);
+	    	  	Cookie newCookie = new Cookie("ArticleView", String.format("[%s_%s_%s]", art_id, brd_id, mem_id));
+	              
+	            newCookie.setPath("/");
+	            newCookie.setMaxAge(60 * 60); // 1시간 (초 * 분 * 시간)
+	            response.addCookie(newCookie);
+	      }
+	    
 	    // 댓글 리스트
 	    List<Reply> replyAll = rs.replyAll(reply);
 	    System.out.println("ArticleController 댓글 리스트 replyAll.size()=>" + replyAll.size());
@@ -112,21 +150,26 @@ public class InformationController {
 	    model.addAttribute("replyAll", replyAll);
 	    model.addAttribute("reply", reply);
 	    model.addAttribute("category", category);
-	    model.addAttribute("article", result);
+	    model.addAttribute("article", articleDetail);
 	    return "/information/detail";
 	}
 	
 	//댓글 작성
 	@PostMapping(value="/board/information/replyWrite")
-	public String write(@AuthenticationPrincipal MemberDetails memberDetails, Reply reply, Model model, Integer category) throws Exception {
-		if(memberDetails != null)
-		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+	public String write(@AuthenticationPrincipal MemberDetails memberDetails, Reply reply, Model model, Integer category, RedirectAttributes redirectAttributes) throws Exception {
+		MemberInfo memberInfo = null;
+		redirectAttributes.addFlashAttribute("category", category);
+		
+		if(memberDetails != null) {
+			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+			reply.setMem_id(memberDetails.getMemberInfo().getMem_id());
+		}
 		System.out.println("reply write Start...");
 		
 		int result = rs.cywriteReply(reply);
 		System.out.println("댓글작성 시작");
 //		log.info("값 확인 {}", reply);
-		return "redirect:/board/information/detail?art_id=" +reply.getArt_id()+ "&brd_id=" +reply.getBrd_id()+ "&category=" + category;
+		return "redirect:/board/information/"+reply.getArt_id()+ "?brd_id=" +reply.getBrd_id()+ "&category=" + category;
 	}
 	
 	
@@ -144,7 +187,7 @@ public class InformationController {
 		
 		int result = rs.cydeleteReply(reply);
 		System.out.println("댓글삭제 시작");
-		return "redirect:/board/information/detail?art_id=" +reply.getArt_id()+ "&brd_id=" +reply.getBrd_id()+ "&category=" + category;
+		return "redirect:/board/information/"+reply.getArt_id()+ "?brd_id=" +reply.getBrd_id()+ "&category=" + category;
 	}
 	
 	
@@ -152,7 +195,7 @@ public class InformationController {
 	@RequestMapping(value="/board/information/updateReply", method = RequestMethod.POST)
 	public String update(@AuthenticationPrincipal MemberDetails memberDetails, Reply reply, Model model, Integer category) throws Exception {
 		if(memberDetails != null)
-			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
 		System.out.println("reply update Start...");
 		model.addAttribute("category", category);
 		model.addAttribute("reply", reply);
@@ -165,26 +208,27 @@ public class InformationController {
 		return "redirect:/board/information/detail?art_id=" +reply.getArt_id()+ "&brd_id=" +reply.getBrd_id()+ "&category=" + category;
 	}
 	
-	
+
 	//댓글 추천(좋아요)
 	@RequestMapping(value="/board/information/replyupdategood")
 	public String replyupdategood(@AuthenticationPrincipal MemberDetails memberDetails, Reply reply, Integer category, Model model) {
 		if(memberDetails != null)
-		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
-
+			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+		
 		int result = rs.replyupdategood(reply);
 		model.addAttribute("category", category);
 		model.addAttribute("reply", reply);
 		System.out.println("rep_good Start...");
 		int brd_id = reply.getBrd_id();
 		int art_id = reply.getArt_id();
-		return "redirect:/board/information/detail?art_id=" + art_id + "&brd_id=" + brd_id + "&category=" + category;
+		return "redirect:/board/information/"+reply.getArt_id()+ "?brd_id=" +reply.getBrd_id()+ "&category=" + category;
 	}
+	
+	
 	
 	// 댓글 비추천(싫어요)
 	@RequestMapping(value="/board/information/replyupdatebad")
 	public String replyupdatebad(@AuthenticationPrincipal MemberDetails memberDetails, Reply reply, Integer category, Model model) {
-		if(memberDetails != null)
 		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
 		
 		int result = rs.replyupdatebad(reply);
@@ -193,31 +237,88 @@ public class InformationController {
 		System.out.println("art_bad Start...");
 		int brd_id = reply.getBrd_id();
 		int art_id = reply.getArt_id();
-		return "redirect:/board/information/detail?art_id=" + art_id + "&brd_id=" + brd_id + "&category=" + category;
+		return "redirect:/board/information/"+reply.getArt_id()+ "?brd_id=" +reply.getBrd_id()+ "&category=" + category;
 	}
 	
 	
-	// 추천
+//	// 추천
+//	@RequestMapping(value="/board/information/updategood")
+//	public String updategood(@AuthenticationPrincipal MemberDetails memberDetails, Article article, Integer category, Model model) {
+//		if(memberDetails != null)
+//		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+//
+//		int result = as.cyupdateGood(article);
+//		model.addAttribute("category", category);
+//		model.addAttribute("article", article);
+//		System.out.println("art_good Start...");
+//		int brd_id = article.getBrd_id();
+//		int art_id = article.getArt_id();
+//		return "redirect:/board/information/detail?art_id=" + art_id + "&brd_id=" + brd_id + "&category=" + category;
+//	}
+//	
+//	// 추천
 	@RequestMapping(value="/board/information/updategood")
-	public String updategood(@AuthenticationPrincipal MemberDetails memberDetails, Article article, Integer category, Model model) {
-		if(memberDetails != null)
-		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
-
-		int result = as.updateGood(article);
-		model.addAttribute("category", category);
-		model.addAttribute("article", article);
-		System.out.println("art_good Start...");
-		int brd_id = article.getBrd_id();
-		int art_id = article.getArt_id();
+	public String updategood(@AuthenticationPrincipal MemberDetails memberDetails, Article article, Integer category, Model model, HttpServletRequest request, HttpServletResponse response) {
+		Integer art_id = article.getArt_id();
+		Integer brd_id = article.getBrd_id();
+		Integer mem_id = null;
+		 if (memberDetails != null) {
+		    	MemberInfo memberInfo = memberDetails.getMemberInfo();
+		        model.addAttribute("memberInfo", memberInfo);
+		        mem_id = memberInfo.getMem_id();
+		  }
+		    
+		    Article updategood = as.cyArticlereadDetail(article); // DB에서 불러오기
+		    System.out.println("controller detail; Article result" + updategood);
+		    System.out.println("detail Start...");
+		    
+			model.addAttribute("category", category);
+			model.addAttribute("article", article);
+			System.out.println("art_good Start...");
+		
+			// 쿠키를 이름(name) 중복 확인
+			Cookie oldCookie = null;	// oldCookie 객체 생성
+		    Cookie[] cookies = request.getCookies();	// cookies 배열에 모든 쿠키를 담는다.
+		    if (cookies != null) {			// 쿠키가 있으면?
+		         for (Cookie cookie : cookies) {	// 쿠키들로 반복문을 돌려서
+		            if (cookie.getName().equals("ArticleGood")) {	// 이름이 viewArticle인 쿠키가 있으면?
+		               oldCookie = cookie;	// 쿠키를 내 oldCookie에 담는다.
+		            }
+		         }
+		      }
+		    // 쿠키 값(value) 중복 확인
+		     if (oldCookie != null) {				// oldCookie가 있으면 그걸 가져와서 값을 설정해준다.
+		          if (!oldCookie.getValue().contains(String.format("[%s_%s_%s]", art_id, brd_id, mem_id))) {
+		        	  updategood.setArt_read(updategood.getArt_good() + 1); // 조회수 증가
+		        	as.cyupdateGood(article);
+		        	  
+		        	oldCookie.setValue(oldCookie.getValue() + String.format("[%s_%s_%s]", art_id, brd_id, mem_id));
+		            oldCookie.setPath("/");
+		            oldCookie.setMaxAge(60 * 60); // 1시간 (초 * 분 * 시간)
+		            response.addCookie(oldCookie);
+		          } 
+		      } else {								// oldCookie가 없으면 newCookie를 새로 만든다.
+		    	  updategood.setArt_read(updategood.getArt_good() + 1); // 조회수 증가
+		    	  	as.cyupdateGood(article);
+		    	  	Cookie newCookie = new Cookie("ArticleGood", String.format("[%s_%s_%s]", art_id, brd_id, mem_id));
+		              
+		            newCookie.setPath("/");
+		            newCookie.setMaxAge(60 * 60); // 1시간 (초 * 분 * 시간)
+		            response.addCookie(newCookie);
+		      }
+		    
+		
+		
 		return "redirect:/board/information/detail?art_id=" + art_id + "&brd_id=" + brd_id + "&category=" + category;
 	}
+	
 	// 비추천
 	@RequestMapping(value="/board/information/updatebad")
 	public String updatebad(@AuthenticationPrincipal MemberDetails memberDetails, Article article, Integer category, Model model) {
 		if(memberDetails != null)
 		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
 		
-		int result = as.updateBad(article);
+		int result = as.cyupdateBad(article);
 		model.addAttribute("category", category);
 		model.addAttribute("article", result);
 		System.out.println("art_bad Start...");
@@ -275,26 +376,31 @@ public class InformationController {
 		model.addAttribute("category", category);
 		int result = as.cyArticlemodify(article);
 		
-		return "redirect:/board/information/detail?art_id="+article.getArt_id()+"&brd_id="+article.getBrd_id()+"&category="+category; 
+		
+		return "redirect:/board/information/"+article.getArt_id()+ "?brd_id=" +article.getBrd_id()+ "&category=" + category;
 	}
 	
 	
 	//게시물 작성 GET
 	@RequestMapping(value = "/board/information/write", method = RequestMethod.GET)
-	public String getwrite(@AuthenticationPrincipal MemberDetails memberDetails, Integer category, Model model) throws Exception {
+	public String getwrite(@AuthenticationPrincipal MemberDetails memberDetails, Article article,Integer category, Model model) throws Exception {
 		if(memberDetails != null)
 		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
-		System.out.println("write Start...");
+		model.addAttribute("category", category);
+		System.out.println("작성 겟 Start...");
 		return "information/write";
 	}
 	
 	//게시물 작성POST
 	@RequestMapping(value = "/board/information/insert", method = RequestMethod.POST)
 	public String insert(@AuthenticationPrincipal MemberDetails memberDetails, Article article, Integer category, Model model) throws Exception {
-		if(memberDetails != null)
-		model.addAttribute("memberInfo", memberDetails.getMemberInfo());
-		
-		System.out.println("writeform Start...");
+		if(memberDetails != null) {
+			model.addAttribute("memberInfo", memberDetails.getMemberInfo());
+			article.setMem_id(memberDetails.getMemberInfo().getMem_id());
+		}
+		System.out.println("작성 포스트 Start...");
+		System.out.println("Article =" + article);
+
 		int result = as.cyArticleinsert(article);
 		return "redirect:/board/information?category=1400";
 	}

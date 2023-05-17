@@ -46,6 +46,10 @@ public class CommServiceImpl implements CommService {
 		return cd.getCategoryListBySuper(superId);
 	}
 	
+	@Override
+	public List<Comm> hgGetCategoryNames() {
+		return cd.hgGetCategoryNames();
+	}
 	// 최승환
 //	@Override
 //	public String shcategoryName(int comm_id) {
@@ -55,4 +59,5 @@ public class CommServiceImpl implements CommService {
 //	public List<Comm> shcommList(int comm_id) {
 //		return cd.shcommList(comm_id);
 //	}
+	
 }

@@ -33,6 +33,7 @@
 				}
 			});
 		});
+		$('.side-menu[data-value="notice"]').click();
 	});
 </script>
 <style type="text/css">
@@ -119,6 +120,7 @@
 		border: 0;
 		outline: none;
 		cursor: pointer;
+		height: 50px;
 	}
 	aside > div#admin-menu > button.side-menu[data-selected="true"] {
 		background-color: var(--theme);
@@ -171,7 +173,7 @@
 		display: flex;
 		justify-content: flex-start;
 		align-items: stretch;
-		padding: 10px;
+		padding: 75px;
 		height: 100%;
 	}
 	div.admin-main {
@@ -341,7 +343,7 @@
 		opacity: 0.5;
 	}
 	
-	div.admin-board-1-page {
+	div.admin-board-1-page, div.admin-board-2-page {
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -475,6 +477,9 @@
 		border: 2.5px solid var(--subtheme);
 		border-width: 2.5px 0;
 	}
+	div.admin-board-2 div.list-item:not(:last-child) {
+		border-bottom: 1px solid var(--subtheme);
+	}
 	div.admin-report-container {
 		display: flex;
 		flex-direction: column;
@@ -524,8 +529,8 @@
 </head>
 <body>
 	<aside>
-		<div id="admin-profile">
-			<div class="image-container">
+		<div id="admin-profile" class="padding-20px padding-hor-0">
+			<div class="image-container background-color-theme">
 				<img src="${pageContext.request.contextPath }/uploads/profile/${memberInfo.mem_image }" onerror="this.onerror=null; this.src='${pageContext.request.contextPath }/image/abstract-user.svg';">
 			</div>
 			<span id="admin-nickname">${memberInfo.mem_nickname }</span>
@@ -544,11 +549,11 @@
 			<button class="side-menu radio-button adv-hover" data-group="menu" data-selected="false" data-value="article">게시글 관리</button>
 			<button class="side-menu radio-button adv-hover" data-group="menu" data-selected="false" data-value="suggest">건의글 관리</button>
 		</div>
-		<div id="admin-action">
+		<div id="admin-action" class="padding-20px padding-hor-0">
 			<button class="admin-action-button adv-hover" type="button" onclick="location.href = '${pageContext.request.contextPath}/';">
 				<span>메인 페이지</span>
 			</button>
-			<button class="admin-action-button adv-hover" type="button">
+			<button class="admin-action-button adv-hover" type="button" onclick="location.href = '${pageContext.request.contextPath}/logout';">
 				<svg class="admin-action-button-content" viewBox="0 0 512 512">
 					<!-- https://ionic.io/ionicons -->
 					<path d="M336 112a80 80 0 00-160 0v96"/>

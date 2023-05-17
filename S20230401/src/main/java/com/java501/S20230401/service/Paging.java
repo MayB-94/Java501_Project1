@@ -26,4 +26,17 @@ public class Paging {
 		endPage		= endPage > totalPage? totalPage : endPage;
 		
 	}
+	public Paging(int total, String presentPage, int pageRow, int pageBlock) {
+		this.pageRow = pageRow;
+		this.pageBlock = pageBlock;
+		this.total = total;
+		if(presentPage != null) this.currentPage = Integer.parseInt(presentPage);
+		
+		start 		= (currentPage - 1) * pageRow + 1;
+		end			= start + pageRow - 1;
+		startPage	= currentPage - ((currentPage - 1) % pageBlock);
+		endPage		= startPage + pageBlock - 1;
+		totalPage 	= (int)Math.ceil((double)total / pageRow);
+		endPage		= endPage > totalPage? totalPage : endPage;
+	}
 }

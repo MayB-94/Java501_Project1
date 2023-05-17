@@ -33,6 +33,10 @@ public interface ReplyService {
 	public List<ReplyMember> getReplyByArticle(Article article);
 	public int hgInsertReply(Reply reply);
 	public List<ReplyMember> hgGetRepliesOfMember(int mem_id);
+	public List<Reply> hgGetRepliesOfArticle(Article searcher);
+	public int hgDeleteReply(Reply reply);
+	public Reply hgGetReplyById(Reply reply);
+	public int hgRealDeleteReply(Reply reply);
 	
 	// 임동빈
 	int 	dbInsertReply(Reply reply);

@@ -63,7 +63,7 @@ public class WaitingDaoImpl implements WaitingDao {
 	
 	// 김진현
 	@Override
-	public int jhWaitListYN(Article article) {
+	public int JHWaitListYN(Article article) {
 		return session.selectOne("JHWaitListYN", article);
 
 	}

@@ -20,9 +20,6 @@
 		</div>
 		<div id="art_misc" style="display: flex; justify-content: flex-end; align-items: center;">
 			<span>
-				댓글 수: ${article.rep_count }
-			</span>
-			<span>
 				작성일자:
 				<fmt:formatDate value="${article.art_regdate }" pattern="yyyy/MM/dd HH:mm:ss"/>
 			</span>

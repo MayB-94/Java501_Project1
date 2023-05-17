@@ -12,6 +12,25 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/preference.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/presets.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/css/layout.css">
+
+<script type="text/javascript">
+	$(window).scroll(() => {
+		let scrollTop = $(window).scrollTop();
+		let header = $('header');
+		if (header != null) {
+			if (scrollTop > 21 && !header.hasClass('fix-header')) {
+				header.addClass('fix-header');
+			}
+			else if (scrollTop <= 21 && header.hasClass('fix-header')) {
+				header.removeClass('fix-header');
+			}
+		}
+	});
+	$(() => {
+		$('#scrollToTop').click(e => $(window).scrollTop(0));
+		$('#scrollToBottom').click(e => $(window).scrollTop($(document).height() - 1120));
+	});
+</script>
 <style type="text/css">
 	button{
 		width: auto;
@@ -24,11 +43,16 @@
 		border: none;
 		border-radius: 14px;
 	}
-	.btn-write {
-		background-color: var(--subtheme);
-		color: var(--subtheme-font);
-		font-weight: bolder;
-		cursor: pointer;
+	.btn-cost{
+		width: auto;
+		height: 25px;
+		font-size:15px;
+		font-family: 'Nanum Gothic';
+		color: white;
+		text-align: center;
+		background: red;
+		border: none;
+		border-radius: 8px;
 	}
 	.btns-tag{
 		padding: 0px 2px;
@@ -220,6 +244,12 @@
 				</div>
 			</div>
 			<div id="top-right">
+				<c:if test="${memberInfo != null }">
+					<!-- 메세지 추가 -->
+					<div class="userMessage" onclick="userMessage()">
+						<svg class="userMessage-popup" viewBox="0 0 512 512" style="width: 30; height: 30;"><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg>
+					</div>
+				</c:if>
 				<!-- <button id="viewMode">
 					<div id="viewModeButton"></div>
 				</button> -->
@@ -280,6 +310,11 @@
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/';">
 										마이 페이지
 									</button>
+									<c:if test="${memberInfo.mem_authority >= 108 }">
+										<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px;" class="theme-button" onclick="location.href = '${pageContext.request.contextPath }/admin';">
+											관리자 페이지
+										</button>
+									</c:if>
 									<button style="width: 240px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 5px 10px; margin-bottom: 10px;" class="subtheme-button" onclick="location.href = '${pageContext.request.contextPath }/logout';">
 										로그아웃
 									</button>
@@ -297,8 +332,9 @@
 	<main>
 		<div class="container padding-10px">
 			<div class="article-view">
-				<div class="board-title" align="center">
-					<h1 class="color-subtheme">${boardName} 게시판</h1>
+				<div class="board-title margin-50px margin-hor-0" align="center" style="border: 1px solid transparent; border-radius: 20px; background-color: rgba(var(--subtheme-rgb), 0.25)">
+					<h1 class="color-subtheme text-align-left padding-10px padding-hor-20px">${boardName} 게시판</h1>
+					<p class="translucent-theme-font text-align-left padding-10px padding-hor-20px" style="padding-top: 0;">사용하지 않는 물건들을 다른 사람과 나눠보세요</p>
 				</div>
 				
 				<div class="display-flex justify-content-flex-end align-items-center"><span class="font-size-14px" style="color: rgba(var(--theme-font-rgb), 0.5);">총 ${totalArt }개의 게시글이 있습니다</span></div>
@@ -315,7 +351,7 @@
 				<div class="board-btns display-flex flex-grow-1" style="margin: 5px 0px;">
 					<div class="btns-right" style="display: flex; justify-content: flex-end; flex-grow: 1;">
 						<span>
-							<c:if test="${category % 100 != 0 && memberInfo != null}">
+							<c:if test="${memberInfo != null}">
 								<button class="btn-write adv-hover" onclick="location.href='${pageContext.request.contextPath}/board/share/write?category=${category}';">글쓰기</button>
 							</c:if>
 						</span>
@@ -376,11 +412,19 @@
 								<div class="view-middle display-flex justify-content-space-between align-items-center padding-5px padding-hor-0">
 									<span class="font-weight-bolder">${article.member.mem_nickname}</span>
 									<div class="display-flex justify-content-flex-end align-items-center">
+									
+ 										<%-- <c:if test="${fn:contains(article.status_name, '모집')}"><button>${article.status_name}</button></c:if>
+										<c:if test="${fn:contains(article.status_name, '진행')}"><button>${article.status_name}</button></c:if>
+										<c:if test="${fn:contains(article.status_name, '완료')}"><button>${article.status_name}</button></c:if>
+										<c:if test="${fn:contains(article.status_name, '취소')}"><button>${article.status_name}</button></c:if> --%>
+										
 										<c:if test="${article.status_name != null}">
-											<button class="btn margin-right-5px font-weight-bolder" ${article.trade.trd_status == 401 ? 'style="background-color: var(--subtheme);"' : '' }>${article.status_name}</button>
+											<button class="btn margin-right-5px font-weight-bolder" ${article.trade.trd_status == 401 || article.trade.trd_status == 402 ? 'style="background-color: var(--subtheme);"' : '' }>${article.status_name}</button>
 										</c:if>
+										
+										
 										<c:choose>
-											<c:when test="${article.trade.trd_cost == null || article.trade.trd_cost == 0}">
+											<c:when test="${article.trade.trd_cost == 0}">
 												<span class="font-size-20px font-weight-bolder color-subtheme">무료</span>
 											</c:when>
 											<c:when test="${article.trade.trd_cost != null && article.trade.trd_cost != 0}">

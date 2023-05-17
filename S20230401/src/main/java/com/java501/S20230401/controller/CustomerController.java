@@ -70,6 +70,7 @@ public class CustomerController {
 		
 		// Paging 작업
 		Paging page = new Paging(totalCustomer, currentPage);
+		// Parameter article --> Page만 추가 Setting
 		article.setStart(page.getStart());	// 시작시 1
 		article.setEnd(page.getEnd());		// 시작시 10
 		
@@ -128,6 +129,7 @@ public class CustomerController {
 
 		System.out.println("댓글 갯수세기 시작");
 		// 댓글 총갯수세기
+		// 댓글 목록
 		System.out.println("아티클수"+article);
 		Reply reply = new Reply();
 		reply.setArt_id(article.getArt_id());
@@ -149,6 +151,10 @@ public class CustomerController {
 		model.addAttribute("category", category);
 		model.addAttribute("boardName", boardName);
 		model.addAttribute("categoryName", categoryName);
+		
+		System.out.println("댓글카운트"+replyCount);
+		System.out.println("댓글리스트"+replyList);
+		System.out.println("카테고리"+category);
 		
 		return "/customer/detailCustomer";
 	}

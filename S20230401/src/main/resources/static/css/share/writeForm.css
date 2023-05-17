@@ -215,6 +215,7 @@ form div.popup-group > div.popup-window {
 	border-radius: 2.5px;
 	background-color: var(--theme);
 	border: 2px solid #CCCCCC;
+	top: auto;
 	bottom: 32px;
 	left: 44px;
 }
