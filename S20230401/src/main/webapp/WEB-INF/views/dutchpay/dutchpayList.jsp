@@ -475,7 +475,7 @@
 							<option value="nickname">닉네임</option>
 							<option value="articleTag">태그</option>
 						</select>
-						<input type="text" name="keyWord" placeholder="검색어 입력" required="required">
+						<input type="text" name="keyWord" placeholder="검색어 입력" required="required"><!--  -->
 						<button type="submit" class="adv-hover">검색</button>
 					</form>
 				</div>
