@@ -1,6 +1,5 @@
 package com.java501.S20230401.controller;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartRequest;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +23,6 @@ import com.java501.S20230401.model.Article;
 import com.java501.S20230401.model.Comm;
 import com.java501.S20230401.model.Member;
 import com.java501.S20230401.model.MemberDetails;
-import com.java501.S20230401.model.MemberInfo;
 import com.java501.S20230401.model.Reply;
 import com.java501.S20230401.model.Report;
 import com.java501.S20230401.service.ArticleService;

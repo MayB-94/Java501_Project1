@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 // 정보공유 페이지 계열 컨트롤러 : 김찬영
-@Controller  
+//@Controller  
 @RequiredArgsConstructor
 @Slf4j
 public class InformationController {

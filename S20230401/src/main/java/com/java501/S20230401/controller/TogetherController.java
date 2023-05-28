@@ -40,11 +40,11 @@ import com.java501.S20230401.service.ReplyService;
 import com.java501.S20230401.service.WaitingService;
 
 import lombok.RequiredArgsConstructor;
-
 // 함께해요 페이지 계열 컨트롤러 : 임동빈
-@Controller
+//@Controller
 @RequiredArgsConstructor
 public class TogetherController {
+	/**
 
 	private final ArticleService as;
 	private final ReplyService rs;
@@ -824,27 +824,27 @@ public class TogetherController {
 		public String listSearch(@AuthenticationPrincipal MemberDetails memberDetails,
 				Article article, int category, String currentPage, Model model) {
 			
-			/*
-			 * if (memberDetails != null) model.addAttribute("memberInfo",
-			 * memberDetails.getMemberInfo());
-			 * 
-			 * // category 값을 brd_id에 할당. article.setBrd_id(category); int number =
-			 * article.getBrd_id();
-			 * 
-			 * System.out.println("board/listSearch number->"+number); // Article 전체 Count
-			 * int condArticleCnt = as.dbCondArticleCnt(article);
-			 * System.out.println("board/listSearch condArticleCnt->"+condArticleCnt); //
-			 * Paging 작업 Paging page = new Paging(condArticleCnt, currentPage); // Parameter
-			 * Article --> Page만 추가 Setting article.setStart(page.getStart()); // 시작시 1
-			 * article.setEnd(page.getEnd()); // 시작시 10
-			 * 
-			 * List<Article> listSearchArticle = as.dbListSearchArticle(article);
-			 * 
-			 * 
-			 * model.addAttribute("article", article); model.addAttribute("totalArticle",
-			 * condArticleCnt); model.addAttribute("listArticle", listSearchArticle);
-			 * model.addAttribute("category", number); model.addAttribute("page", page);
-			 */
+			
+//			  if (memberDetails != null) model.addAttribute("memberInfo",
+//			  memberDetails.getMemberInfo());
+//			  
+//			  // category 값을 brd_id에 할당. article.setBrd_id(category); int number =
+//			  article.getBrd_id();
+//			  
+//			  System.out.println("board/listSearch number->"+number); // Article 전체 Count
+//			  int condArticleCnt = as.dbCondArticleCnt(article);
+//			  System.out.println("board/listSearch condArticleCnt->"+condArticleCnt); //
+//			  Paging 작업 Paging page = new Paging(condArticleCnt, currentPage); // Parameter
+//			  Article --> Page만 추가 Setting article.setStart(page.getStart()); // 시작시 1
+//			  article.setEnd(page.getEnd()); // 시작시 10
+//			  
+//			  List<Article> listSearchArticle = as.dbListSearchArticle(article);
+//			  
+//			  
+//			  model.addAttribute("article", article); model.addAttribute("totalArticle",
+//			  condArticleCnt); model.addAttribute("listArticle", listSearchArticle);
+//			  model.addAttribute("category", number); model.addAttribute("page", page);
+			 
 		 
 		 
 			try {
@@ -854,5 +854,6 @@ public class TogetherController {
 				return "redirect:/board/together?category="+category;
 			}
 		}
+	 **/
 	 
 }

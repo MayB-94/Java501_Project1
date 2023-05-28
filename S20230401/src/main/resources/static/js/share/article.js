@@ -2,7 +2,7 @@
  * 
  */
 // 세션 스토리지에서 contextPath 호출하여 저장 경로, 글번호, 게시판 번호, 카테고리 번호, 로그인 유저, 작성자
-const contextPath = sessionStorage.getItem("contextPath");
+// const contextPath = sessionStorage.getItem("contextPath");
 const artId = sessionStorage.getItem("artId");
 const brdId = sessionStorage.getItem("brdId");
 const memId = sessionStorage.getItem("memId");
@@ -361,3 +361,15 @@ function reportCheck(report_id){
         throw error;
     });
 }
+
+// 이미지 에러 처리
+$(() => {
+    $('.article_content').find('img').error(e => {
+        $(e.target).closest('img').attr('src', `${contextPath}/image/ShareGo_Not_Found_Image.png`);
+    });
+    $('.board-toggle').click(e => {
+        let parent = $(e.target).closest('.board-summary');
+        let children = parent.find('.board-summary-part');
+        children.toggle();
+    });
+});

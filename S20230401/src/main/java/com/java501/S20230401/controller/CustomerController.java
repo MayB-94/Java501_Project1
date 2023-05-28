@@ -2,13 +2,10 @@ package com.java501.S20230401.controller;
 
 import java.util.List;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,17 +21,14 @@ import com.java501.S20230401.model.MemberInfo;
 import com.java501.S20230401.model.Reply;
 import com.java501.S20230401.service.ArticleService;
 import com.java501.S20230401.service.CommService;
-import com.java501.S20230401.service.MemberService;
 import com.java501.S20230401.service.Paging;
 import com.java501.S20230401.service.ReplyService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 // 고객센터 페이지 계열 컨트롤러 : 최승환
-@Controller
+//@Controller
 @RequiredArgsConstructor
-@Slf4j
 public class CustomerController {
 	
 	private final ArticleService 	as;

@@ -8,9 +8,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONObject;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.fasterxml.jackson.databind.annotation.JsonValueInstantiator;
 import com.java501.S20230401.model.Article;
 import com.java501.S20230401.model.Comm;
 import com.java501.S20230401.model.MemberDetails;
@@ -33,12 +30,10 @@ import com.java501.S20230401.service.Paging;
 import com.java501.S20230401.service.RegionService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
+/**
 // 같이사요 페이지 계열 컨트롤러 : 김진현
-@Controller
+//@Controller
 @RequiredArgsConstructor
-@Slf4j
 public class DutchpayController {
 	private final ArticleService as;
 	private final RegionService rs;
@@ -629,3 +624,4 @@ public class DutchpayController {
 	
 	
 }
+**/

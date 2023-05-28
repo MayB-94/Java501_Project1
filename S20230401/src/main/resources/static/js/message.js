@@ -4,6 +4,55 @@
 // contextPath 할당
 const contextPath = window.location.pathname.split('/')[0];
 // 쪽지 작성
+
+
+
+// 쪽지함 클릭 이벤트
+const contentMap = {
+    write: '.content-write',
+    receiver: '.content-receiver',
+    sender: '.content-sender',
+    storage: '.content-storage',
+    recycle: '.content-recycle'
+};
+let previousBtn = document.querySelector('.menu-item button:nth-child(2)');
+let previousContent = '.content-receiver';
+
+const changeStyle = (content, previousContent)=>{
+    document.querySelector(content).style.display = 'block';
+    if(previousContent != content)
+        document.querySelector(previousContent).style.display = 'none';
+}
+function clickEvent(btn, box){
+    content = contentMap[box];
+
+    changeStyle(content, previousContent);
+    btn.style.color = 'black';
+    btn.style.backgroundColor = 'white';
+    
+    if(btn != previousBtn){
+        previousBtn.style.color = 'white';
+        previousBtn.style.backgroundColor = 'transparent';
+    }
+    previousBtn = btn;
+    previousContent = content;
+}
+
+/*
+switch(box){
+    case 'write':
+        content = '.content-write'; break;
+    case 'receiver':
+        content = '.content-receiver'; break;
+    case 'sender':
+        content = '.content-sender'; break;
+    case 'storage':
+        content = '.content-storage'; break;
+    case 'recycle':
+        content = '.content-recycle'; break;
+}
+document.querySelector(content).style.display = (document.querySelector(content).style.display == 'none')? 'block' : 'none';
+
 function writebox(){
     document.querySelector('.content-write').style.display = 'block';
     document.querySelector('.content-receiver').style.display = 'none';
@@ -46,6 +95,8 @@ function recyclebox(){
     document.querySelector('.content-storage').style.display = 'none';
     document.querySelector('.content-recycle').style.display = 'block';
 }
+*/
+
 // 쪽지 클릭 이벤트
 $(()=>{
     let mes_id, mem_sender_id, mem_receiver_id;

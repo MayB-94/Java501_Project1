@@ -66,7 +66,7 @@ public class ShareController {
 	private final MemberService 	memberService;
 	
 	
-	// 나눔해요 글 목록 + 검색
+	// 나눔해요 모든 게시판의 글 목록 + 검색
 	@RequestMapping(value = "board/share")
 	public String totalPage(@AuthenticationPrincipal
 							MemberDetails memberDetails,	// 세션의 로그인 유저 정보
@@ -113,7 +113,7 @@ public class ShareController {
 	
 	
 	
-	// 게시글 조회, 댓글 조회 (share/article.jsp)
+	// 게시글 상세페이지 (share/article.jsp)
 	@RequestMapping(value = "board/share/{art_id}")
 	public String detailShareArticle(	@PathVariable("art_id")
 										String art_id,
@@ -140,13 +140,13 @@ public class ShareController {
 			shareUser.setArt_id(article.getArt_id());
 			shareUser.setBrd_id(article.getBrd_id());
 			shareUser.setMem_id(memberInfo.getMem_id());
+			
 			// 찜 목록 확인
 			int userFavorite = favoriteService.dgUserFavorite(shareUser);
 			// 대기열 확인
 			int userWaiting = waitingService.dgUserWaiting(shareUser);
 			// 거래 목록 확인
 			int userJoin = joinService.shareUserJoin(shareUser);
-			
 			model.addAttribute("userJoin", userJoin);
 			model.addAttribute("userFavorite", userFavorite);
 			model.addAttribute("userWaiting", userWaiting);
@@ -160,22 +160,31 @@ public class ShareController {
 		}else{
 			System.out.println("실패 조회수 변동 없음");
 		}
-		
 		// 글 정보 저장
 		Article detailArticle = articleService.detailShareArticle(article);
 		// 댓글 정보 저장
 		List<Reply> replyList = replyService.replyShareList(article);
 		// 접속한 게시판과 카테고리 식별
-		String boardName = commService.categoryName(category);
-		String categoryName = commService.categoryName(article.getBrd_id());
-		// 거래 대기열 목록 저장
-		List<Waiting> waitingList = waitingService.dgShareWaitingList(detailArticle.getTrade().getTrd_id());
-		// 거래 참가자 목록 저장
-		List<Join> joinList = joinService.shareJoinList(detailArticle.getTrade().getTrd_id());
+		String categoryName = commService.categoryName(category);
+		String boardName = commService.categoryName(article.getBrd_id());
+		
+		Map<String, Object> shareName = new HashMap<String, Object>();
+		shareName.put("boardName", boardName);
+		shareName.put("categoryName", categoryName);
+		model.addAttribute("shareName", shareName);
+		System.out.println(shareName);
+		
+		// 거래글의 경우
+		if(detailArticle.getTrade().getTrd_id() != null) {
+			// 거래 대기열 목록 저장
+			List<Waiting> waitingList = waitingService.dgShareWaitingList(detailArticle.getTrade().getTrd_id());
+			model.addAttribute("waitingList", waitingList);
+			// 거래 참가자 목록 저장
+			List<Join> joinList = joinService.shareJoinList(detailArticle.getTrade().getTrd_id());
+			model.addAttribute("joinList", joinList);
+		}
 
 		
-		model.addAttribute("joinList", joinList);
-		model.addAttribute("waitingList", waitingList);
 		model.addAttribute("article", detailArticle);
 		model.addAttribute("replyList", replyList);
 		model.addAttribute("category", category);
@@ -618,6 +627,14 @@ public class ShareController {
 		return isReport;
 	}
 	
+	
+	
+	
+	// 임시
+	@RequestMapping(value = "sidevar")
+	public String sidvar() {
+		return "sidevar";
+	}
 
 
 
@@ -630,17 +647,24 @@ public class ShareController {
 */
 	// Share외의 다른 카테고리 연결
 	@RequestMapping(value = "board/{categoryConnect}")
-	public String togetherPage(	@PathVariable("categoryConnect")
-								String 	categoryConnect, 
-								Article article, 
-								String 	currentPage, 
-								Model 	model, 
-								Integer category,
-								RedirectAttributes redirectAttributes) {
+	public String CategoryPage(	@PathVariable("categoryConnect")
+								String 	categoryConnect,
+								Integer category) {
 		log.info("현재 {}에 접속 감지 카테고리 번호 : {}", categoryConnect, category);
-		redirectAttributes.addFlashAttribute("article", article);
-		redirectAttributes.addFlashAttribute("currentPage", currentPage);
 		return "redirect:/board/share?category="+category;
+	}
+	
+	// 상세글 다른 카테고리 연걸
+	@RequestMapping(value = "board/{categoryConnect}/{art_id}")
+	public String CategoryDetail(	@PathVariable("categoryConnect")
+									String categoryConnect,
+									@PathVariable("art_id")
+									String art_id,
+									Article article,
+									Integer category) {
+		log.info("접속 카테고리 : {} 게시판 : {} 글 : {}",categoryConnect, article.getBrd_id(), art_id);
+		article.setArt_id(Integer.parseInt(art_id));
+		return getRedirectArticle(article, category);
 	}
 
 	// 쿠키용 체크
@@ -712,7 +736,3 @@ public class ShareController {
 		return String.format("redirect:/board/share/%s?brd_id=%s&category=%s", reply.getArt_id(), reply.getBrd_id(), category);
 	}
 }
-
-
-
-

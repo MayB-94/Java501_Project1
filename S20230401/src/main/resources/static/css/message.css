@@ -1,14 +1,17 @@
 @charset "UTF-8";
+.message-sidebar{
+	background-color: #0193F8;
+}
 body {
 	font-family: Arial, sans-serif;
 	margin: 0;
 	padding: 0;
+	overflow: hidden;
 }
 .container {
-	display: flex;
 	width: 800px;
 	height: 600px;
-	border: 1px solid #ccc;
+	display: flex;
 }
 .message-sidebar {
 	width: 200px;
@@ -21,7 +24,6 @@ body {
 }
 /* 프로필 영역 */
 .menu-profile {
-	background-color: #0193F8;
 	padding: 40px;
 	height: 100px;
 	width: auto;
@@ -47,82 +49,53 @@ body {
 /* 사이드바 버튼 */
 .menu-item button{
 	margin: 10px 0px;
-	padding: 10px 0px;z`
-	border-radius: 10px;
-	background-color: #3f7ab5;
+	padding: 10px 0px;
 	color: white;
+	background-color: transparent;
 	border: none;
 	font-size: 20px;
 	font-weight: bolder;
+	cursor: pointer;
 }
+.menu-item button:hover{
+	background-color: rgb(35, 161, 252);
+}
+.menu-item button:nth-child(2){
+	background-color: white;
+	color: black;
+}
+
+/* 쪽지 본문 */
 .message-content {
 	flex: 1;
-	padding: 10px;
+	padding-left: 40px;
 }
+
 /* 두번째 자식 요소 제외 (받은 쪽지함) */
 .message-content > *:not(:nth-child(2)) {
 	display: none;
 }
 .message-content h2{
 	flex: 1;
-	padding: 20px;
 	font-size: 26px;
-    /*margin-bottom: 90px;*/
-    margin: 0;
-    color: #333;
+  padding: 50px 0px;
+  color: #333;
+}
+.message-box {
+	height: 380px;
+	border: 1px solid #0193F8;
+	border-left: 0;
+	border-right: 0;
+	overflow: auto;
 }
 .message-list{
-	border: 1px solid rgba(0, 0, 0, 0.1);
-	margin: 10px;
-    padding: 10px;
-}
-/* 쪽지 쓰기 */
-.content-write {
-	height: 100%;
-}
-div.write-group:first-of-type {
-	background-color: #0193F8;
-	color: white;
-	font-size: 20px;
-}
-.write-group{
-	display: flex;
-	flex: 1;
-	align-items: center;
-	margin: 30px;
-	height: 50px;
-	font-weight: bold;
-}
-.write-group input{
-	height: 30px;
-	border-radius: 10px;
-	margin-left: 10px;
-	border: none;
-}
-.write-group button{
-	height: 30px;
-	border-radius: 10px;
-	border: none;
-	background-color: #0193F8;
-	color: white;
-	font-size: 18px;
-}
-.write-group textarea{
-	width: 100%;
-    height: 120px;
-	resize: none;
-	font-size: 16px;
-	color: #495057;
-	background-color: #fff;
-    border: 1px solid rgba(0, 123, 255, .2);
-    border-radius: 10px;
-	transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	border-bottom: 1px solid #0193F8;
 }
 .list-title {
 	display: flex;
-    justify-content: space-between;
-    align-items: center;
-	margin-bottom: 5px;
+  justify-content: space-between;
+  align-items: center;
+	padding: 10px;
 }
 .list-content{
 	display: none;
@@ -142,6 +115,49 @@ div.write-group:first-of-type {
 .list-content {
 	color: #555;
 }
-.menu-item button:hover{
+
+
+/* 쪽지 쓰기 */
+.content-write {
+	height: 100%;
+}
+div.write-group:first-of-type {
 	background-color: #0193F8;
+	color: white;
+	font-size: 20px;
+}
+.write-group{
+	display: flex;
+	flex: 1;
+	align-items: center;
+	height: auto;
+	padding: 10px 0px;
+	margin: 20px 0px;
+	font-weight: bold;
+}
+
+.write-group input{
+	height: 30px;
+	border-radius: 10px;
+	margin-left: 10px;
+	border: none;
+}
+.write-group button{
+	height: 30px;
+	border-radius: 10px;
+	border: none;
+	background-color: #0193F8;
+	color: white;
+	font-size: 18px;
+}
+.write-group textarea{
+	width: 100%;
+  height: 120px;
+	resize: none;
+	font-size: 16px;
+	color: #495057;
+	background-color: #fff;
+  border: 1px solid rgba(0, 123, 255, .2);
+  border-radius: 10px;
+	transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }

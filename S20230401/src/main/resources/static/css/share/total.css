@@ -1,0 +1,141 @@
+@charset "UTF-8";
+
+button{
+    width: auto;
+    height: 25px;
+    font-size:12px;
+    font-family: 'Nanum Gothic';
+    color: white;
+    text-align: center;
+    background: gray;
+    border: none;
+    border-radius: 14px;
+}
+.btn-cost{
+    width: auto;
+    height: 25px;
+    font-size:15px;
+    font-family: 'Nanum Gothic';
+    color: white;
+    text-align: center;
+    background: red;
+    border: none;
+    border-radius: 8px;
+}
+.btns-tag{
+    padding: 0px 2px;
+    background-color: transparent;
+    color: var(--subtheme);
+    font-weight: bold;
+    cursor: pointer;
+}
+.btns-tag::before{
+    content: '#';
+}
+
+span.article-title > a:hover {
+    color: var(--subtheme);
+}
+
+div.article-info:not(:last-child) {
+    border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+}
+
+/* Search style */
+div.board-search > form svg {
+    fill: none;
+    stroke: var(--subtheme);
+    stroke-width: 64px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+}
+
+div.board-search > form select {
+    outline: none;
+    border: 2.5px solid var(--subtheme);
+    border-width: 0 0 2.5px 0;
+    color: var(--subtheme);
+    font-weight: bolder;
+    background-color: transparent;
+}
+
+div.board-search > form input[type="text"] {
+    outline: none;
+    border: 2.5px solid var(--subtheme);
+    border-width: 0 0 2.5px 0;
+    background-color: transparent;
+}
+
+div.board-search > form button[type="submit"] {
+    outline: none;
+    border: 0;
+    background-color: var(--subtheme);
+    color: var(--subtheme-font);
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* Paging style */
+div.board_paging {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+button.paging-block, button.paging-page {
+    border-radius: 12px;
+    min-width: 24px;
+    height: 24px;
+    cursor: pointer;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    outline: none;
+}
+.btns-right > button {
+	background-color: var(--subtheme);
+}
+button.paging-block *, button.paging-page * {
+    pointer-events: none;
+}
+button.paging-block {
+    width: 16px;
+    height: 16px;
+}
+button.paging-block > svg {
+    width: 50%;
+    height: 100%;
+    fill: none;
+    stroke: var(--subtheme);
+    cursor: default;
+    stroke-width: 64px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+button.paging-block:disabled > svg {
+    stroke: rgba(var(--subtheme-rgb), 0.5);
+}
+button.paging-page {
+    color: var(--theme-font);
+    font-size: 16px;
+    font-weight: bolder;
+}
+button.paging-page > span {
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}
+button.paging-page:hover:not(:disabled) {
+    background-color: rgba(var(--theme-font-rgb), 0.25);
+}
+button.paging-block:disabled {
+    cursor: default;
+}
+button.paging-page:disabled {
+    color: var(--subtheme);
+    cursor: default;
+}
