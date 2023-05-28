@@ -9,7 +9,6 @@
 		<id 		column="mem_sender_id" 		property="mem_sender_id"/>	<!-- PK -->
 		<id 		column="mem_receiver_id" 	property="mem_receiver_id"/><!-- PK -->
 		<result 	column="mes_title" 			property="mes_title"/>
-		<result 	column="mes_title" 			property="mes_title"/>
 		<result 	column="mes_content" 		property="mes_content"/>
 		<result 	column="mes_regdate" 		property="mes_regdate"/>
 		<result 	column="mes_isread" 		property="mes_isread"/>
@@ -25,6 +24,7 @@
 		ON		MEM_SENDER_ID = MEM_ID
 		WHERE   MEM_RECEIVER_ID = #{mem_id}
 		AND		ISDELETE = 0
+		ORDER BY MES_REGDATE DESC
 	</select>
 	<!-- 보낸 쪽지함 조회 -->
 	<select id="dgMessageListSen" parameterType="int" resultMap="dgMessageMap">
@@ -34,6 +34,7 @@
 		ON		MEM_RECEIVER_ID = MEM_ID
 		WHERE   MEM_SENDER_ID = #{mem_id}
 		AND		ISDELETE = 0
+		ORDER BY MES_REGDATE DESC
 	</select>
 	<!-- 쪽지 작성 -->
 	<insert id="dgMessageWrite" parameterType="Message">
