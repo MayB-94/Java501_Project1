@@ -46,64 +46,6 @@ function messageReply(receiver_id, sender_id){
     $('#mem_username').trigger('input');
 }
 
-/*
-switch(box){
-    case 'write':
-        content = '.content-write'; break;
-    case 'receiver':
-        content = '.content-receiver'; break;
-    case 'sender':
-        content = '.content-sender'; break;
-    case 'storage':
-        content = '.content-storage'; break;
-    case 'recycle':
-        content = '.content-recycle'; break;
-}
-document.querySelector(content).style.display = (document.querySelector(content).style.display == 'none')? 'block' : 'none';
-
-function writebox(){
-    document.querySelector('.content-write').style.display = 'block';
-    document.querySelector('.content-receiver').style.display = 'none';
-    document.querySelector('.content-sender').style.display = 'none';
-    document.querySelector('.content-storage').style.display = 'none';
-    document.querySelector('.content-recycle').style.display = 'none';
-}
-// 받은 쪽지함
-function receivebox(){
-    document.querySelector('.content-write').style.display = 'none';
-    document.querySelector('.content-receiver').style.display = 'block';
-    document.querySelector('.content-sender').style.display = 'none';
-    document.querySelector('.content-storage').style.display = 'none';
-    document.querySelector('.content-recycle').style.display = 'none';
-}
-
-// 보낸 쪽지함
-function sentbox(){
-    document.querySelector('.content-write').style.display = 'none';
-    document.querySelector('.content-receiver').style.display = 'none';
-    document.querySelector('.content-sender').style.display = 'block';
-    document.querySelector('.content-storage').style.display = 'none';
-    document.querySelector('.content-recycle').style.display = 'none';
-}
-
-// 쪽지 보관함
-function storagebox(){
-    document.querySelector('.content-write').style.display = 'none';
-    document.querySelector('.content-receiver').style.display = 'none';
-    document.querySelector('.content-sender').style.display = 'none';
-    document.querySelector('.content-storage').style.display = 'block';
-    document.querySelector('.content-recycle').style.display = 'none';
-}
-
-// 휴지통
-function recyclebox(){
-    document.querySelector('.content-write').style.display = 'none';
-    document.querySelector('.content-receiver').style.display = 'none';
-    document.querySelector('.content-sender').style.display = 'none';
-    document.querySelector('.content-storage').style.display = 'none';
-    document.querySelector('.content-recycle').style.display = 'block';
-}
-*/
 
 // 쪽지 클릭 이벤트
 $(()=>{
